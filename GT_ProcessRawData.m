@@ -15,9 +15,11 @@ function [GT_AnalysisInfo] = GT_ProcessRawData(rawDataFiles, GT_AnalysisInfo)
 %   Last Revised: 
 %________________________________________________________________________________________________________________________
 
+global blockOneProg 
+
 if ~isfield(GT_AnalysisInfo, 'GT_ProcessNeuro_Complete')
-    for f = 1:size(rawDataFiles, 1)
-        rawDataFile = rawDataFiles(f, :);
+    for blockOneProg = 1:size(rawDataFiles, 1)
+        rawDataFile = rawDataFiles(blockOneProg, :);
         [animalID, hem, fileDate, fileID] = GT_GetFileInfo(rawDataFile);
         strDay = GT_ConvertDate(fileDate);
         load(rawDataFile)
@@ -74,4 +76,10 @@ if ~isfield(GT_AnalysisInfo, 'GT_ProcessNeuro_Complete')
         
     end
     
+else
+        blockOneProg = size(rawDataFiles, 1);
+
 end
+
+end
+

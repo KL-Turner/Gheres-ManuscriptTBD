@@ -14,7 +14,7 @@
 %   Last Revised:
 %________________________________________________________________________________________________________________________
 
-%% BLOCK PURPOSE: [0] Analyze vessel diameter and add it to MScanData.mat
+%% BLOCK PURPOSE: [2] Analyze vessel diameter and add it to MScanData.mat
 clear
 clc
 
@@ -80,23 +80,23 @@ while buttonState == 0
     ...
 end
 
-multiWaitbar('Processing RawData files', 0, 'Color', [0.1 0.5 0.8]);
+multiWaitbar('Processing RawData files', 0, 'Color', [0.8 0.0 0.1]);
 for blockOneProg = 1:size(rawDataFiles, 1)
     multiWaitbar('Processing RawData files', blockOneProg/size(rawDataFiles, 1));
 end
 
-multiWaitbar('Categorizing Behavioral Data', 0, 'Color', [0.1 0.5 0.8]);
+multiWaitbar('Categorizing Behavioral Data', 0, 'Color', [1.0 0.4 0.0]);
 
 for blockTwoProg = 1:size(rawDataFiles, 1)
     multiWaitbar('Categorizing Behavioral Data', blockTwoProg/size(rawDataFiles, 1));
 end
 
-multiWaitbar('Creating Neural Spectrograms', 0, 'Color', [0.1 0.5 0.8]);
+multiWaitbar('Creating Neural Spectrograms', 0, 'Color', [0.9 0.8 0.2]);
 for blockThreeProg = 1:size(rawDataFiles, 1)
     multiWaitbar('Creating Neural Spectrograms', blockThreeProg/size(rawDataFiles, 1));
 end
 
-multiWaitbar('Calculating Resting Baselines', 0, 'Color', [0.1 0.5 0.8]);
+multiWaitbar('Calculating Resting Baselines', 0, 'Color', [0.2 0.9 0.3]);
 for blockFourProg = 1:size(rawDataFiles, 1)
     multiWaitbar('Calculating Resting Baselines', blockFourProg/size(rawDataFiles, 1));
 end
@@ -107,29 +107,21 @@ for blockFiveProg = 1:size(rawDataFiles, 1)
 end
 
 if saveFigsToggle == 1
-    multiWaitbar('Generating Single Trial Summary Figures', 0, 'Color', [0.1 0.5 0.8]);
+    multiWaitbar('Generating Single Trial Summary Figures', 0, 'Color', [0.8 0.4 0.9]);
     for blockSixProg = 1:size(rawDataFiles, 1)
         multiWaitbar('Generating Single Trial Summary Figures', blockSixProg/size(rawDataFiles, 1));
     end
 end
 
-%% BLOCK PURPOSE: [1] Analyze vessel diameter and add it to MScanData.mat
+
+
+test
+multiWaitbar('CloseAll')
 
 % [GT_AnalysisInfo] = GT_ProcessRawData(rawDataFiles, GT_AnalysisInfo);
 % 
-%% BLOCK PURPOSE: [2] Analyze vessel diameter and add it to MScanData.mat
 % [GT_AnalysisInfo] = GT_CategorizeData(rawDataFiles, GT_AnalysisInfo);
 
-%% BLOCK PURPOSE: [0] Analyze vessel diameter and add it to MScanData.mat
 
-%% BLOCK PURPOSE: [0] Analyze vessel diameter and add it to MScanData.mat
-
-%% BLOCK PURPOSE: [0] Analyze vessel diameter and add it to MScanData.mat
-
-%% BLOCK PURPOSE: [0] Analyze vessel diameter and add it to MScanData.mat
-
-
-MessageAlert('Complete')
-multiWaitbar('CloseAll')
 
     
