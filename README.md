@@ -1,6 +1,6 @@
 ## Automated sleep scoring analysis with GUI inputs
 
-| ![](GUI.png) |
+| ![](https://github.com/KL-Turner/Gheres-Manuscript/blob/master/GUI_photo.PNG) |
 |:--:|
 | *Figure 1: Graphical User Input front interface* |
 
