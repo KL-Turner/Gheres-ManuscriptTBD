@@ -1,4 +1,4 @@
-function c = colors(colorname)
+function c = GT_colors(colorname)
 % colors('amber')
 % returns RGB tuples adapted from
 % http://en.wikipedia.org/wiki/List_of_colors

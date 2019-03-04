@@ -1,4 +1,4 @@
-function [thresh] = GT_CreateBallVelocityThreshold(vel)
+function [thresh] = GT_CreateBallVelocityThreshold(vel, an_fs)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
 % The Pennsylvania State University, Dept. of Biomedical Engineering
@@ -17,28 +17,31 @@ function [thresh] = GT_CreateBallVelocityThreshold(vel)
 %   Last Revised: February 29th, 2019
 %________________________________________________________________________________________________________________________
 
-y = hilbert(diff(vel));
-velocity = abs(y);
-figure;
 isok = 'n';
+dVel = abs((diff(vel, 1)))*an_fs^2;
 
 while strcmp(isok,'y') == 0
-    plot(velocity, 'k');
-    thresh = input('No Threshold to binarize ball velocity found. Please enter a threshold: '); disp(' ')
-    binVel = BinarizeBallVelocity(vel,thresh);
-    binInds = find(binVel);
-    subplot(211)
-    plot(vel, 'k') 
-    axis tight
-    hold on
-    scatter(binInds, max(vel)*ones(size(binInds)),'r');
-    subplot(212) 
-    plot(velocity, 'k')
-    axis tight
-    hold on
-    scatter(binInds, max(velocity)*ones(size(binInds)),'r');
+    fig = figure;
+    plot(dVel,'k');
+    title('Raw acceleration signal')
+    thresh = input('No Threshold for resting behavior found. Please enter a threshold: '); disp(' ')
+    bin_vel = GT_BinarizeBallVelocity(dVel, thresh);
+    ax1 = subplot(311); 
+    plot(vel, 'k'); 
+    axis tight; 
+    ylabel('Velocity')
+    ax2 = subplot(312);
+    plot(abs(diff(vel, 1))*an_fs^2, 'k'); 
+    axis tight; 
+    ylabel('Acceleration')
+    ax3 = subplot(313); 
+    plot(bin_vel, 'k'); 
+    axis tight;
+    ylabel('Binarization')
+    linkaxes([ax1, ax2, ax3], 'x');
     isok = input('Is this threshold okay? (y/n) ','s'); disp(' ')
-    hold off
+end
+close(fig)
+clc
 end
 
-end

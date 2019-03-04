@@ -22,7 +22,7 @@ analogFs = RawData.an_fs;
 expectedLength = trialDuration_Seconds*analogFs;
 neuralData = RawData.Neuro(1:min(expectedLength, length(RawData.Neuro)));
 
-switch NeurType
+switch neurType
     case 'MUApower'
         fpass = [300 3000];
     case 'Gam'
@@ -38,16 +38,15 @@ switch NeurType
 end
 
 %% CALCULATE NEURAL POWER
-if ismember(NeurType, [{'MUApower'}, {'Gam'}, {'Beta'}, {'Alpha'}, {'Theta'}, {'Delta'}])
-    disp(['ProcessNeuro.m: Processing ' Neural_Hem ' ' NeurType]); disp(' ')
+if ismember(neurType, [{'MUApower'}, {'Gam'}, {'Beta'}, {'Alpha'}, {'Theta'}, {'Delta'}])
     neuroFs = 30;
     [z, p, k] = butter(4, fpass / (analogFs / 2));
     [sos, g] = zp2sos(z, p, k);
     filtNeuro = filtfilt(sos, g, neuralData - mean(neuralData));
     [z1, p1, k1] = butter(4, 10 / (analogFs / 2), 'low');
     [sos1, g1] = zp2sos(z1, p1, k1);
-    Long_Neuro = filtfilt(sos1, g1, filtNeuro.^2);
-    neuro = max(resample(Long_Neuro, neuroFs, analogFs), 0);
+    longNeuro = filtfilt(sos1, g1, filtNeuro.^2);
+    neuro = max(resample(longNeuro, neuroFs, analogFs), 0);
 end
 
 end

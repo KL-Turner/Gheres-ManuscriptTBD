@@ -1,4 +1,4 @@
-function [SpectrogramData] = CreateTrialSpectrograms_2P(animalID, mergedDataFiles, SpectrogramData)
+function [RawDataSpectrogramData] = GT_CreateTrialSpectrograms(animalID, mergedDataFiles, RawDataSpectrogramData)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
 % Ph.D. Candidate, Department of Bioengineering
@@ -13,11 +13,9 @@ function [SpectrogramData] = CreateTrialSpectrograms_2P(animalID, mergedDataFile
 %   Outputs: //
 %________________________________________________________________________________________________________________________
 
-for fileNumber = 1:size(mergedDataFiles, 1)
-    mergedDataFileID = mergedDataFiles(fileNumber, :);
-    load(mergedDataFileID);
-    [~, ~, fileID, vesselID] = GetFileInfo_2P(mergedDataFileID);
-    RawNeuro = MergedData.Data.Raw_NeuralData;
+    load(rawDataFile);
+    [~, ~, fileID, vesselID] = GetFileInfo_2P(rawDataFile);
+    RawNeuro = RawData.Data.Raw_NeuralData;
     
     w0 = 60/(20000/2);  bw = w0/35;
     [num,den] = iirnotch(w0, bw);
@@ -25,30 +23,27 @@ for fileNumber = 1:size(mergedDataFiles, 1)
 
     % Spectrogram parameters
     params.tapers = [5 9];
-    params.Fs = MergedData.Notes.MScan.MScan_analogSamplingRate;
+    params.Fs = RawData.Notes.MScan.MScan_analogSamplingRate;
     params.fpass = [0.1 100];
     movingwin1 = [1 1/5];
     movingwin5 = [5 1/5];
-
-    disp(['Creating spectrogram for file number ' num2str(fileNumber) ' of ' num2str(size(mergedDataFiles, 1)) '...']); disp(' ')
     
     [Neural_S1, Neural_T1, Neural_F1] = mtspecgramc(RawNeuro2, movingwin1, params);
     [Neural_S5, Neural_T5, Neural_F5] = mtspecgramc(RawNeuro2, movingwin5, params);
     
-    SpectrogramData.FiveSec.S{fileNumber, 1} = Neural_S5';
-    SpectrogramData.FiveSec.T{fileNumber, 1} = Neural_T5;
-    SpectrogramData.FiveSec.F{fileNumber, 1} = Neural_F5;
-    SpectrogramData.VesselIDs{fileNumber, 1} = vesselID;
-    SpectrogramData.FileIDs{fileNumber, 1} = fileID;
-    SpectrogramData.Notes.params = params;
-    SpectrogramData.Notes.movingwin5 = movingwin5;
+    RawData.GT_SleepAnalysis.spectrogramData.FiveSec.S{fileNumber, 1} = Neural_S5';
+    RawData.GT_SleepAnalysis.spectrogramData.FiveSec.T{fileNumber, 1} = Neural_T5;
+    RawData.GT_SleepAnalysis.spectrogramData.FiveSec.F{fileNumber, 1} = Neural_F5;
+    RawData.GT_SleepAnalysis.spectrogramData.VesselIDs{fileNumber, 1} = vesselID;
+    RawData.GT_SleepAnalysis.spectrogramData.FileIDs{fileNumber, 1} = fileID;
+    RawData.GT_SleepAnalysis.spectrogramData.Notes.params = params;
+    RawData.GT_SleepAnalysis.spectrogramData.Notes.movingwin5 = movingwin5;
     
-    SpectrogramData.OneSec.S{fileNumber, 1} = Neural_S1';
-    SpectrogramData.OneSec.T{fileNumber, 1} = Neural_T1;
-    SpectrogramData.OneSec.F{fileNumber, 1} = Neural_F1;
-    SpectrogramData.Notes.movingwin1 = movingwin1; 
-end
+    RawData.GT_SleepAnalysis.spectrogramData.OneSec.S{fileNumber, 1} = Neural_S1';
+    RawData.GT_SleepAnalysis.spectrogramData.OneSec.T{fileNumber, 1} = Neural_T1;
+    RawData.GT_SleepAnalysis.spectrogramData.OneSec.F{fileNumber, 1} = Neural_F1;
+    RawData.GT_SleepAnalysis.spectrogramData.Notes.movingwin1 = movingwin1; 
 
-save([animalID '_SpectrogramData.mat'], 'SpectrogramData', '-v7.3');
+save(rawDataFile, 'RawData', '-v7.3');
 
 end

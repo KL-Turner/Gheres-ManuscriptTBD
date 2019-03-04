@@ -22,7 +22,7 @@ function varargout = GT_ScoringParameters(varargin)
 
 % Edit the above text to modify the response to help GT_ScoringParameters
 
-% Last Modified by GUIDE v2.5 03-Mar-2019 19:15:13
+% Last Modified by GUIDE v2.5 04-Mar-2019 17:21:03
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -262,4 +262,40 @@ function goButton_Callback(hObject, eventdata, handles)
 % hObject    handle to goButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-GT_StartAnalysis
+GT_StartAnalysis;
+
+
+% --- Executes on button press in rerunProcData.
+function rerunProcData_Callback(hObject, eventdata, handles)
+% hObject    handle to rerunProcData (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rerunProcData
+
+
+% --- Executes on button press in rerunCatData.
+function rerunCatData_Callback(hObject, eventdata, handles)
+% hObject    handle to rerunCatData (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rerunCatData
+
+
+% --- Executes on button press in rerunSpecData.
+function rerunSpecData_Callback(hObject, eventdata, handles)
+% hObject    handle to rerunSpecData (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rerunSpecData
+
+
+% --- Executes on button press in rerunBase.
+function rerunBase_Callback(hObject, eventdata, handles)
+% hObject    handle to rerunBase (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of rerunBase

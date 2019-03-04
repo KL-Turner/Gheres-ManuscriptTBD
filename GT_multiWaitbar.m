@@ -1,4 +1,4 @@
-function cancel = multiWaitbar( label, varargin )
+function cancel = GT_multiWaitbar( label, varargin )
 %multiWaitbar: add, remove or update an entry on the multi waitbar
 %
 %   multiWaitbar(LABEL,VALUE) adds a waitbar for the specified label, or
@@ -323,7 +323,7 @@ f = figure( ...
     'NumberTitle', 'off' );
 % Resize and centre on the first screen
 screenSize = get(0,'ScreenSize');
-figSz = [360 42];
+figSz = [400 400];
 figPos = ceil((screenSize(1,3:4)-figSz)/2);
 fobj = handle( f );
 fobj.Position = [figPos, figSz];

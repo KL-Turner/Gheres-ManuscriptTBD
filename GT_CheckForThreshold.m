@@ -1,4 +1,4 @@
-function [ok] = GT_CheckForThreshold(sfield, animalID)
+function [ok] = GT_CheckForThreshold(sfield, animalID, GT_AnalysisInfo)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
 % The Pennsylvania State University, Dept. of Biomedical Engineering
@@ -18,16 +18,12 @@ function [ok] = GT_CheckForThreshold(sfield, animalID)
 %________________________________________________________________________________________________________________________
 
 % Navigate to Shared Variables folder
-disp(['GT_CheckForThreshold.m: Checking for Threshold field: ' sfield '...']); disp(' ')
-% Begin Check
 ok = 0;
-if exist([animalID '_GT_AnalysisInfo.mat'],'file') == 2
-    load([animalID '_GT_AnalysisInfo.mat']);
-    if isfield(Thresholds, sfield)
+if ~isfield(GT_AnalysisInfo, 'thresholds')
+    GT_AnalysisInfo.thresholds = [];
+else
+    if isfield(GT_AnalysisInfo.thresholds, sfield)
         ok = 1;
-        disp(['GT_CheckForThreshold.m: Threshold: ' sfield ' found.']); disp(' ')
-    else
-        disp(['GT_CheckForThreshold.m: Threshold: ' sfield ' not found.']); disp(' ')
     end
 end
 

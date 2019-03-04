@@ -1,12 +1,12 @@
 function GT_MessageAlert(messageType, guiParams)
-
+x = 3;
 if x == 2
     x = 5;
 elseif strcmp(messageType, 'Complete')
     analysisInfo = dir('*_GT_AnalysisInfo.mat');
     load(analysisInfo.name);
     
-            scoringID = guiParams.scoringID;
+        scoringID = guiParams.scoringID;
         saveStructToggle = guiParams.saveStructToggle;
         saveFigsToggle = guiParams.saveFigsToggle;
         
@@ -52,4 +52,7 @@ elseif strcmp(messageType, 'Complete')
                      ' ', ...
                      ['Summary figures saved: ' figsSaved]}, 'Analysis Complete', 'help');
         waitfor(msg)
+    end
+end
+
 end
