@@ -1,8 +1,19 @@
 ## Automated sleep scoring analysis with GUI inputs
 
-| ![](GIU.png) |
+| ![](GUI.png) |
 |:--:|
-| *Figure 1: Still-shot of mouse's whiskers during acquisition* |
+| *Figure 1: Graphical User Input front interface* |
+
+| Analysis Parameter    | Accepted Values   | Default Value     | Description     |
+| :---                  | :----:              |---:             |--               |
+| Hippocampal LFP       | x > 1              | Here's this       |                 |
+| Ball Velocity         | y >= 0              | And more          |                 |
+| Heart Rate            | 5 <= z <= 5              | And more          |                 |
+
+| Syntax      | Description | Test Text     |
+| :---        |    :----:   |          ---: |
+| Header      | Title       | Here's this   |
+| Paragraph   | Text        | And more      |
 
     Acknowledgements
     multiWaitbar.m Author: Ben Tordoff
