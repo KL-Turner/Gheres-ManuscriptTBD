@@ -40,6 +40,11 @@ else
     GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines = false;
 end
 
+specDataFile = dir('*_GT_SpectrogramData.mat');
+if ~isempty(specDataFile)
+    load(specDataFile.name);
+end
+
 if ~isempty(analysisInfo)
     load(analysisInfo.name);
 else
@@ -89,18 +94,27 @@ if Error == true
 end
 
 % Progress Bars
-GT_multiWaitbar('Processing RawData Files', 0, 'Color', [0.9 0.8 0.2]);
-GT_multiWaitbar('Categorizing Behavioral Data', 0, 'Color', [0.4 0.1 0.5]);
-GT_multiWaitbar('Finding Resting Epochs (Data Types)', 0, 'Color', [0.8 0.4 0.9]);
-GT_multiWaitbar('Finding Resting Epochs (Files per Data Type)', 0, 'Color', [0.1 0.5 0.8]);
-GT_multiWaitbar('Creating Neural Spectrograms', 0, 'Color', [0.8 0.4 0.9]);
-GT_multiWaitbar('Calculating Resting Baselines', 0, 'Color', [0.4 0.1 0.5]);
-GT_multiWaitbar('Normalizing Data by Baselines', 0, 'Color', [0.8 0.4 0.9]);
-GT_multiWaitbar('Running Sleep Scoring Analysis (part 1)', 0, 'Color', [0.8 0.4 0.9]);
-GT_multiWaitbar('Running Sleep Scoring Analysis (part 2)', 0, 'Color', [0.4 0.1 0.5]);
-
+pause(0.25)
+GT_multiWaitbar('Processing RawData Files', 0, 'Color', [0.2 0.9 0.3]);
+pause(0.25)
+GT_multiWaitbar('Categorizing Behavioral Data', 0, 'Color', [0.2 0.9 0.3]);
+pause(0.25)
+GT_multiWaitbar('Finding Resting Epochs (Data Types)', 0, 'Color', [0.2 0.9 0.3]);
+pause(0.25)
+GT_multiWaitbar('Finding Resting Epochs (Files per Data Type)', 0, 'Color', [0.2 0.9 0.3]);
+pause(0.25)
+GT_multiWaitbar('Creating Neural Spectrograms', 0, 'Color', [0.2 0.9 0.3]);
+pause(0.25)
+GT_multiWaitbar('Calculating Resting Baselines', 0, 'Color', [0.2 0.9 0.3]);
+pause(0.25)
+GT_multiWaitbar('Normalizing Data by Baselines', 0, 'Color', [0.2 0.9 0.3]);
+pause(0.25)
+GT_multiWaitbar('Running Sleep Scoring Analysis (part 1)', 0, 'Color', [0.2 0.9 0.3]);
+pause(0.25)
+GT_multiWaitbar('Running Sleep Scoring Analysis (part 2)', 0, 'Color', [0.2 0.9 0.3]);
+pause(0.25)
 if guiParams.saveFigsToggle == true
-    GT_multiWaitbar('Generating Single Trial Summary Figures', 0, 'Color', [0.9 0.8 0.2]);
+    GT_multiWaitbar('Generating Single Trial Summary Figures', 0, 'Color', [0.2 0.9 0.3]);
 end
 
 %% BLOCK PURPOSE: [1] Analyze each RawData file to bandpass filter and downsample the various analog signals.
@@ -115,52 +129,54 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_ProcessRawData') || GT_Analys
 else
     for blockOneProg = 1:size(rawDataFiles, 1)
         GT_multiWaitbar('Processing RawData Files', blockOneProg/size(rawDataFiles, 1));
-        pause(0.05)
+        pause(0.1)
     end
 end
+sleepScoringDataDirectory = dir('*_SleepScoringData.mat');
+sleepScoringDataFiles = char({sleepScoringDataDirectory.name}');
 
 %% BLOCK PURPOSE: [2] Categorize the animal's behavior using ball velocity.
 if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_AnalysisInfo.analysisChecklist.GT_CategorizeData == false || guiParams.rerunCatData == true 
-    for blockTwoProg = 1:size(rawDataFiles, 1)
-        rawDataFile = rawDataFiles(blockTwoProg, :);
-        [GT_AnalysisInfo] = GT_CategorizeData(rawDataFile, GT_AnalysisInfo);
-        GT_multiWaitbar('Categorizing Behavioral Data', blockTwoProg/size(rawDataFiles, 1));
+    for blockTwoProg = 1:size(sleepScoringDataFiles, 1)
+        sleepScoringDataFile = sleepScoringDataFiles(blockTwoProg, :);
+        [GT_AnalysisInfo] = GT_CategorizeData(sleepScoringDataFile, GT_AnalysisInfo);
+        GT_multiWaitbar('Categorizing Behavioral Data', blockTwoProg/size(sleepScoringDataFiles, 1));
     end
 else
-    for blockTwoProg = 1:size(rawDataFiles, 1)
-        GT_multiWaitbar('Categorizing Behavioral Data', blockTwoProg/size(rawDataFiles, 1));
-        pause(0.05)
+    for blockTwoProg = 1:size(sleepScoringDataFiles, 1)
+        GT_multiWaitbar('Categorizing Behavioral Data', blockTwoProg/size(sleepScoringDataFiles, 1));
+        pause(0.1)
     end
 end
 
 %% BLOCK PURPOSE: [3] Find resting epochs. (This block is programmatically coupled with Block [2])
 % To properly utilize the progress bars, this function's code has been pasted into this block. 
-dataTypes = {'CBVrefl_barrels', 'deltaBandPower', 'thetaBandPower', 'gammaBandPower'};
+dataTypes = {'CBV', 'deltaBandPower', 'thetaBandPower', 'gammaBandPower'};
 if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_AnalysisInfo.analysisChecklist.GT_CategorizeData == false || guiParams.rerunCatData == true
     for blockThreeProgA = 1:length(dataTypes)
         GT_multiWaitbar('Finding Resting Epochs (Data Types)', blockThreeProgA/length(dataTypes));
-        restVals = cell(size(rawDataFiles, 1), 1);
-        eventTimes = cell(size(rawDataFiles, 1), 1);
-        durations = cell(size(rawDataFiles, 1), 1);
-        puffDistances = cell(size(rawDataFiles, 1), 1);
-        fileIDs = cell(size(rawDataFiles, 1), 1);
-        fileDates = cell(size(rawDataFiles, 1), 1);
+        restVals = cell(size(sleepScoringDataFiles, 1), 1);
+        eventTimes = cell(size(sleepScoringDataFiles, 1), 1);
+        durations = cell(size(sleepScoringDataFiles, 1), 1);
+        puffDistances = cell(size(sleepScoringDataFiles, 1), 1);
+        fileIDs = cell(size(sleepScoringDataFiles, 1), 1);
+        fileDates = cell(size(sleepScoringDataFiles, 1), 1);
         
-        for blockThreeProgB = 1:size(rawDataFiles, 1)
-            filename = rawDataFiles(blockThreeProgB, :);
+        for blockThreeProgB = 1:size(sleepScoringDataFiles, 1)
+            filename = sleepScoringDataFiles(blockThreeProgB, :);
             load(filename);
             
             % Get the date and file identifier for the data to be saved with each resting event
             [~, ~, fileDate, fileID] = GT_GetFileInfo(filename);
             
             % Expected number of samples for element of dataType
-            downSampled_Fs = RawData.GT_SleepAnalysis.downSampled_Fs;
+            downSampled_Fs = SleepScoringData.downSampled_Fs;
             expectedLength = 300*downSampled_Fs;
             
             % Get information about periods of rest from the loaded file
-            trialEventTimes = RawData.GT_SleepAnalysis.Flags.rest.eventTime';
-            trialPuffDistances = RawData.GT_SleepAnalysis.Flags.rest.puffDistance;
-            trialDurations = RawData.GT_SleepAnalysis.Flags.rest.duration';
+            trialEventTimes = SleepScoringData.Flags.rest.eventTime';
+            trialPuffDistances = SleepScoringData.Flags.rest.puffDistance;
+            trialDurations = SleepScoringData.Flags.rest.duration';
             
             % Initialize cell array for all periods of rest from the loaded file
             trialRestVals = cell(size(trialEventTimes'));
@@ -179,9 +195,9 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_Analys
                 
                 % Extract data from the trial and add to the cell array for the current loaded file
                 try
-                    trialRestVals{tET} = RawData.GT_SleepAnalysis.(dataTypes{blockThreeProgA})(:, startInd:stopInd);
+                    trialRestVals{tET} = SleepScoringData.(dataTypes{blockThreeProgA})(:, startInd:stopInd);
                 catch
-                    trialRestVals{tET} = RawData.barrels.(dataTypes{blockThreeProgA})(:, startInd:stopInd);
+                    trialRestVals{tET} = SleepScoringData.(dataTypes{blockThreeProgA})(:, startInd:stopInd);
                 end
             end
             % Add all periods of rest to a cell array for all files
@@ -207,10 +223,10 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_Analys
     GT_AnalysisInfo.analysisChecklist.GT_CategorizeData = true;
     save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
 else
-    for blockThreeProgB = 1:size(rawDataFiles, 1)
-        GT_multiWaitbar('Finding Resting Epochs (Data Types)', blockThreeProgB/size(rawDataFiles, 1));
-        GT_multiWaitbar('Finding Resting Epochs (Files per Data Type)', blockThreeProgB/size(rawDataFiles, 1));
-        pause(0.05)
+    for blockThreeProgB = 1:size(sleepScoringDataFiles, 1)
+        GT_multiWaitbar('Finding Resting Epochs (Data Types)', blockThreeProgB/size(sleepScoringDataFiles, 1));
+        GT_multiWaitbar('Finding Resting Epochs (Files per Data Type)', blockThreeProgB/size(sleepScoringDataFiles, 1));
+        pause(0.1)
     end
 end
 
@@ -255,50 +271,61 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CreateTrialSpectrograms') || 
 else
     for blockFourProg = 1:size(rawDataFiles, 1)
         GT_multiWaitbar('Creating Neural Spectrograms', blockFourProg/size(rawDataFiles, 1));
-        pause(0.05)
+        pause(0.1)
     end
 end
 
 %% BLOCK PURPOSE: [5] Determine resting baseline values using the animal's behavior flags.
-if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') || GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines == false || guiParams.rerunBaseData == true 
+if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') || GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines == false || guiParams.rerunBase == true 
     [GT_AnalysisInfo] = GT_CalculateRestingBaselines(GT_AnalysisInfo, guiParams);
     [GT_AnalysisInfo] = GT_CalculateSpectrogramBaselines(GT_AnalysisInfo, SpectrogramData);
-    for blockFiveProg = 1:size(rawDataFiles, 1)
-        GT_multiWaitbar('Calculating Resting Baselines', blockFiveProg/size(rawDataFiles, 1));
-        pause(0.05)
+    for blockFiveProg = 1:size(sleepScoringDataFiles, 1)
+        GT_multiWaitbar('Calculating Resting Baselines', blockFiveProg/size(sleepScoringDataFiles, 1));
+        pause(0.1)
     end
     save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
 else
-    for blockFiveProg = 1:size(rawDataFiles, 1)
-        GT_multiWaitbar('Calculating Resting Baselines', blockFiveProg/size(rawDataFiles, 1));
-        pause(0.05)
-    end 
+    for blockFiveProg = 1:size(sleepScoringDataFiles, 1)
+        GT_multiWaitbar('Calculating Resting Baselines', blockFiveProg/size(sleepScoringDataFiles, 1));
+        pause(0.1)
+    end
 end
 
 %% BLOCK PURPOSE: [6] Normalize data by resting baselines. (This block is programmatically coupled with Block [5])
-if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') || GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines == false || guiParams.rerunBaseData == true 
-    for blockSixProg = 1:size(rawDataFiles, 1)
-        rawDataFile = rawDataFiles(blockSixProg, :);
-        [GT_AnalysisInfo] = GT_CategorizeData(rawDataFile, GT_AnalysisInfo);
-        GT_multiWaitbar('Calculating Resting Baselines', blockSixProg/size(rawDataFiles, 1));
+if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') || GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines == false || guiParams.rerunBase == true 
+    for blockSixProg = 1:size(sleepScoringDataFiles, 1)
+        sleepScoringDataFile = sleepScoringDataFiles(blockSixProg, :);
+        [GT_AnalysisInfo] = GT_NormalizeData(sleepScoringDataFile, GT_AnalysisInfo, SpectrogramData);
+        GT_multiWaitbar('Normalizing Data by Baselines', blockSixProg/size(sleepScoringDataFiles, 1));
     end
     GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines = true;
     save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
 else
-    for blockSixProg = 1:size(rawDataFiles, 1)
-        GT_multiWaitbar('Calculating Resting Baselines', blockSixProg/size(rawDataFiles, 1));
-        pause(0.05)
+    for blockSixProg = 1:size(sleepScoringDataFiles, 1)
+        GT_multiWaitbar('Normalizing Data by Baselines', blockSixProg/size(sleepScoringDataFiles, 1));
+        pause(0.1)
     end
 end
 
 %% BLOCK PURPOSE: [7] Run sleep scoring analysis functions.
-% for blockTwoProg = 1:size(rawDataFiles, 1)
-%     rawDataFile = rawDataFiles(blockTwoProg, :);
-%     [GT_AnalysisInfo] = GT_CategorizeData(rawDataFile, GT_AnalysisInfo);
-%     GT_multiWaitbar('Categorizing Behavioral Data', blockTwoProg/size(rawDataFiles, 1));
-% end
-% GT_AnalysisInfo.analysisChecklist.GT_ProcessRawData = true;
-% save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
+for blockSevenProgA = 1:size(sleepScoringDataFiles, 1)
+    sleepScoringDataFiles = sleepScoringDataFiles(blockSevenProgA, :);
+    GT_AddSleepParameters(sleepScoringDataFile); 
+    GT_multiWaitbar('Running Sleep Scoring Analysis (part 1)', blockSevenProgA/size(sleepScoringDataFiles, 1));
+end
+    
+for blockSevenProgB = 1:size(sleepScoringDataFiles, 1)
+    sleepScoringDataFiles = sleepScoringDataFiles(blockSevenProgB, :);
+    GT_AddSleepLogicals(sleepScoringDataFile, GT_AnalysisInfo, guiParams, blockSevenProgB); 
+    GT_multiWaitbar('Running Sleep Scoring Analysis (part 2)', blockSevenProgB/size(sleepScoringDataFiles, 1));
+end
+
+[GT_AnalysisInfo] = CreateSleepData(sleepScoringDataFiles, GT_AnalysisInfo, guiParams);   % Create struct containing sleep epochs
+
+if guiParams.saveStructToggle == true
+   save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
+end
+
 
 %% BLOCK PURPOSE: [8] Create single trial summary figures if prompted.
 if guiParams.saveFigsToggle == true

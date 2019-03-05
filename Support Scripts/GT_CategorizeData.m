@@ -1,4 +1,4 @@
-function [GT_AnalysisInfo] = GT_CategorizeData(rawDataFile, GT_AnalysisInfo)
+function [GT_AnalysisInfo] = GT_CategorizeData(sleepScoringDataFile, GT_AnalysisInfo)
 %___________________________________________________________________________________________________
 % Edited by Kevin L. Turner 
 % Ph.D. Candidate, Department of Bioengineering 
@@ -53,11 +53,11 @@ function [GT_AnalysisInfo] = GT_CategorizeData(rawDataFile, GT_AnalysisInfo)
 %_______________________________________________________________
 %   RETURN:                     
 %                           None, output of the script is additions to the
-%                           RawData structure.
+%                           SleepScoringData structure.
 %_______________________________________________________________
 
-load(rawDataFile)
-downSampled_Fs = RawData.GT_SleepAnalysis.downSampled_Fs;
+load(sleepScoringDataFile)
+downSampled_Fs = SleepScoringData.downSampled_Fs;
 
 %% Process binary runing waveform to detect runing events
 % Setup parameters for link_binary_events
@@ -68,7 +68,7 @@ breakThresh = 0;   % seconds changed by atw on 2/6/18 from 0.07
 % trial time. This will link any event occurring within "link_thresh"
 % seconds to the beginning/end of the trial rather than assuming that it is
 % a new/isolated event.
-modBinVel = RawData.GT_SleepAnalysis.binBallVelocity;
+modBinVel = SleepScoringData.binBallVelocity;
 
 % Link the binarized runing for use in GetRunningData function
 binVel = GT_LinkBinaryEvents(gt(modBinVel,0), [linkThresh breakThresh]*downSampled_Fs);
@@ -92,19 +92,19 @@ end
 %% Categorize data by behavior
 
 % Retrieve details on runing events
-[RawData.GT_SleepAnalysis.Flags.run] = GetRunningData(RawData, binVel);
+[SleepScoringData.Flags.run] = GetRunningData(SleepScoringData, binVel);
 
 % Retrieve details on puffing events
-[RawData.GT_SleepAnalysis.Flags.stim] = GetStimData(RawData);
+[SleepScoringData.Flags.stim] = GetStimData(SleepScoringData);
 
 % Identify and separate resting data
-[RawData.GT_SleepAnalysis.Flags.rest] = GetRestData(RawData);
+[SleepScoringData.Flags.rest] = GetRestData(SleepScoringData);
 
-% Save RawData structure
-save(rawDataFile, 'RawData', '-v7.3');
+% Save SleepScoringData structure
+save(sleepScoringDataFile, 'SleepScoringData');
 
-function [puffTimes] = GetPuffTimes(RawData)
-%   function [Puff_Times] = GetPuffTimes(RawData)
+function [puffTimes] = GetPuffTimes(SleepScoringData)
+%   function [Puff_Times] = GetPuffTimes(SleepScoringData)
 %
 %   Author: Aaron Winder
 %   Affiliation: Engineering Science and Mechanics, Penn State University
@@ -115,24 +115,24 @@ function [puffTimes] = GetPuffTimes(RawData)
 %   
 %_______________________________________________________________
 %   PARAMETERS:             
-%                       RawData - [struct] structure obtained using the 
-%                       function ProcessRawDataFile.
+%                       SleepScoringData - [struct] structure obtained using the 
+%                       function ProcessSleepScoringDataFile.
 %_______________________________________________________________
 %   RETURN:                     
 %                       Puff_Times - [array] time in seconds of all puffs              
 %_______________________________________________________________
 
-solNames = fieldnames(RawData.GT_SleepAnalysis.Sol);
+solNames = fieldnames(SleepScoringData.Sol);
 puffList = cell(1, length(solNames));
 
 for sN = 1:length(solNames)
-    puffList{sN} = RawData.GT_SleepAnalysis.Sol.(solNames{sN});
+    puffList{sN} = SleepScoringData.Sol.(solNames{sN});
 end
 
 puffTimes = cell2mat(puffList);
 
-function [Stim] = GetStimData(RawData)
-%   function [Stim] = GetStimData(RawData)
+function [Stim] = GetStimData(SleepScoringData)
+%   function [Stim] = GetStimData(SleepScoringData)
 %
 %   Author: Aaron Winder
 %   Affiliation: Engineering Science and Mechanics, Penn State University
@@ -150,8 +150,8 @@ function [Stim] = GetStimData(RawData)
 %   
 %_______________________________________________________________
 %   PARAMETERS:             
-%                       RawData - [struct] structure obtained using the 
-%                       function ProcessRawDataFile.    
+%                       SleepScoringData - [struct] structure obtained using the 
+%                       function ProcessSleepScoringDataFile.    
 %_______________________________________________________________
 %   RETURN:                     
 %                       Stim - [struct] structure containing a nested 
@@ -161,8 +161,8 @@ function [Stim] = GetStimData(RawData)
 %_______________________________________________________________
 
 % Setup
-downSampled_Fs = RawData.GT_SleepAnalysis.downSampled_Fs;
-puffTimes = GetPuffTimes(RawData);
+downSampled_Fs = SleepScoringData.downSampled_Fs;
+puffTimes = GetPuffTimes(SleepScoringData);
 trialDuration = 300;
 
 % Set time intervals for calculation of the run scores
@@ -170,7 +170,7 @@ preTime = 1;
 postTime = 1;
 
 % Get puffer IDs
-solNames = fieldnames(RawData.GT_SleepAnalysis.Sol);
+solNames = fieldnames(SleepScoringData.Sol);
 Stim.solenoidName = cell(length(puffTimes), 1);
 Stim.eventTime = zeros(length(puffTimes), 1);
 Stim.runScore_Pre = zeros(length(puffTimes), 1);
@@ -178,7 +178,7 @@ Stim.runScore_Post = zeros(length(puffTimes), 1);
 i = 1;
 
 for sN = 1:length(solNames)
-    solPuffTimes = RawData.GT_SleepAnalysis.Sol.(solNames{sN});
+    solPuffTimes = SleepScoringData.Sol.(solNames{sN});
     for spT = 1:length(solPuffTimes) 
         if trialDuration - solPuffTimes(spT) <= postTime
             disp(['Puff at time: ' solPuffTimes(spT) ' is too close to trial end'])
@@ -190,8 +190,8 @@ for sN = 1:length(solNames)
         rPostEnd = round((solPuffTimes(spT) + postTime)*downSampled_Fs);
         
         % Calculate the percent of the pre-stim time that the animal ran
-        runScorePre = sum(RawData.GT_SleepAnalysis.binBallVelocity(rPreStart:rPuffInd))/(preTime*downSampled_Fs);
-        runScorePost = sum(RawData.GT_SleepAnalysis.binBallVelocity(rPuffInd:rPostEnd))/(postTime*downSampled_Fs);
+        runScorePre = sum(SleepScoringData.binBallVelocity(rPreStart:rPuffInd))/(preTime*downSampled_Fs);
+        runScorePost = sum(SleepScoringData.binBallVelocity(rPuffInd:rPostEnd))/(postTime*downSampled_Fs);
         
         % Add to Stim structure
         Stim.solenoidName{i} = solNames{sN};
@@ -221,8 +221,8 @@ end
 puffTimeCell = mat2cell(puffTimeElapsed', ones(max(length(puffTimes), 1), 1));
 Stim.PuffDistance = puffTimeCell;
 
-function [Run] = GetRunningData(RawData, binarizedRuns)
-%   function [Run] = GetRunningData(RawData, Bin_wwf)
+function [Run] = GetRunningData(SleepScoringData, binarizedRuns)
+%   function [Run] = GetRunningData(SleepScoringData, Bin_wwf)
 %
 %   Author: Aaron Winder
 %   Affiliation: Engineering Science and Mechanics, Penn State University
@@ -248,8 +248,8 @@ function [Run] = GetRunningData(RawData, binarizedRuns)
 %                           administered during the trial.
 %_______________________________________________________________
 %   PARAMETERS:             
-%                       RawData - [struct] structure obtained using the 
-%                       function ProcessRawDataFile.    
+%                       SleepScoringData - [struct] structure obtained using the 
+%                       function ProcessSleepScoringDataFile.    
 %_______________________________________________________________
 %   RETURN:                     
 %                       Run - [struct] structure containing a nested 
@@ -257,10 +257,10 @@ function [Run] = GetRunningData(RawData, binarizedRuns)
 %_______________________________________________________________
 
 %% Setup
-downSampled_Fs = RawData.GT_SleepAnalysis.downSampled_Fs;
+downSampled_Fs = SleepScoringData.downSampled_Fs;
 
 %% Get Puff Times
-[puffTimes] = GetPuffTimes(RawData);
+[puffTimes] = GetPuffTimes(SleepScoringData);
 
 %% Find the starts of runing
 runEdge = diff(binarizedRuns);
@@ -298,7 +298,7 @@ if not(binarizedRuns(end))
 end
 
 
-% Calculate the runing intensity -> sum(RawData.Bin_wwf)/sum(Bin_wwf)
+% Calculate the runing intensity -> sum(SleepScoringData.Bin_wwf)/sum(Bin_wwf)
 % over the duration of the run. Calculate the movement intensity over the
 % same interval.
 runInt = zeros(size(runStarts));
@@ -306,7 +306,7 @@ runInt = zeros(size(runStarts));
 for wS = 1:length(runSamples)
     % Runing intensity
     runInds = runSamples(wS):runSamples(wS) + runLength(wS);
-    runInt(wS) = sum(RawData.Data.Behavior.binarizedRuns(runInds)) / numel(runInds);
+    runInt(wS) = sum(SleepScoringData.binBallVelocity(runInds)) / numel(runInds);
 end
 
 % Calculate the time to the closest puff
@@ -337,8 +337,8 @@ Run.restTime = restDur';
 Run.runScore = runInt';
 Run.puffDistance = puffTimeCell;
 
-function [Rest] = GetRestData(RawData)
-%   function [Rest] = GetRestData(RawData)
+function [Rest] = GetRestData(SleepScoringData)
+%   function [Rest] = GetRestData(SleepScoringData)
 %
 %   Author: Aaron Winder
 %   Affiliation: Engineering Science and Mechanics, Penn State University
@@ -352,8 +352,8 @@ function [Rest] = GetRestData(RawData)
 %                           the cessation of all volitional movement.   
 %_______________________________________________________________
 %   PARAMETERS:             
-%                       RawData - [struct] structure obtained using the 
-%                       function ProcessRawDataFile.    
+%                       SleepScoringData - [struct] structure obtained using the 
+%                       function ProcessSleepScoringDataFile.    
 %_______________________________________________________________
 %   RETURN:                     
 %                       Rest - [struct] structure containing a nested 
@@ -361,10 +361,10 @@ function [Rest] = GetRestData(RawData)
 %_______________________________________________________________
 
 % Setup
-downSampled_Fs = RawData.GT_SleepAnalysis.downSampled_Fs;
+downSampled_Fs = SleepScoringData.downSampled_Fs;
 
 %% Get stimulation times
-[puffTimes] = GetPuffTimes(RawData);
+[puffTimes] = GetPuffTimes(SleepScoringData);
 
 %% Recalculate linked binarized wwf without omitting any possible runs,
 % this avoids inclusion of brief runer movements in periods of rest.
@@ -373,7 +373,7 @@ downSampled_Fs = RawData.GT_SleepAnalysis.downSampled_Fs;
 % trial time. This will link any event occurring within "link_thresh"
 % seconds to the beginning/end of the trial rather than assuming that it is
 % a new/isolated event.
-modBinarizedRuns = RawData.GT_SleepAnalysis.binBallVelocity;
+modBinarizedRuns = SleepScoringData.binBallVelocity;
 modBinarizedRuns([1, end]) = 1;
 
 linkThresh = 0.5; % seconds

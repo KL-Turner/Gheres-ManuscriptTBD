@@ -1,4 +1,4 @@
-function [thresh] = GT_CreateBallVelocityThreshold(vel, an_fs)
+function [thresh] = GT_CreateBallVelocityThreshold(vel, fs)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
 % The Pennsylvania State University, Dept. of Biomedical Engineering
@@ -18,26 +18,36 @@ function [thresh] = GT_CreateBallVelocityThreshold(vel, an_fs)
 %________________________________________________________________________________________________________________________
 
 isok = 'n';
-dVel = abs((diff(vel, 1)))*an_fs^2;
+accel = diff(vel, 1);
 
-while strcmp(isok,'y') == 0
+while strcmp(isok,'y') == 0   
     fig = figure;
-    plot(dVel,'k');
-    title('Raw acceleration signal')
-    thresh = input('No Threshold for resting behavior found. Please enter a threshold: '); disp(' ')
-    bin_vel = GT_BinarizeBallVelocity(dVel, thresh);
-    ax1 = subplot(311); 
-    plot(vel, 'k'); 
-    axis tight; 
-    ylabel('Velocity')
-    ax2 = subplot(312);
-    plot(abs(diff(vel, 1))*an_fs^2, 'k'); 
-    axis tight; 
+    plot((1:length(accel))/fs, accel, 'k');
+    xlabel('Time (sec)')
     ylabel('Acceleration')
-    ax3 = subplot(313); 
-    plot(bin_vel, 'k'); 
-    axis tight;
+    axis tight
+    
+    thresh = input('No Threshold for resting behavior found. Please enter a threshold: '); disp(' ')
+    binVel = abs(accel) > thresh;
+    
+    ax1 = subplot(3,1,1); 
+    plot((1:length(vel))/fs, vel, 'k'); 
+    xlabel('Time (sec)')
+    ylabel('Velocity')
+    axis tight; 
+    
+    ax2 = subplot(3,1,2);
+    plot((1:length(accel))/fs, accel, 'k');
+    xlabel('Time (sec)')
+    ylabel('Acceleration')
+    axis tight
+    
+    ax3 = subplot(3,1,3); 
+    plot((1:length(binVel))/fs, binVel, 'k'); 
+    xlabel('Time (sec)')
     ylabel('Binarization')
+    axis tight;
+    
     linkaxes([ax1, ax2, ax3], 'x');
     isok = input('Is this threshold okay? (y/n) ','s'); disp(' ')
 end

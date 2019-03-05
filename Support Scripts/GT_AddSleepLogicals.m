@@ -1,4 +1,4 @@
-function [ProcData] = AddSleepLogicals(animal, hem, fileID, ProcData, electrodeInput)
+function [GT_AnalysisInfo] = GT_AddSleepLogicals(sleepScoringDataFile, GT_AnalysisInfo, guiParams, iteration)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
 % Ph.D. Candidate, Department of Bioengineering
@@ -18,84 +18,69 @@ function [ProcData] = AddSleepLogicals(animal, hem, fileID, ProcData, electrodeI
 %   Outputs: Save logicals to the ProcData file.
 %________________________________________________________________________________________________________________________
 
+load(sleepScoringDataFile)
+[~,~,~, fileID] = GT_GetFileInfo(sleepScoringDataFile);
+
 %% BLOCK PURPOSE:  Create logicals to compare sleep parameters
 % Create logical for the left and right electrode
-if strcmp(electrodeInput,'L')   % If the left electrode is selected...
-    for bins = 1:length(ProcData.Sleep.Parameters.DeltaBand_Power.LH)    % Loop through the total number of bins
-        if max(ProcData.Sleep.Parameters.DeltaBand_Power.LH{bins}) >= 5  % If the max Power in the 5 second interval
-            electrodeLogical(bins, 1) = 1; %#ok<*SAGROW>            % is >= 5, put a 1
-        else
-            electrodeLogical(bins, 1) = 0;                          % else, put a 0
-        end
+for bins = 1:length(SleepScoringData.SleepParameters.deltaBandPower)    % Loop through the total number of bins
+    if max(SleepScoringData.SleepParameters.deltaBandPower{bins}) >= guiParams.neurCrit   % If the max Power in the 5 second interval
+        deltaElectrodeLogical(bins, 1) = 1; %#ok<*SAGROW>          % is >= 5, put a 1
+    else
+        deltaElectrodeLogical(bins, 1) = 0;                        % else, put a 0
     end
 end
 
-if electrodeInput == 'R'    % If the right electrode is selected...
-    for bins = 1:length(ProcData.Sleep.Parameters.DeltaBand_Power.RH)   % Loop through the total number of bins
-        if max(ProcData.Sleep.Parameters.DeltaBand_Power.RH{bins}) >= 5   % If the max Power in the 5 second interval
-            electrodeLogical(bins, 1) = 1; %#ok<*SAGROW>            % is >= 5, put a 1
-        else
-            electrodeLogical(bins, 1) = 0;                          % else, put a 0
-        end
+for bins = 1:length(SleepScoringData.SleepParameters.teltaBandPower)   % Loop through the total number of bins
+    if max(SleepScoringData.SleepParameters.thetaBandPower{bins}) >= guiParams.neurCrit   % If the max Power in the 5 second interval
+        thetaElectrodeLogical(bins, 1) = 1; %#ok<*SAGROW>          % is >= 5, put a 1
+    else
+        thetaElectrodeLogical(bins, 1) = 0;                        % else, put a 0
     end
 end
 
-if electrodeInput == 'B'    % If both electrodes are selected...
-    for bins = 1:length(ProcData.Sleep.Parameters.DeltaBand_Power.LH)    % Loop through the total number of bins
-        if max(ProcData.Sleep.Parameters.DeltaBand_Power.LH{bins}) >= 5   % If the max Power in the 5 second interval
-            LH_electrodeLogical(bins, 1) = 1; %#ok<*SAGROW>          % is >= 5, put a 1
-        else
-            LH_electrodeLogical(bins, 1) = 0;                        % else, put a 0
-        end
-    end
-    
-    for bins = 1:length(ProcData.Sleep.Parameters.DeltaBand_Power.RH)   % Loop through the total number of bins
-        if max(ProcData.Sleep.Parameters.DeltaBand_Power.RH{bins}) >= 5   % If the max Power in the 5 second interval
-            RH_electrodeLogical(bins, 1) = 1; %#ok<*SAGROW>          % is >= 5, put a 1
-        else
-            RH_electrodeLogical(bins, 1) = 0;                        % else, put a 0
-        end
-    end
-    
-    electrodeLogical = arrayfun(@(LH_electrodeLogical, RH_electrodeLogical) any(LH_electrodeLogical + RH_electrodeLogical), LH_electrodeLogical, RH_electrodeLogical);
-end
+electrodeLogical = arrayfun(@(deltaElectrodeLogical, thetaElectrodeLogical) any(deltaElectrodeLogical + thetaElectrodeLogical), deltaElectrodeLogical, thetaElectrodeLogical);
 
-ProcData.Sleep.Logicals.DeltaBand_Power = electrodeLogical;   % Place the data in the ProcData struct to later be saved
+GT_AnalysisInfo.(guiParams.scoringID).FileIDs{iteration, 1} = fileID;
+GT_AnalysisInfo.(guiParams.scoringID).Logicals.electrodeLogical{iteration, 1} = electrodeLogical;   % Place the data in the ProcData struct to later be saved
 
 %% BLOCK PURPOSE: Create logical for the whisker angle acceleration
-for bins = 1:length(ProcData.Sleep.Parameters.WhiskerAcceleration)  % Loop through the total number of bins
-    if max(ProcData.Sleep.Parameters.WhiskerAcceleration{bins}) <= 5  % If the max whisker acceleration in the 5 second interval
-        whiskerLogical(bins, 1) = 1; %#ok<*SAGROW>              % is <= 5 degrees/sec sq, put a 1
+for bins = 1:length(SleepScoringData.SleepParameters.ballVelocity)  % Loop through the total number of bins
+    if sum(SleepScoringData.SleepParameters.ballVelocity{bins}) <= guiParams.ballCrit  % If the max whisker acceleration in the 5 second interval
+        ballLogical(bins, 1) = 1; %#ok<*SAGROW>              % is <= 5 degrees/sec sq, put a 1
     else
-        whiskerLogical(bins, 1) = 0;                            % else, put a 0
+        ballLogical(bins, 1) = 0;                            % else, put a 0
     end
 end
 
-if length(whiskerLogical) ~= 60
-    whiskerLogical_length = length(whiskerLogical);
-    logical_diff = 60 - whiskerLogical_length;
-    for x = 1:logical_diff
-        whiskerLogical(whiskerLogical_length + x, 1) = 0;
-    end
-end
-
-ProcData.Sleep.Logicals.WhiskerAccelerationLogical = whiskerLogical;       % Place the data in the ProcData struct to later be saved
+GT_AnalysisInfo.(guiParams.scoringID).Logicals.ballLogical{iteration, 1} = ballLogical;   % Place the data in the ProcData struct to later be saved
 
 %% BLOCK PURPOSE: Create logical for the heart rate
-for bins = 1:length(ProcData.Sleep.Parameters.HeartRate)         % Loop through the total number of bins
-    if max(ProcData.Sleep.Parameters.HeartRate{bins}) <= 9       % If the max whisker acceleration in the 5 second interval
+for bins = 1:length(SleepScoringData.SleepParameters.HeartRate)         % Loop through the total number of bins
+    if max(SleepScoringData.SleepParameters.HeartRate{bins}) <= guiParams.hrCrit       % If the max whisker acceleration in the 5 second interval
         heartRateLogical(bins, 1) = 1; %#ok<*SAGROW>             % is <= 5 degrees/sec sq, put a 1
     else
         heartRateLogical(bins, 1) = 0;                           % else, put a 0
     end
 end
 
-ProcData.Sleep.Logicals.HeartRateLogical = heartRateLogical;     % Place the data in the ProcData struct to later be saved
+GT_AnalysisInfo.(guiParams.scoringID).Logicals.heartRateLogical{iteration, 1} = heartRateLogical;   % Place the data in the ProcData struct to later be saved
 
 %% BLOCK PURPOSE: Create combined logical for potentially sleeping epochs
-sleepLogical = electrodeLogical.*whiskerLogical.*heartRateLogical;
-ProcData.Sleep.Logicals.SleepLogical = sleepLogical;
+% Toggles{1,1} = guiParams.neurToggle;
+% Toggles{2,1} = guiParams.ballToggle;
+% Toggles{3,1} = guiParams.hrToggle;
+% logicals = vertcat(electrodeLogical, ballLogical, heartRateLogical);
+% 
+% a = 1;
+% for t = 1:length(Toggles)
+%     if Toggles{t, 1} == true
+%         sLogical(a, :) = logicals(t, :);
+%         a = a + 1;
+%     end
+% end
 
-save([animal '_' hem '_' fileID '_', 'ProcData']);
+sleepLogical = electrodeLogical.*ballLogical.*heartRateLogical;
+GT_AnalysisInfo.(guiParams.scoringID).Logicals.sleepLogical = sleepLogical;
 
 end 

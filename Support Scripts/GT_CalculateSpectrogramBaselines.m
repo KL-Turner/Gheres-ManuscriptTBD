@@ -99,8 +99,8 @@ for day = 1:length(dayFields)
         dayVals1 = [dayVals1, S_avgs.OneSec.(dayFields{day}){x, 1}];
         dayVals5 = [dayVals5, S_avgs.FiveSec.(dayFields{day}){x, 1}];
     end
-    GT_AnalysisInfo.Baselines.Spectrograms.OneSec.(dayFields{day}) = mean(dayVals1, 2);
-    GT_AnalysisInfo.Baselines.Spectrograms.FiveSec.(dayFields{day}) = mean(dayVals5, 2);
+    GT_AnalysisInfo.baselines.Spectrograms.OneSec.(dayFields{day}) = mean(dayVals1, 2);
+    GT_AnalysisInfo.baselines.Spectrograms.FiveSec.(dayFields{day}) = mean(dayVals5, 2);
 end
 
 end

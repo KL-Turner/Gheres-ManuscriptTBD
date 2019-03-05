@@ -107,7 +107,7 @@ for dT = 1:length(dataTypes)
     
     % Save the means into the Baseline struct under the current loop iteration with the associated dates
     for x = 1:length(uniqueDays)
-        GT_AnalysisInfo.(dataType).(date{x, 1}) = mean(tempData_means{x, 1});    % LH date-specific means
+        GT_AnalysisInfo.baselines.(dataType).(date{x, 1}) = mean(tempData_means{x, 1});    % LH date-specific means
     end
 end
 

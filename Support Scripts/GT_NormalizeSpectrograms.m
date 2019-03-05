@@ -1,4 +1,4 @@
-function [SpectrogramData] = GT_NormalizeSpectrograms(animal, RestingBaselines, SpectrogramData)
+function [GT_AnalysisInfo] = GT_NormalizeSpectrograms(sleepDataFile, GT_AnalysisInfo, SpectrogramData)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
 % Ph.D. Candidate, Department of Bioengineering
@@ -13,7 +13,21 @@ function [SpectrogramData] = GT_NormalizeSpectrograms(animal, RestingBaselines, 
 %   Outputs: //
 %________________________________________________________________________________________________________________________
 
+load(sleepDataFile)
 uniqueFileIDs = SpectrogramData.FileIDs;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 for ii = 1:length(uniqueFileIDs)
     fileID = uniqueFileIDs{ii, :};
