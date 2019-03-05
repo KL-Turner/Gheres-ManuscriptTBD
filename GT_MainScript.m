@@ -309,35 +309,34 @@ end
 
 %% BLOCK PURPOSE: [7] Run sleep scoring analysis functions.
 for blockSevenProgA = 1:size(sleepScoringDataFiles, 1)
-    sleepScoringDataFiles = sleepScoringDataFiles(blockSevenProgA, :);
+    sleepScoringDataFile = sleepScoringDataFiles(blockSevenProgA, :);
     GT_AddSleepParameters(sleepScoringDataFile); 
     GT_multiWaitbar('Running Sleep Scoring Analysis (part 1)', blockSevenProgA/size(sleepScoringDataFiles, 1));
 end
     
 for blockSevenProgB = 1:size(sleepScoringDataFiles, 1)
-    sleepScoringDataFiles = sleepScoringDataFiles(blockSevenProgB, :);
-    GT_AddSleepLogicals(sleepScoringDataFile, GT_AnalysisInfo, guiParams, blockSevenProgB); 
+    sleepScoringDataFile = sleepScoringDataFiles(blockSevenProgB, :);
+    [GT_AnalysisInfo] = GT_AddSleepLogicals(sleepScoringDataFile, GT_AnalysisInfo, guiParams, blockSevenProgB); 
     GT_multiWaitbar('Running Sleep Scoring Analysis (part 2)', blockSevenProgB/size(sleepScoringDataFiles, 1));
 end
 
-[GT_AnalysisInfo] = CreateSleepData(sleepScoringDataFiles, GT_AnalysisInfo, guiParams);   % Create struct containing sleep epochs
+[GT_AnalysisInfo] = GT_FindSleepData(sleepScoringDataFiles, GT_AnalysisInfo, guiParams);   % Create struct containing sleep epochs
 
 if guiParams.saveStructToggle == true
    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
 end
 
-
 %% BLOCK PURPOSE: [8] Create single trial summary figures if prompted.
-if guiParams.saveFigsToggle == true
-    for blockSixProg = 1:size(rawDataFiles, 1)
-        rawDataFile = rawDataFiles(blockSixProg, :);
-        GT_CreateSingleTrialFigs(rawDataFile, GT_AnalysisInfo);
-        GT_multiWaitbar('Generating Single Trial Summary Figures', blockSixProg/size(rawDataFiles, 1));
-    end
-end
+% if guiParams.saveFigsToggle == true
+%     for blockSixProg = 1:size(rawDataFiles, 1)
+%         rawDataFile = rawDataFiles(blockSixProg, :);
+%         GT_CreateSingleTrialFigs(rawDataFile, GT_AnalysisInfo);
+%         GT_multiWaitbar('Generating Single Trial Summary Figures', blockSixProg/size(rawDataFiles, 1));
+%     end
+% end
 
 %% Results
-GT_MessageAlert('Complete');
+GT_MessageAlert('Complete', guiParams);
 GT_multiWaitbar('CloseAll');
 
 end

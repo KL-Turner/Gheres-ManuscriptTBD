@@ -24,7 +24,7 @@ function GT_AddSleepParameters(sleepScoringDataFile)
 load(sleepScoringDataFile)
 
 Delta = SleepScoringData.normDeltaBandPower;   % Right electrode Delta power signal
-Theta = SleepScoringData.normTheteaBandPower;   % Right electrode Theta power signal
+Theta = SleepScoringData.normThetaBandPower;   % Right electrode Theta power signal
 Gamma = SleepScoringData.normGammaBandPower;   % Right electrode Gamma power signal
 
 % Smooth the signal with a 1 Hz low pass 4th-order butterworth filter
@@ -45,11 +45,11 @@ for neuralBins = 1:60   % loop through all 9000 samples across 5 minutes in 5 se
         tempThetaStruct(neuralBins, 1) = {ThetaNeuro(neuralBins:150)};
         tempGammaStruct(neuralBins, 1) = {GammaNeuro(neuralBins:150)};
     elseif neuralBins == 60
-        tempDeltaStruct(neuralBins, 1) = {NormDelta((((150*(neuralBins - 1)) + 1)):end)};   % Samples 151 to 300, etc...
+        tempDeltaStruct(neuralBins, 1) = {DeltaNeuro((((150*(neuralBins - 1)) + 1)):end)};   % Samples 151 to 300, etc...
         tempThetaStruct(neuralBins, 1) = {ThetaNeuro((((150*(neuralBins - 1)) + 1)):end)};
         tempGammaStruct(neuralBins, 1) = {GammaNeuro((((150*(neuralBins - 1)) + 1)):end)};
     else
-        tempDeltaStruct(neuralBins, 1) = {NormDelta((((150*(neuralBins - 1)) + 1)):(150*neuralBins))};  % Samples 151 to 300, etc... 
+        tempDeltaStruct(neuralBins, 1) = {DeltaNeuro((((150*(neuralBins - 1)) + 1)):(150*neuralBins))};  % Samples 151 to 300, etc... 
         tempThetaStruct(neuralBins, 1) = {ThetaNeuro((((150*(neuralBins - 1)) + 1)):(150*neuralBins))};
         tempGammaStruct(neuralBins, 1) = {GammaNeuro((((150*(neuralBins - 1)) + 1)):(150*neuralBins))};    
     end
@@ -64,25 +64,25 @@ SleepScoringData.SleepParameters.gammaBandPower = tempGammaStruct;
 ballVelocity = SleepScoringData.binBallVelocity;     % Unfiltered whisker angle
 
 % Find the number of whiskerBins due to frame drops.
-ballBinNumber = ceil(length(whiskerAcceleration) / 150);
+ballBinNumber = ceil(length(ballVelocity) / 150);
 
 % Divide the signal into five second bins and put them in a cell array
 tempBallStruct = cell(ballBinNumber, 1);   % Pre-allocate cell array
 
 for ballBins = 1:ballBinNumber  % loop through all 9000 samples across 5 minutes in 5 second bins (60 total)
     if ballBins == 1
-        tempBallStruct(whiskerBins, 1) = (ballVelocity(ballBins:150));  % Samples 1 to 150
+        tempBallStruct(ballBins, 1) = {(ballVelocity(ballBins:150))};  % Samples 1 to 150
     elseif ballBins == ballBinNumber
-        tempBallStruct(whiskerBins, 1) = (ballVelocity((((150*(ballBins - 1)) + 1)):end));  % Samples 8701 to end. which changes due to dropped frames
+        tempBallStruct(ballBins, 1) = {(ballVelocity((((150*(ballBins - 1)) + 1)):end))};  % Samples 8701 to end. which changes due to dropped frames
     else
-        tempBallStruct(whiskerBins, 1) = (ballVelocity((((150*(ballBins - 1)) + 1)):(150*ballBins)));  % Samples 151 to 300, etc...
+        tempBallStruct(ballBins, 1) = {(ballVelocity((((150*(ballBins - 1)) + 1)):(150*ballBins)))};  % Samples 151 to 300, etc...
     end
 end
 SleepScoringData.SleepParameters.ballVelocity = tempBallStruct;   % Place the data in the ProcData struct to later be saved
 
 %% BLOCK PURPOSE: Create folder for the Heart Rate
 % Find the heart rate from the current ProcData file
-HeartRate = SleepScoringData.HR;
+HeartRate = SleepScoringData.HeartRate;
 
 % Divide the signal into five second bins and put them in a cell array
 tempHRStruct = cell(60, 1);   % Pre-allocate cell array

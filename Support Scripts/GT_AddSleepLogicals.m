@@ -31,7 +31,7 @@ for bins = 1:length(SleepScoringData.SleepParameters.deltaBandPower)    % Loop t
     end
 end
 
-for bins = 1:length(SleepScoringData.SleepParameters.teltaBandPower)   % Loop through the total number of bins
+for bins = 1:length(SleepScoringData.SleepParameters.thetaBandPower)   % Loop through the total number of bins
     if max(SleepScoringData.SleepParameters.thetaBandPower{bins}) >= guiParams.neurCrit   % If the max Power in the 5 second interval
         thetaElectrodeLogical(bins, 1) = 1; %#ok<*SAGROW>          % is >= 5, put a 1
     else
@@ -81,6 +81,6 @@ GT_AnalysisInfo.(guiParams.scoringID).Logicals.heartRateLogical{iteration, 1} = 
 % end
 
 sleepLogical = electrodeLogical.*ballLogical.*heartRateLogical;
-GT_AnalysisInfo.(guiParams.scoringID).Logicals.sleepLogical = sleepLogical;
+GT_AnalysisInfo.(guiParams.scoringID).Logicals.sleepLogical{iteration,1} = sleepLogical;
 
 end 

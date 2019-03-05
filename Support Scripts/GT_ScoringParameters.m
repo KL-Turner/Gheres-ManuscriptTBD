@@ -57,7 +57,10 @@ handles.output = hObject;
 
 set(handles.neurToggle, 'Value', 1);
 set(handles.ballToggle, 'Value', 1);
+set(handles.hrToggle, 'Value', 1);
 set(handles.saveStructToggle, 'Value', 1);
+set(handles.saveFigsToggle, 'Value', 1);
+
 
 % Update handles structure
 guidata(hObject, handles);
