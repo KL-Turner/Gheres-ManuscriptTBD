@@ -599,7 +599,7 @@ if ~updated && (decval == lastdecval)
 end
 
 % Now work out the remaining time
-minTime = 3; % secs
+minTime = 0.5; % secs
 if val <= 0
     % Zero value, so clear the eta
     entry.Created = tic();

@@ -1,4 +1,4 @@
-function CreateSingleTrialFigs(procDataFile, RestingBaselines, SpectrogramData)
+function GT_CreateSingleTrialFigs(procDataFile, RestingBaselines, SpectrogramData)
 %___________________________________________________________________________________________________
 % Written by Kevin L. Turner 
 % Ph.D. Candidate, Department of Bioengineering 

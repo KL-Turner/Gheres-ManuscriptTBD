@@ -1,9 +1,9 @@
 # Automated sleep scoring analysis with GUI inputs
 
  * Clone (git clone https://github.com/KL-Turner/Gheres-Manuscript.git) or manually download the entire contents of the Gheres-Manuscript repository.
- * Add contents to your Matlab filepath by putting it in the MATLAB folder or by putting it in the documents folder and running:
+ * Add contents to your Matlab filepath by putting it in the MATLAB folder or by putting it in the documents folder and running in the Matlab command window:
     * Windows: addpath(genpath('C:\Users\YourProfileName\Documents\Gheres-Manuscript'))
-    * macOS (Unix): addpath(genpath('/Users/YourProfileName/Documents/Gheres-Manuscript'))           ... In the Matlab command window.
+    * macOS (Unix): addpath(genpath('/Users/YourProfileName/Documents/Gheres-Manuscript')) - Note; the GUI is not yet fully optimized for cross-platform functionality. It is fully functional, does not display as cleanly in macOS.
  * Change Matlab working directory to data location.
  * Run GT_MainScript.m, which can be ran independently or called as a function with no inputs. 
 
@@ -57,4 +57,4 @@ Hit the green 'GO.' button to begin the analysis. A set loading bars will be dis
 * Chronux subfunctions http://chronux.org/
 * Several functions utilize varying bits of code written by Dr. Patrick J. Drew and Dr. Aaron T. Winder https://github.com/DrewLab
 
-###### report bugs/issues to klt8@psu.edu
+###### send bugs and/or caffeinated-liquids to klt8@psu.edu

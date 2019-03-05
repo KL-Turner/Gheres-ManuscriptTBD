@@ -1,4 +1,4 @@
-function [SpectrogramData] = NormalizeSpectrograms_2P(animal, RestingBaselines, SpectrogramData)
+function [SpectrogramData] = GT_NormalizeSpectrograms(animal, RestingBaselines, SpectrogramData)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
 % Ph.D. Candidate, Department of Bioengineering
@@ -18,7 +18,6 @@ uniqueFileIDs = SpectrogramData.FileIDs;
 for ii = 1:length(uniqueFileIDs)
     fileID = uniqueFileIDs{ii, :};
     date = ConvertDate(fileID);
-    disp(['Normalizing spectrogram ' num2str(ii) ' of ' num2str(length(uniqueFileIDs)) '...']); disp(' ')
     baseLine1 = RestingBaselines.Spectrograms.OneSec.(date);
     baseLine5 = RestingBaselines.Spectrograms.FiveSec.(date);
 

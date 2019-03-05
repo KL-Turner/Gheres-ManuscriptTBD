@@ -40,15 +40,6 @@ else
     GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines = false;
 end
 
-if ~isempty(analysisInfo)
-    load(analysisInfo.name);
-else
-    GT_AnalysisInfo.analysisChecklist.GT_ProcessRawData = false;
-    GT_AnalysisInfo.analysisChecklist.GT_CategorizeData = false;
-    GT_AnalysisInfo.analysisChecklist.GT_CreateTrialSpectrograms = false;
-    GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines = false;
-end
-
 GT_multiWaitbar('CloseAll');
 clear global buttonState
 global buttonState
@@ -136,7 +127,7 @@ end
 %% BLOCK PURPOSE: [3] Find resting epochs. (This block is programmatically coupled with Block [2])
 % To properly utilize the progress bars, this function's code has been pasted into this block. 
 dataTypes = {'CBVrefl_barrels', 'deltaBandPower', 'thetaBandPower', 'gammaBandPower'};
-if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_AnalysisInfo.analysisChecklist.GT_CategorizeData == false || guiParams.rerunCatData == true
+if isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_AnalysisInfo.analysisChecklist.GT_CategorizeData == false || guiParams.rerunCatData == true
     for blockThreeProgA = 1:length(dataTypes)
         GT_multiWaitbar('Finding Resting Epochs (Data Types)', blockThreeProgA/length(dataTypes));
         restVals = cell(size(rawDataFiles, 1), 1);
@@ -154,13 +145,13 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_Analys
             [~, ~, fileDate, fileID] = GT_GetFileInfo(filename);
             
             % Expected number of samples for element of dataType
-            downSampled_Fs = RawData.GT_SleepAnalysis.downSampled_Fs;
+            downSampled_Fs = SpectrogramData.GT_SleepAnalysis.downSampled_Fs;
             expectedLength = 300*downSampled_Fs;
             
             % Get information about periods of rest from the loaded file
-            trialEventTimes = RawData.GT_SleepAnalysis.Flags.rest.eventTime';
-            trialPuffDistances = RawData.GT_SleepAnalysis.Flags.rest.puffDistance;
-            trialDurations = RawData.GT_SleepAnalysis.Flags.rest.duration';
+            trialEventTimes = SpectrogramData.GT_SleepAnalysis.Flags.rest.eventTime';
+            trialPuffDistances = SpectrogramData.GT_SleepAnalysis.Flags.rest.puffDistance;
+            trialDurations = SpectrogramData.GT_SleepAnalysis.Flags.rest.duration';
             
             % Initialize cell array for all periods of rest from the loaded file
             trialRestVals = cell(size(trialEventTimes'));
@@ -179,9 +170,9 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_Analys
                 
                 % Extract data from the trial and add to the cell array for the current loaded file
                 try
-                    trialRestVals{tET} = RawData.GT_SleepAnalysis.(dataTypes{blockThreeProgA})(:, startInd:stopInd);
+                    trialRestVals{tET} = SpectrogramData.GT_SleepAnalysis.(dataTypes{blockThreeProgA})(:, startInd:stopInd);
                 catch
-                    trialRestVals{tET} = RawData.barrels.(dataTypes{blockThreeProgA})(:, startInd:stopInd);
+                    trialRestVals{tET} = SpectrogramData.barrels.(dataTypes{blockThreeProgA})(:, startInd:stopInd);
                 end
             end
             % Add all periods of rest to a cell array for all files
@@ -215,43 +206,41 @@ else
 end
 
 %% BLOCK PURPOSE: [4] Calculate the neural spectrogram for each file.
-% To properly utilize the progress bars, this function's code has been pasted into this block. 
 if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CreateTrialSpectrograms') || GT_AnalysisInfo.analysisChecklist.GT_CreateTrialSpectrograms == false || guiParams.rerunSpecData == true 
     for blockFourProg = 1:size(rawDataFiles, 1)
-        rawDataFile = rawDataFiles(blockFourProg, :);
-        [~, ~, ~, fileID] = GT_GetFileInfo(rawDataFile);
+        GT_multiWaitbar('Creating Neural Spectrograms', blockFourProg/size(rawDataFiles, 1));
         load(rawDataFile);
-        RawNeuro = RawData.Neuro;
+        RawNeuro = SpectrogramData.Neuro;
         
-        % Remove 60 Hz noise
-        w0 = 60/(RawData.an_fs/2);  bw = w0/35;
+        w0 = 60/(SpectrogramData.an_fs/2);  bw = w0/35;
         [num,den] = iirnotch(w0, bw);
         filtRawNeuro = filtfilt(num, den, RawNeuro);
         
         % Spectrogram parameters
         params.tapers = [5 9];
-        params.Fs = RawData.an_fs;
+        params.Fs = SpectrogramData.an_fs;
         params.fpass = [0.1 100];
         movingwin1 = [1 1/5];
-        movingwin5 = [5 1/5]; 
+        movingwin5 = [5 1/5];
+        
         [Neural_S1, Neural_T1, Neural_F1] = mtspecgramc(filtRawNeuro, movingwin1, params);
         [Neural_S5, Neural_T5, Neural_F5] = mtspecgramc(filtRawNeuro, movingwin5, params);
- 
+        
         SpectrogramData.FiveSec.S{blockFourProg, 1} = Neural_S5';
         SpectrogramData.FiveSec.T{blockFourProg, 1}  = Neural_T5;
         SpectrogramData.FiveSec.F{blockFourProg, 1}  = Neural_F5;
-        SpectrogramData.OneSec.S{blockFourProg, 1} = Neural_S1';
-        SpectrogramData.OneSec.T{blockFourProg, 1} = Neural_T1;
-        SpectrogramData.OneSec.F{blockFourProg, 1} = Neural_F1;
         SpectrogramData.FileIDs{blockFourProg, 1} = fileID;
         SpectrogramData.Notes.params = params;
         SpectrogramData.Notes.movingwin5 = movingwin5;
+        
+        SpectrogramData.OneSec.S{blockFourProg, 1} = Neural_S1';
+        SpectrogramData.OneSec.T{blockFourProg, 1} = Neural_T1;
+        SpectrogramData.OneSec.F{blockFourProg, 1} = Neural_F1;
         SpectrogramData.Notes.movingwin1 = movingwin1;
-        GT_multiWaitbar('Creating Neural Spectrograms', blockFourProg/size(rawDataFiles, 1));
+        
     end   
     save([animalID '_GT_SpectrogramData'], 'SpectrogramData', '-v7.3');
     GT_AnalysisInfo.analysisChecklist.GT_CreateTrialSpectrograms = true;
-    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
 else
     for blockFourProg = 1:size(rawDataFiles, 1)
         GT_multiWaitbar('Creating Neural Spectrograms', blockFourProg/size(rawDataFiles, 1));
@@ -261,31 +250,35 @@ end
 
 %% BLOCK PURPOSE: [5] Determine resting baseline values using the animal's behavior flags.
 if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') || GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines == false || guiParams.rerunBaseData == true 
-    [GT_AnalysisInfo] = GT_CalculateRestingBaselines(GT_AnalysisInfo, guiParams);
-    [GT_AnalysisInfo] = GT_CalculateSpectrogramBaselines(GT_AnalysisInfo, SpectrogramData);
     for blockFiveProg = 1:size(rawDataFiles, 1)
+        rawDataFile = rawDataFiles(blockFiveProg, :);
+        [GT_AnalysisInfo] = GT_CalculateRestingBaselines(rawDataFile, GT_AnalysisInfo);
         GT_multiWaitbar('Calculating Resting Baselines', blockFiveProg/size(rawDataFiles, 1));
-        pause(0.05)
-    end
-    GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines = true;
-    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
-end
-
-%% BLOCK PURPOSE: [6] Normalize data by resting baselines. (This block is programmatically coupled with Block [5])
-if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') || GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines == false || guiParams.rerunBaseData == true 
-    for blockFourProg = 1:size(rawDataFiles, 1)
-        rawDataFile = rawDataFiles(blockFourProg, :);
-        [GT_AnalysisInfo] = GT_CategorizeData(rawDataFile, GT_AnalysisInfo);
-        GT_multiWaitbar('Calculating Resting Baselines', blockFourProg/size(rawDataFiles, 1));
     end
     GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines = true;
     save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
 else
-    for blockFourProg = 1:size(rawDataFiles, 1)
-        GT_multiWaitbar('Calculating Resting Baselines', blockFourProg/size(rawDataFiles, 1));
+    for blockFiveProg = 1:size(rawDataFiles, 1)
+        GT_multiWaitbar('Calculating Resting Baselines', blockFiveProg/size(rawDataFiles, 1));
         pause(0.05)
     end
 end
+
+%% BLOCK PURPOSE: [6] Normalize data by resting baselines. (This block is programmatically coupled with Block [5])
+% if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') || GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines == false || guiParams.rerunBaseData == true 
+%     for blockFourProg = 1:size(rawDataFiles, 1)
+%         rawDataFile = rawDataFiles(blockFourProg, :);
+%         [GT_AnalysisInfo] = GT_CategorizeData(rawDataFile, GT_AnalysisInfo);
+%         GT_multiWaitbar('Calculating Resting Baselines', blockFourProg/size(rawDataFiles, 1));
+%     end
+%     GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines = true;
+%     save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
+% else
+%     for blockFourProg = 1:size(rawDataFiles, 1)
+%         GT_multiWaitbar('Calculating Resting Baselines', blockFourProg/size(rawDataFiles, 1));
+%         pause(0.05)
+%     end
+% end
 
 %% BLOCK PURPOSE: [7] Run sleep scoring analysis functions.
 % for blockTwoProg = 1:size(rawDataFiles, 1)

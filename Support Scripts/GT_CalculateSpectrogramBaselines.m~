@@ -1,4 +1,4 @@
-function [GT_AnalysisInfo] = GT_CalculateSpectrogramBaselines(GT_AnalysisInfo, SpectrogramData)
+function [RestingBaselines] = GT_CalculateSpectrogramBaselines_2P(animal, RestingBaselines, SpectrogramData)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
 % Ph.D. Candidate, Department of Bioengineering
@@ -14,7 +14,7 @@ function [GT_AnalysisInfo] = GT_CalculateSpectrogramBaselines(GT_AnalysisInfo, S
 %________________________________________________________________________________________________________________________
 
 
-restFileList = unique(GT_AnalysisInfo.baselineFileInfo.fileIDs);      % Obtain the list of unique fileIDs
+restFileList = unique(RestingBaselines.baselineFileInfo.fileIDs);      % Obtain the list of unique fileIDs
 
 % Obtain the spectrogram information from all the resting files
 for ii = 1:length(restFileList)
@@ -52,13 +52,13 @@ for ii = 1:length(restFileList)
     samplingDiff5 = samplingRate / binSize5;  
     S1_trialRest = [];
     S5_trialRest = [];
-    for iii = 1:length(GT_AnalysisInfo.baselineFileInfo.fileIDs)
-        restFileID = GT_AnalysisInfo.baselineFileInfo.fileIDs{iii, 1};
+    for iii = 1:length(RestingBaselines.baselineFileInfo.fileIDs)
+        restFileID = RestingBaselines.baselineFileInfo.fileIDs{iii, 1};
         if strcmp(fileID, restFileID)
-            restDuration1 = floor(floor(GT_AnalysisInfo.baselineFileInfo.durations(iii, 1)*samplingRate) / samplingDiff1);
-            restDuration5 = floor(floor(GT_AnalysisInfo.baselineFileInfo.durations(iii, 1)*samplingRate) / samplingDiff5);
-            startTime1 = floor(floor(GT_AnalysisInfo.baselineFileInfo.eventTimes(iii, 1)*samplingRate) / samplingDiff1);
-            startTime5 = floor(floor(GT_AnalysisInfo.baselineFileInfo.eventTimes(iii, 1)*samplingRate) / samplingDiff5);
+            restDuration1 = floor(floor(RestingBaselines.baselineFileInfo.durations(iii, 1)*samplingRate) / samplingDiff1);
+            restDuration5 = floor(floor(RestingBaselines.baselineFileInfo.durations(iii, 1)*samplingRate) / samplingDiff5);
+            startTime1 = floor(floor(RestingBaselines.baselineFileInfo.eventTimes(iii, 1)*samplingRate) / samplingDiff1);
+            startTime5 = floor(floor(RestingBaselines.baselineFileInfo.eventTimes(iii, 1)*samplingRate) / samplingDiff5);
             try
                 S1_single_rest = S1_data(:, (startTime1:(startTime1 + restDuration1)));
                 S5_single_rest = S5_data(:, (startTime5:(startTime5 + restDuration5)));
@@ -77,7 +77,7 @@ for ii = 1:length(restFileList)
 end
 
 fields = fieldnames(trialRestData);
-uniqueDays = GT_GetUniqueDays(GT_AnalysisInfo.baselineFileInfo.fileIDs);
+uniqueDays = GetUniqueDays(RestingBaselines.baselineFileInfo.fileIDs);
 
 for day = 1:length(uniqueDays)
     x = 1;
@@ -99,8 +99,11 @@ for day = 1:length(dayFields)
         dayVals1 = [dayVals1, S_avgs.OneSec.(dayFields{day}){x, 1}];
         dayVals5 = [dayVals5, S_avgs.FiveSec.(dayFields{day}){x, 1}];
     end
-    GT_AnalysisInfo.Baselines.Spectrograms.OneSec.(dayFields{day}) = mean(dayVals1, 2);
-    GT_AnalysisInfo.Baselines.Spectrograms.FiveSec.(dayFields{day}) = mean(dayVals5, 2);
+    disp(['Adding spectrogram baseline to baseline file for ' dayFields{day} '...']); disp(' ')
+    RestingBaselines.Spectrograms.OneSec.(dayFields{day}) = mean(dayVals1, 2);
+    RestingBaselines.Spectrograms.FiveSec.(dayFields{day}) = mean(dayVals5, 2);
 end
+
+save([animal '_RestingBaselines.mat'], 'RestingBaselines');
 
 end
