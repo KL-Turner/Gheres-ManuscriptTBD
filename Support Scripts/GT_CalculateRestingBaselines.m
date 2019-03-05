@@ -5,19 +5,19 @@ function [GT_AnalysisInfo] = GT_CalculateRestingBaselines(GT_AnalysisInfo, guiPa
 % The Pennsylvania State University
 %________________________________________________________________________________________________________________________
 %
-%   Purpose: This function finds the resting baseline for all fields of the RestData.mat structure, for each unique day
+%   Purpose: This function finds the resting baseline for all fields of the GT_AnalysisInfo.RestData.mat structure, for each unique day
 %________________________________________________________________________________________________________________________
 %
 %   Inputs: animal name (str) for saving purposes, targetMinutes (such as 30, 60, etc) which the code will interpret as
 %           the number of minutes/files at the beginning of each unique imaging day to use for baseline calculation.
-%           RestData.mat, which should have field names such as CBV, Delta Power, Gamma Power, etc. with ALL resting events
+%           GT_AnalysisInfo.RestData.mat, which should have field names such as CBV, Delta Power, Gamma Power, etc. with ALL resting events
 %
 %   Outputs: SleepRestEventData.mat struct
 %
 %   Last Revision: October 4th, 2018
 %________________________________________________________________________________________________________________________
 
-% The RestData.mat struct has all resting events, regardless of duration. We want to set the threshold for rest as anything
+% The GT_AnalysisInfo.RestData.mat struct has all resting events, regardless of duration. We want to set the threshold for rest as anything
 % that is greater than 10 seconds.
 RestCriteria.Fieldname = {'durations'};
 RestCriteria.Comparison = {'gt'};
@@ -27,25 +27,25 @@ puffCriteria.Fieldname = {'puffDistances'};
 puffCriteria.Comparison = {'gt'};
 puffCriteria.Value = {5};
 
-% Find the fieldnames of RestData and loop through each field. Each fieldname should be a different dataType of interest.
+% Find the fieldnames of GT_AnalysisInfo.RestData and loop through each field. Each fieldname should be a different dataType of interest.
 % These will typically be CBV, Delta, Theta, Gamma, and MUA
-dataTypes = fieldnames(RestData);
+dataTypes = fieldnames(GT_AnalysisInfo.RestData);
 for dT = 1:length(dataTypes)
     dataType = char(dataTypes(dT));   % Load each loop iteration's fieldname as a character string
     
     % Use the RestCriteria we specified earlier to find all resting events that are greater than the criteria
-    [restLogical] = FilterEvents(RestData.(dataType), RestCriteria);   % Output is a logical
-    [puffLogical] = FilterEvents(RestData.(dataType), puffCriteria);   % Output is a logical
+    [restLogical] = FilterEvents(GT_AnalysisInfo.RestData.(dataType), RestCriteria);   % Output is a logical
+    [puffLogical] = FilterEvents(GT_AnalysisInfo.RestData.(dataType), puffCriteria);   % Output is a logical
     combRestLogical = logical(restLogical.*puffLogical);
-    allRestFiles = RestData.(dataType).fileIDs(combRestLogical, :);   % Overall logical for all resting file names that meet criteria
-    allRestDurations = RestData.(dataType).durations(combRestLogical, :);
-    allRestEventTimes = RestData.(dataType).eventTimes(combRestLogical, :);
-    restingData = RestData.(dataType).data(combRestLogical, :);   % Pull out data from all those resting files that meet criteria
+    allRestFiles = GT_AnalysisInfo.RestData.(dataType).fileIDs(combRestLogical, :);   % Overall logical for all resting file names that meet criteria
+    allRestDurations = GT_AnalysisInfo.RestData.(dataType).durations(combRestLogical, :);
+    allRestEventTimes = GT_AnalysisInfo.RestData.(dataType).eventTimes(combRestLogical, :);
+    restingData = GT_AnalysisInfo.RestData.(dataType).data(combRestLogical, :);   % Pull out data from all those resting files that meet criteria
     
-    uniqueDays = GetUniqueDays(RestData.(dataType).fileIDs);   % Find the unique days of imaging
-    uniqueFiles = unique(RestData.(dataType).fileIDs);   % Find the unique files from the filelist. This removes duplicates
+    uniqueDays = GetUniqueDays(GT_AnalysisInfo.RestData.(dataType).fileIDs);   % Find the unique days of imaging
+    uniqueFiles = unique(GT_AnalysisInfo.RestData.(dataType).fileIDs);   % Find the unique files from the filelist. This removes duplicates
     % since most files have more than one resting event
-    numberOfFiles = length(unique(RestData.(dataType).fileIDs));   % Find the number of unique files
+    numberOfFiles = length(unique(GT_AnalysisInfo.RestData.(dataType).fileIDs));   % Find the number of unique files
     fileTarget = guiParams.awakeDuration / 5;   % Divide that number of unique files by 5 (minutes) to get the number of files that
     % corresponds to the desired targetMinutes
     
@@ -85,7 +85,7 @@ for dT = 1:length(dataTypes)
     finalFileIDs = allRestFiles(finalFileFilter, :);
     finalFileDurations = allRestDurations(finalFileFilter, :);
     finalFileEventTimes = allRestEventTimes(finalFileFilter, :);
-    finalRestData = restingData(finalFileFilter, :);
+    finalGT_AnalysisInfo.RestData = restingData(finalFileFilter, :);
     
     % Loop through each unique day and pull out the data that corresponds to the resting files
     for y = 1:length(uniqueDays)
@@ -94,7 +94,7 @@ for dT = 1:length(dataTypes)
             fileID = finalFileIDs{x, 1}(1:6);
             date{y, 1} = ConvertDate(uniqueDays{y, 1});
             if strcmp(fileID, uniqueDays{y, 1}) == 1
-                tempData.(date{y, 1}){z, 1} = finalRestData{x, 1};
+                tempData.(date{y, 1}){z, 1} = finalGT_AnalysisInfo.RestData{x, 1};
                 z = z + 1;
             end
         end

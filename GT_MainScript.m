@@ -267,22 +267,26 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') |
         GT_multiWaitbar('Calculating Resting Baselines', blockFiveProg/size(rawDataFiles, 1));
         pause(0.05)
     end
-    GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines = true;
     save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
+else
+    for blockFiveProg = 1:size(rawDataFiles, 1)
+        GT_multiWaitbar('Calculating Resting Baselines', blockFiveProg/size(rawDataFiles, 1));
+        pause(0.05)
+    end 
 end
 
 %% BLOCK PURPOSE: [6] Normalize data by resting baselines. (This block is programmatically coupled with Block [5])
 if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') || GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines == false || guiParams.rerunBaseData == true 
-    for blockFourProg = 1:size(rawDataFiles, 1)
-        rawDataFile = rawDataFiles(blockFourProg, :);
+    for blockSixProg = 1:size(rawDataFiles, 1)
+        rawDataFile = rawDataFiles(blockSixProg, :);
         [GT_AnalysisInfo] = GT_CategorizeData(rawDataFile, GT_AnalysisInfo);
-        GT_multiWaitbar('Calculating Resting Baselines', blockFourProg/size(rawDataFiles, 1));
+        GT_multiWaitbar('Calculating Resting Baselines', blockSixProg/size(rawDataFiles, 1));
     end
     GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines = true;
     save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
 else
-    for blockFourProg = 1:size(rawDataFiles, 1)
-        GT_multiWaitbar('Calculating Resting Baselines', blockFourProg/size(rawDataFiles, 1));
+    for blockSixProg = 1:size(rawDataFiles, 1)
+        GT_multiWaitbar('Calculating Resting Baselines', blockSixProg/size(rawDataFiles, 1));
         pause(0.05)
     end
 end
