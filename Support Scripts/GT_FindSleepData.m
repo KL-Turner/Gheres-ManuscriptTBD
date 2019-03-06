@@ -20,6 +20,7 @@ function [GT_AnalysisInfo] = GT_FindSleepData(sleepScoringDataFiles, GT_Analysis
 
 %% BLOCK PURPOSE: Create sleep scored data structure.
 % Identify sleep epochs and place in SleepEventData.mat structure
+GT_AnalysisInfo.(guiParams.scoringID).data = [];
 sleepBins = guiParams.minSleepTime / 5;
 for sF = 1:size(sleepScoringDataFiles, 1)           % Loop through the list of SleepScoringData files
     sleepScoringDataFile = sleepScoringDataFiles(sF, :);
@@ -177,7 +178,7 @@ for sF = 1:size(sleepScoringDataFiles, 1)           % Loop through the list of S
         end
         
         %% BLOCK PURPOSE: Save the data in the SleepEventData struct
-        if ~isfield(GT_AnalysisInfo.(guiParams.scoringID), 'data')  % If the structure is empty, we need a special case to format the struct properly
+        if isempty(GT_AnalysisInfo.(guiParams.scoringID).data)  % If the structure is empty, we need a special case to format the struct properly
             for cellLength = 1:size(cellDeltaPower, 2)   % Loop through however many sleep epochs this file has
                 GT_AnalysisInfo.(guiParams.scoringID).data.deltaBandPower{cellLength, 1} = cellDeltaPower{1, 1};
                 GT_AnalysisInfo.(guiParams.scoringID).data.thetaBandPower{cellLength, 1} = cellThetaPower{1, 1};

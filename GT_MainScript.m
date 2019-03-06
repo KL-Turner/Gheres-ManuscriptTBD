@@ -73,7 +73,7 @@ while buttonState == 0
         guiParams.neurCrit = str2double(guiResults.neurCrit.String);
         guiParams.ballCrit = str2double(guiResults.ballCrit.String);
         guiParams.hrCrit = str2double(guiResults.hrCrit.String);
-        guiParams.scoringID = guiResults.scoringID.String;
+        guiParams.scoringID = strrep(guiResults.scoringID.String, ' ', '_');
         guiParams.saveFigsToggle = guiResults.saveFigsToggle.Value;
         guiParams.saveStructToggle = guiResults.saveStructToggle.Value;
         guiParams.rerunProcData = guiResults.rerunProcData.Value;
@@ -95,26 +95,26 @@ end
 
 % Progress Bars
 pause(0.25)
-GT_multiWaitbar('Processing RawData Files', 0, 'Color', [0.2 0.9 0.3]);
+GT_multiWaitbar('Processing RawData Files', 0, 'Color', [0.720000 0.530000 0.040000]);
 pause(0.25)
-GT_multiWaitbar('Categorizing Behavioral Data', 0, 'Color', [0.2 0.9 0.3]);
+GT_multiWaitbar('Categorizing Behavioral Data', 0, 'Color', [0.720000 0.530000 0.040000]);
 pause(0.25)
-GT_multiWaitbar('Finding Resting Epochs (Data Types)', 0, 'Color', [0.2 0.9 0.3]);
+GT_multiWaitbar('Finding Resting Epochs (Data Types)', 0, 'Color', [0.720000 0.530000 0.040000]);
 pause(0.25)
-GT_multiWaitbar('Finding Resting Epochs (Files per Data Type)', 0, 'Color', [0.2 0.9 0.3]);
+GT_multiWaitbar('Finding Resting Epochs (Files per Data Type)', 0, 'Color', [0.720000 0.530000 0.040000]);
 pause(0.25)
-GT_multiWaitbar('Creating Neural Spectrograms', 0, 'Color', [0.2 0.9 0.3]);
+GT_multiWaitbar('Creating Neural Spectrograms', 0, 'Color', [0.720000 0.530000 0.040000]);
 pause(0.25)
-GT_multiWaitbar('Calculating Resting Baselines', 0, 'Color', [0.2 0.9 0.3]);
+GT_multiWaitbar('Calculating Resting Baselines', 0, 'Color', [0.720000 0.530000 0.040000]);
 pause(0.25)
-GT_multiWaitbar('Normalizing Data by Baselines', 0, 'Color', [0.2 0.9 0.3]);
+GT_multiWaitbar('Normalizing Data by Baselines', 0, 'Color', [0.720000 0.530000 0.040000]);
 pause(0.25)
-GT_multiWaitbar('Running Sleep Scoring Analysis (part 1)', 0, 'Color', [0.2 0.9 0.3]);
+GT_multiWaitbar('Running Sleep Scoring Analysis (part 1)', 0, 'Color', [0.720000 0.530000 0.040000]);
 pause(0.25)
-GT_multiWaitbar('Running Sleep Scoring Analysis (part 2)', 0, 'Color', [0.2 0.9 0.3]);
+GT_multiWaitbar('Running Sleep Scoring Analysis (part 2)', 0, 'Color', [0.720000 0.530000 0.040000]);
 pause(0.25)
 if guiParams.saveFigsToggle == true
-    GT_multiWaitbar('Generating Single Trial Summary Figures', 0, 'Color', [0.2 0.9 0.3]);
+    GT_multiWaitbar('Generating Single Trial Summary Figures', 0, 'Color', [0.720000 0.530000 0.040000]);
 end
 
 %% BLOCK PURPOSE: [1] Analyze each RawData file to bandpass filter and downsample the various analog signals.
@@ -336,7 +336,7 @@ end
 % end
 
 %% Results
-GT_MessageAlert('Complete', guiParams);
+GT_MessageAlert(GT_AnalysisInfo, guiParams);
 GT_multiWaitbar('CloseAll');
 
 end
