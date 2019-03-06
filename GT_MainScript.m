@@ -87,11 +87,11 @@ while buttonState == 0
 end
 
 % Handle invalid inputs to GUI
-[Error] = GT_CheckGUIVals(guiParams);
-if Error == true
-    GT_MessageAlert('Invalid', guiParams)
-    return;
-end
+% [Error] = GT_CheckGUIVals(guiParams);
+% if Error == true
+%     GT_MessageAlert('Invalid', guiParams)
+%     return;
+% end
 
 % Progress Bars
 pause(0.25)
