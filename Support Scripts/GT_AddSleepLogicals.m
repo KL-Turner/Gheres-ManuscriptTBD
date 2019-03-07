@@ -39,7 +39,8 @@ for bins = 1:length(SleepScoringData.SleepParameters.thetaBandPower)   % Loop th
     end
 end
 
-electrodeLogical = arrayfun(@(deltaElectrodeLogical, thetaElectrodeLogical) any(deltaElectrodeLogical + thetaElectrodeLogical), deltaElectrodeLogical, thetaElectrodeLogical);
+electrodeLogical1 = arrayfun(@(deltaElectrodeLogical, thetaElectrodeLogical) any(deltaElectrodeLogical + thetaElectrodeLogical), deltaElectrodeLogical, thetaElectrodeLogical);
+[electrodeLogical] = GT_LinkBinaryEvents(gt(electrodeLogical1, 0), [3, 0]);
 
 GT_AnalysisInfo.(guiParams.scoringID).FileIDs{iteration, 1} = fileID;
 GT_AnalysisInfo.(guiParams.scoringID).Logicals.electrodeLogical{iteration, 1} = electrodeLogical;   % Place the data in the ProcData struct to later be saved
@@ -80,7 +81,8 @@ GT_AnalysisInfo.(guiParams.scoringID).Logicals.heartRateLogical{iteration, 1} = 
 %     end
 % end
 
-sleepLogical = electrodeLogical.*ballLogical.*heartRateLogical;
-GT_AnalysisInfo.(guiParams.scoringID).Logicals.sleepLogical{iteration,1} = sleepLogical;
+sleepLogical1 = electrodeLogical.*ballLogical.*heartRateLogical;
+[sleepLogical] = GT_LinkBinaryEvents(gt(sleepLogical1', 0), [2, 0]);
+GT_AnalysisInfo.(guiParams.scoringID).Logicals.sleepLogical{iteration,1} = sleepLogical';
 
 end 

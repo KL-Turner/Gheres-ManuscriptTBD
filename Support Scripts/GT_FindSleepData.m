@@ -70,7 +70,14 @@ for sF = 1:size(sleepScoringDataFiles, 1)           % Loop through the list of S
             matGammaPower = cell2mat(gammaPower);
             arrayGammaPower = reshape(matGammaPower', [1, size(matGammaPower, 2)*size(matGammaPower, 1)]);
             cellGammaPower = {arrayGammaPower};
-                      
+            
+            for fix = 1:length(ballVelocity)
+                if length(ballVelocity{fix,1}) < 150
+                    lDiff = 150 - length(ballVelocity{fix,1});
+                    lDiff = zeros(lDiff,1);
+                    ballVelocity{fix,1} = logical(horzcat(ballVelocity{fix,1}, lDiff));
+                end
+            end
             matBallVelocity = cell2mat(ballVelocity);
             arrayBallVelocity = reshape(matBallVelocity', [1, size(matBallVelocity, 2)*size(matBallVelocity, 1)]);
             cellBallVelocity = {arrayBallVelocity};
@@ -95,7 +102,7 @@ for sF = 1:size(sleepScoringDataFiles, 1)           % Loop through the list of S
             cellCBV = {arrayCBV};
             
             matBinTimes = cell2mat(BinTimes);
-            arrayBitTimes = reshape(matBinTimes', [1, size(matBinTimes, 2)*size(matBinTimes, 1)]);
+            arrayBinTimes = reshape(matBinTimes', [1, size(matBinTimes, 2)*size(matBinTimes, 1)]);
             cellBinTimes = {arrayBinTimes};
         else
             count = length(fixedSleepIndex);

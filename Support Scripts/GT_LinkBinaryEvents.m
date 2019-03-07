@@ -21,11 +21,20 @@ function [linkedWF] = GT_LinkBinaryEvents(binWF, dCrit)
 dBinWF = diff(gt(binWF, 0));
 upInd = find(dBinWF == 1);
 downInd = find(dBinWF == -1);
-if binWF(end) > 0
-    downInd = [downInd length(binWF)];
-end
-if binWF(1) > 0
-    upInd = [1 upInd];
+if size(dBinWF, 1) == 1
+    if binWF(end) > 0
+        downInd = horzcat(downInd, length(binWF));
+    end
+    if binWF(1) > 0
+        upInd = horzcat(1, upInd);
+    end
+else
+    if binWF(end) > 0
+        downInd = vertcat(downInd, length(binWF));
+    end
+    if binWF(1) > 0
+        upInd = vertcat(1, upInd);
+    end
 end
 
 %% Link periods of bin_wf==0 together if less than dCrit(1)

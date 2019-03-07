@@ -54,7 +54,8 @@ resampledBallVelocity = resample(filteredBallVelocity, downSampled_Fs, RawData.a
 [ok] = GT_CheckForThreshold(['binarizedBallVelocity_' strDay], animalID, GT_AnalysisInfo);
 
 if ok == 0
-    [ballVelocityThreshold] = GT_CreateBallVelocityThreshold(resampledBallVelocity, downSampled_Fs);
+%     [ballVelocityThreshold] = GT_CreateBallVelocityThreshold(resampledBallVelocity, downSampled_Fs);
+    ballVelocityThreshold = 1e-2;
     GT_AnalysisInfo.thresholds.(['binarizedBallVelocity_' strDay]) = ballVelocityThreshold;
 end
 

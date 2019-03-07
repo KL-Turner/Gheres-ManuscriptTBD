@@ -9,7 +9,7 @@
 
 # Running the function
 
-| ![](https://github.com/KL-Turner/Gheres-Manuscript/blob/master/GUI_photo.PNG) |
+| ![]https://github.com/KL-Turner/Gheres-Manuscript/blob/master/Misc/GUI_photo.PNG |
 |:--:|
 | *Figure 1: Graphical User Input (GUI) front interface* |
 
@@ -43,13 +43,14 @@ There are various options that can be toggled on or off.
 
 Hit the green 'GO.' button to begin the analysis. A set loading bars will be displayed that keeps track the analysis' progression. The only prompts occur in block one, where the user is requested an input to define the ball velocity's acceleration threshold. Follow the prompts to set and then confirm the threshold value. This will occur for each unique day of imaging.
 
-| ![](https://github.com/KL-Turner/Gheres-Manuscript/blob/master/GUI_photo.PNG) |
+| ![]https://github.com/KL-Turner/Gheres-Manuscript/blob/master/Misc/ProgressBar_Photo.PNG |
 |:--:|
 | *Figure 2: Loading bars showing analysis progression* |
 
+# Displayed results
+
 # Error messages
 
-# Displayed results
 
 # Acknowledgements
 * multiWaitbar.m Author: Ben Tordoff https://www.mathworks.com/matlabcentral/fileexchange/26589-multiwaitbar-label-varargin

@@ -1,158 +1,109 @@
-function GT_CreateSingleTrialFigs(procDataFile, RestingBaselines, SpectrogramData)
-%___________________________________________________________________________________________________
-% Written by Kevin L. Turner 
-% Ph.D. Candidate, Department of Bioengineering 
-% The Pennsylvania State University
-%___________________________________________________________________________________________________
-%
-%   Purpose: Create a single figure for easy analysis of the whisker, CBV, and neural data for each
-%            five minute trial.
-%___________________________________________________________________________________________________
-%
-%   Inputs: Single procDataFile string that will be used to load the RawData and ProcData structures.
-%          
-%
-%   Outputs: Output figure will be a 4x1 subplot that can be saved to directory under the animal ID.
-%
-%            (4,1,1): Whisker angle with an overlain scatter of the stimuli. Filtered
-%                     signal is lowpass filtered at 10 Hz. Added HR.
-%
-%            (4,1,2:3): Biltaral LH and RH CBV signals, lowpass filtered at 2 Hz. Normalized by the
-%            entire day's resting average.
-%
-%            (4,1,4): LH LFP normalized spectrogram (Bandpass filtered between 0.1 and 100 Hz).
-%
-%            (4,1,5): RH LFP normalized spectrogram (Bandpass filtered between 0.1 and 100 Hz).
-%___________________________________________________________________________________________________
+function GT_CreateSingleTrialFigs(sleepScoringDataFile, GT_AnalysisInfo, guiParams)
 
-%% This function can be run through a loop of filenames, or called independently for convenience.
-% If there is no filename (procDataFile) loaded in, prompt the user to load in a ProcData.mat file
-% from the current directory.
-if nargin == 0  
-    procDataFile = uigetfile('*_ProcData.mat');
-end
+[animalID, hem, ~, fileID] = GT_GetFileInfo(sleepScoringDataFile);
+load(sleepScoringDataFile);
 
-load(procDataFile); 
-
-% Obtain the animal and file ID information from the raw/procDataFile. It can be either or.
-[animal, ~, fileDate, fileID] = GetFileInfo(procDataFile);
-strDay = ConvertDate(fileDate);
-
-%% BLOCK PURPOSE: Filter the whisker angle and identify the solenoid timing and location.
-% Setup butterworth filter coefficients for a 10 Hz lowpass based on the sampling rate (150 Hz).
-[B, A] = butter(4, 10 / (150/2), 'low');
-filteredWhiskerAngle = filtfilt(B, A, ProcData.Data.Behavior.whiskers);
-whiskers = ProcData.Data.Behavior.whiskers;
-
-% Link closely occuring whisker events for a scatterplot overlain on the LH/RH CBV plot.
-whiskingThreshold = 0.1;
-dCrit = [75, 0];
-whiskerMoves = gt(abs(diff(filteredWhiskerAngle, 2)), whiskingThreshold);
-[linkedWhiskerMovements] = LinkBinaryEvents(whiskerMoves, dCrit);
-whiskingInds = find(linkedWhiskerMovements);
-
-HeartRate = ProcData.Data.HeartRate.HR;
-tR = ProcData.Data.HeartRate.tr;
-
-% Identify the solenoid times from the ProcData file.
-solenoidLeftPad = floor(ProcData.Data.Sol.solenoidLeftPad);
-solenoidRightPad = floor(ProcData.Data.Sol.solenoidRightPad);
-solenoidAuditory = floor(ProcData.Data.Sol.solenoidAuditory);
-
-%% CBV data - normalize and then lowpass filer
-LH_CBV = ProcData.Data.CBV.LH;
-RH_CBV = ProcData.Data.CBV.RH;
-
-normLH_CBV = (LH_CBV - RestingBaselines.CBV.LH.(strDay)) ./ (RestingBaselines.CBV.LH.(strDay));
-normRH_CBV = (RH_CBV - RestingBaselines.CBV.RH.(strDay)) ./ (RestingBaselines.CBV.RH.(strDay));
-
-[D, C] = butter(4, 2 / (30 / 2), 'low');
-filtLH_CBV = filtfilt(D, C, normLH_CBV);
-filtRH_CBV = filtfilt(D, C, normRH_CBV);
-
-%% Neural spectrograms
-for f = 1:length(SpectrogramData.LH.FileIDs)
-    specFileID = SpectrogramData.LH.FileIDs{f};
-    if strcmp(fileID, specFileID)
-        LH_S_norm = SpectrogramData.LH.FiveSec.S_Norm{f};
-        RH_S_norm = SpectrogramData.RH.FiveSec.S_Norm{f};
-        F = SpectrogramData.LH.FiveSec.F{f};
-        T = SpectrogramData.LH.FiveSec.T{f};
+%% BLOCK PURPOSE: Find the sleeping times from the SleepEventData for this particular trial
+% This loop creates a logical that matches the inputed FileID with all potential sleeping trials
+for f = 1:length(GT_AnalysisInfo.(guiParams.scoringID).data.fileIDs)                   % Loop through each sleeping event
+    if strcmp(GT_AnalysisInfo.(guiParams.scoringID).data.fileIDs{f,1}, fileID)        % If the fileID matches the sleep event, create a 1
+        sleepTimeLogical{f, 1} = 1;
+    else
+        sleepTimeLogical{f, 1} = 0;                        % Else create a 0
     end
 end
 
-%% Yvals for behavior Indices
-whisking_YVals = 1.10*max(-whiskers)*ones(size(whiskingInds));
-LH_solenoid_YVals = 1.20*max(-whiskers)*ones(size(solenoidLeftPad));
-RH_solenoid_YVals = 1.20*max(-whiskers)*ones(size(solenoidRightPad));
-Aud_solenoid_YVals = 1.20*max(-whiskers)*ones(size(solenoidAuditory));
-
-%% Figure
-singleTrialFig = figure;
-ax1 = subplot(5,1,1);
-plot((1:length(ProcData.Data.Behavior.whiskers)) / ProcData.Notes.downsampledWhiskerSamplingRate,...
-    -ProcData.Data.Behavior.whiskers, 'k');
-ylabel('Degrees');
-hold on;
-
-scatter((whiskingInds / ProcData.Notes.downsampledWhiskerSamplingRate), whisking_YVals, '.k');
-scatter(solenoidLeftPad, LH_solenoid_YVals, 'vk', 'MarkerFaceColor', 'b');
-scatter(solenoidRightPad, RH_solenoid_YVals, 'vk', 'MarkerFaceColor', 'g');
-scatter(solenoidAuditory, Aud_solenoid_YVals, 'vk', 'MarkerFaceColor', 'r');
-
-yyaxis right
-plot(tR, HeartRate, 'm');
-ylabel('Heart Rate (Hz)');
-ylim([6 15]);
-
-title({[animal ' ' fileID ' Single Trial'], 'Behavioral State'});
-set(gca, 'Ticklength', [0 0])
-legend('Whisker Angle', 'Whisking Events', 'Left Pad Sol', 'Right Pad Sol', 'Auditory Sol', 'Heart Rate', 'Location', 'NorthEast')
-
-ax2 = subplot(5,1,2:3);
-timeVector = (1:9000) ./ 30;
-plot(timeVector, filtLH_CBV*100, 'k');
-hold on;
-plot(timeVector, filtRH_CBV*100, 'b');
-title('Normalized & Filtered CBV Signals');
-ylabel('Reflectance (%)')
-axis tight
-legend('LH CBV', 'RH CBV', 'Location', 'NorthEast')
-set(gca, 'Ticklength', [0 0])
-
-ax4 = subplot(5,1,4);
-imagesc(T, F, LH_S_norm);
-colormap parula
-colorbar
-caxis([-1 2])
-xlim([0 300])
-title('LH Spectrogram, 5 second sliding window with 5,9 tapers')
-ylabel('Frequency (Hz)')
-axis xy
-set(gca, 'Ticklength', [0 0])
-
-ax5 = subplot(5,1,5);
-imagesc(T, F, RH_S_norm);
-colormap parula
-colorbar
-caxis([-1 2])
-xlim([0 300])
-title('RH Spectrogram, 5 second sliding window with 5,9 tapers')
-ylabel('Frequency (Hz)')
-xlabel('Time (sec)')
-axis xy
-set(gca, 'Ticklength', [0 0])
-
-linkaxes([ax1 ax2 ax4 ax5], 'x')
-
-%% Save the file to directory.
-[pathstr, ~, ~] = fileparts(cd);
-dirpath = [pathstr '/Figures/Single Trial Figures/'];
-
-if ~exist(dirpath, 'dir') 
-    mkdir(dirpath); 
+% Now that we have a logical showing the sleeping events that match this specific trial, we want to pull out the sleep times
+% for that specific trial
+x = 1;                                              % This is the first index point for our new "Sleeping times" cell
+for f = 1:length(sleepTimeLogical)         % Loop through the sleep logical
+    if sleepTimeLogical{f, 1} == 1         % If the logical denotes a 1, aka the fileID matches the sleep logical
+        sleepTimes{x, 1} = GT_AnalysisInfo.(guiParams.scoringID).data.binTimes{f, 1};  % Pull out the associated bin times
+        x = x + 1;                                                  % This adds additional times within the same trial down the new struct
+    end
 end
 
-savefig(singleTrialFig, [dirpath animal '_' fileID '_SingleTrialFig']);
+%% BLOCK PURPOSE: Filter the whisker angle and identify the solenoid timing and location.
+% Setup butterworth filter coefficients for a 10 Hz lowpass based on the sampling rate (150 Hz).
+
+% Identify the solenoid times from the ProcData file.
+solenoidContra = floor(SleepScoringData.Sol.solenoidContralateral);
+solenoidIpsi = floor(SleepScoringData.Sol.solenoidIpsilateral);
+solenoidTail = floor(SleepScoringData.Sol.solenoidTail);
+
+%% CBV data loaded in the GetBilateralCBV function
+[B, A] = butter(4, 4 / (30 / 2), 'low');
+HeartRate = zeros(1,300);
+HeartRate(2:298) = filtfilt(B, A, SleepScoringData.HeartRate);
+HeartRate(1) = HeartRate(2);
+HeartRate(299:end) = HeartRate(298);
+
+[D, C] = butter(4, 1 / (30 / 2), 'low');
+CBV = filtfilt(D, C, SleepScoringData.normCBV(1:end - 1));
+timeVec = (1:length(CBV))/30;
+delta = filtfilt(D, C, SleepScoringData.normDeltaBandPower);
+theta = filtfilt(D, C, SleepScoringData.normThetaBandPower);
+gamma = filtfilt(D, C, SleepScoringData.normGammaBandPower);
+ballVelocity = SleepScoringData.ballVelocity;
+binBallVelocity = SleepScoringData.binBallVelocity;
+
+%% Yvals for behavior Indices
+ball_YVals = 1.10*max(CBV)*ones(size(binBallVelocity));
+solenoidContra_YVals = 1.20*max(CBV)*ones(size(solenoidContra));
+solenoidIpsi_YVals = 1.20*max(CBV)*ones(size(solenoidIpsi));
+solenoidTail_YVals = 1.20*max(CBV)*ones(size(solenoidTail));
+sleeping_YVal = 1.30*max(CBV);
+
+%% Figure
+singleSleepTrial = figure('visible', 'off');
+ax1 = subplot(5,1,1);
+plot(timeVec, ballVelocity, 'LineWidth', 1, 'color', colors('ash grey'));
+hold on;
+axis tight
+ylabel('Degrees');
+yyaxis right
+ylim([6 15]);
+plot(1:length(HeartRate), HeartRate, 'LineWidth', 1, 'color', colors('carrot orange'));
+ylabel('Heart Rate (Hz)');
+title([animalID ' ' fileID ' Sleep Scoring']);
+set(gca, 'Ticklength', [0 0])
+legend('ball velocity', 'heart rate', 'Location', 'NorthEast')
+
+ax2 = subplot(5,1,2:3);
+yyaxis right
+plot(timeVec, delta, '-', 'LineWidth', 1, 'color', colors('sapphire'));
+hold on
+plot(timeVec, theta, '-', 'LineWidth', 1, 'color', colors('harvest gold'));
+plot(timeVec, gamma, '-', 'LineWidth', 1, 'color', colors('royal purple'));
+ylim([-2 10])
+ylabel('Normalized Power')
+
+yyaxis left
+plot(timeVec, CBV, 'color', colors('Dark Candy Apple Red'), 'LineWidth', 2);
+hold on;
+for sleepT = 1:length(sleepTimes)
+    scatter(sleepTimes{sleepT, 1}, (ones(1, length(sleepTimes{sleepT, 1})))*sleeping_YVal, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', colors('rich electric blue'))
+end
+scatter(solenoidContra, solenoidContra_YVals, 'v', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', colors('raspberry'));
+scatter(solenoidIpsi, solenoidIpsi, 'v', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', colors('teal blue'));
+scatter(solenoidTail, solenoidTail_YVals, 'v', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', colors('rose pink'));
+
+title('Normalized CBV reflectance and individual neural bands of interest');
+ylabel('Reflectance (%)')
+legend('CBV', 'sleep epochs', 'contra stim', 'ipsi stim', 'tail stim', 'delta power', 'theta power', 'gamma power', 'Location', 'NorthEast')
+set(gca, 'Ticklength', [0 0])
+
+ax3 = subplot(5,1,4:5);
+imagesc(SleepScoringData.Spectrograms.FiveSec.T5, SleepScoringData.Spectrograms.FiveSec.F5, SleepScoringData.Spectrograms.FiveSec.S5_Norm)
+axis xy
+caxis([-1 2])
+title('Normalized spectrogram - caxis default [-1:2]')
+ylabel('Frequency (Hz)')
+xlabel('Time (sec)')
+linkaxes([ax1 ax2 ax3], 'x')
+
+%% Save the file to directory.
+dirpath = ([cd '/Sleep Summary Figs/' guiParams.scoringID '/']);
+savefig(singleSleepTrial, [dirpath animalID '_' hem '_' fileID '_SingleTrialSummaryFig']);
 
 end

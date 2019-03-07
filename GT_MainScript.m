@@ -28,7 +28,7 @@ clc
 rawDataDirectory = dir('*_RawData.mat');
 rawDataFiles = char({rawDataDirectory.name}');
 animalFile = rawDataFiles(1, :);
-[animalID, ~, ~, ~] = GT_GetFileInfo(animalFile);
+[animalID, hem, ~, ~] = GT_GetFileInfo(animalFile);
 
 analysisInfo = dir('*_GT_AnalysisInfo.mat');
 if ~isempty(analysisInfo)
@@ -86,12 +86,15 @@ while buttonState == 0
     ...
 end
 
+guiParams.rerunBase = true;
+guiParams.rerunCatData = true;
+
 % Handle invalid inputs to GUI
-% [Error] = GT_CheckGUIVals(guiParams);
-% if Error == true
-%     GT_MessageAlert('Invalid', guiParams)
-%     return;
-% end
+[Error] = GT_CheckGUIVals(guiParams);
+if Error == true
+    GT_MessageAlert('Invalid', GT_AnalysisInfo, guiParams)
+    return;
+end
 
 % Progress Bars
 pause(0.25)
@@ -264,7 +267,7 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CreateTrialSpectrograms') || 
         SpectrogramData.Notes.movingwin5 = movingwin5;
         SpectrogramData.Notes.movingwin1 = movingwin1;
         GT_multiWaitbar('Creating Neural Spectrograms', blockFourProg/size(rawDataFiles, 1));
-    end   
+    end
     save([animalID '_GT_SpectrogramData'], 'SpectrogramData', '-v7.3');
     GT_AnalysisInfo.analysisChecklist.GT_CreateTrialSpectrograms = true;
     save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
@@ -276,7 +279,7 @@ else
 end
 
 %% BLOCK PURPOSE: [5] Determine resting baseline values using the animal's behavior flags.
-if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') || GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines == false || guiParams.rerunBase == true 
+if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') || GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines == false || guiParams.rerunBase == true
     [GT_AnalysisInfo] = GT_CalculateRestingBaselines(GT_AnalysisInfo, guiParams);
     [GT_AnalysisInfo] = GT_CalculateSpectrogramBaselines(GT_AnalysisInfo, SpectrogramData);
     for blockFiveProg = 1:size(sleepScoringDataFiles, 1)
@@ -292,7 +295,7 @@ else
 end
 
 %% BLOCK PURPOSE: [6] Normalize data by resting baselines. (This block is programmatically coupled with Block [5])
-if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') || GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines == false || guiParams.rerunBase == true 
+if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') || GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines == false || guiParams.rerunBase == true
     for blockSixProg = 1:size(sleepScoringDataFiles, 1)
         sleepScoringDataFile = sleepScoringDataFiles(blockSixProg, :);
         [GT_AnalysisInfo] = GT_NormalizeData(sleepScoringDataFile, GT_AnalysisInfo, SpectrogramData);
@@ -308,36 +311,74 @@ else
 end
 
 %% BLOCK PURPOSE: [7] Run sleep scoring analysis functions.
+GT_AnalysisInfo.(guiParams.scoringID).guiParams = guiParams;
 for blockSevenProgA = 1:size(sleepScoringDataFiles, 1)
     sleepScoringDataFile = sleepScoringDataFiles(blockSevenProgA, :);
-    GT_AddSleepParameters(sleepScoringDataFile); 
+    GT_AddSleepParameters(sleepScoringDataFile);
     GT_multiWaitbar('Running Sleep Scoring Analysis (part 1)', blockSevenProgA/size(sleepScoringDataFiles, 1));
 end
-    
+
 for blockSevenProgB = 1:size(sleepScoringDataFiles, 1)
     sleepScoringDataFile = sleepScoringDataFiles(blockSevenProgB, :);
-    [GT_AnalysisInfo] = GT_AddSleepLogicals(sleepScoringDataFile, GT_AnalysisInfo, guiParams, blockSevenProgB); 
+    [GT_AnalysisInfo] = GT_AddSleepLogicals(sleepScoringDataFile, GT_AnalysisInfo, guiParams, blockSevenProgB);
     GT_multiWaitbar('Running Sleep Scoring Analysis (part 2)', blockSevenProgB/size(sleepScoringDataFiles, 1));
 end
 
 [GT_AnalysisInfo] = GT_FindSleepData(sleepScoringDataFiles, GT_AnalysisInfo, guiParams);   % Create struct containing sleep epochs
 
 if guiParams.saveStructToggle == true
-   save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
+    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
 end
 
 %% BLOCK PURPOSE: [8] Create single trial summary figures if prompted.
-% if guiParams.saveFigsToggle == true
-%     for blockSixProg = 1:size(rawDataFiles, 1)
-%         rawDataFile = rawDataFiles(blockSixProg, :);
-%         GT_CreateSingleTrialFigs(rawDataFile, GT_AnalysisInfo);
-%         GT_multiWaitbar('Generating Single Trial Summary Figures', blockSixProg/size(rawDataFiles, 1));
-%     end
-% end
+if guiParams.saveFigsToggle == true
+    if exist('Sleep Summary Figs') == 7
+        if exist(['Sleep Summary Figs/' guiParams.scoringID '/']) == 7
+            % Get a list of all files in the folder with the desired file name pattern.
+            filePattern = fullfile(['Sleep Summary Figs/' guiParams.scoringID '/'], '*.fig'); % Change to whatever pattern you need.
+            theFiles = dir(filePattern);
+            for k = 1 : length(theFiles)
+                baseFileName = theFiles(k).name;
+                fullFileName = fullfile(['Sleep Summary Figs/' guiParams.scoringID '/'], baseFileName);
+                delete(fullFileName);
+            end
+        else
+            dirpath = ([cd '/Sleep Summary Figs/' guiParams.scoringID '/']);
+            mkdir(dirpath);
+        end
+    else
+        dirpath = ([cd '/Sleep Summary Figs/' guiParams.scoringID '/']);
+        mkdir(dirpath);
+    end
+    if ~isempty(GT_AnalysisInfo.(guiParams.scoringID).data)
+        uniqueSleepFiles = unique(GT_AnalysisInfo.(guiParams.scoringID).data.fileIDs);
+        for blockEightProg = 1:size(uniqueSleepFiles, 1)
+            uniqueSleepFile = ([animalID '_' hem '_' char(uniqueSleepFiles(blockEightProg, :)) '_SleepScoringData.mat']);
+            GT_CreateSingleTrialFigs(uniqueSleepFile, GT_AnalysisInfo, guiParams);
+            GT_multiWaitbar('Generating Single Trial Summary Figures', blockEightProg/size(uniqueSleepFiles, 1));
+        end
+    end
+end
 
 %% Results
-GT_MessageAlert(GT_AnalysisInfo, guiParams);
+GT_MessageAlert('Complete', GT_AnalysisInfo, guiParams);
 GT_multiWaitbar('CloseAll');
+
+if guiParams.saveFigsToggle == true
+    if exist(['Sleep Summary Figs/' guiParams.scoringID '/']) == 7
+        if ~isempty(['Sleep Summary Figs/' guiParams.scoringID '/'])
+            curDir = cd;
+            cd (['Sleep Summary Figs/' guiParams.scoringID '/']);
+            figDirectory = dir('*.fig');
+            figFiles = char({figDirectory.name}');
+            for f = 1:size(figFiles, 1)
+                figF = figFiles(f, :);
+                openfig(figF, 'visible');
+            end
+        end
+    end
+end
+cd(curDir);
 
 end
 
