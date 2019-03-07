@@ -9,7 +9,7 @@
 
 # Running the function
 
-| ![]https://github.com/KL-Turner/Gheres-Manuscript/blob/master/Misc/GUI_photo.PNG |
+| ![](https://github.com/KL-Turner/Gheres-Manuscript/blob/master/Misc/GUI_photo.PNG) |
 |:--:|
 | *Figure 1: Graphical User Input (GUI) front interface* |
 
@@ -43,7 +43,7 @@ There are various options that can be toggled on or off.
 
 Hit the green 'GO.' button to begin the analysis. A set loading bars will be displayed that keeps track the analysis' progression. The only prompts occur in block one, where the user is requested an input to define the ball velocity's acceleration threshold. Follow the prompts to set and then confirm the threshold value. This will occur for each unique day of imaging.
 
-| ![]https://github.com/KL-Turner/Gheres-Manuscript/blob/master/Misc/ProgressBar_Photo.PNG) |
+| ![](https://github.com/KL-Turner/Gheres-Manuscript/blob/master/Misc/ProgressBar_Photo.PNG) |
 |:--:|
 | *Figure 2: Loading bars showing analysis progression* |
 
@@ -51,15 +51,15 @@ Hit the green 'GO.' button to begin the analysis. A set loading bars will be dis
 
 After the analysis is finished, one of two messages will pop up outlining the results. It is recommended to carefully inspect the figures to determine whether the results are (accurately) scored.
 
-| ![]https://github.com/KL-Turner/Gheres-Manuscript/blob/master/Misc/PositiveResults.PNG |
+| ![](https://github.com/KL-Turner/Gheres-Manuscript/blob/master/Misc/PositiveResults.PNG) |
 |:--:|
 | *Figure 3: Example of a positive result(s) message* |
 
-| ![]https://github.com/KL-Turner/Gheres-Manuscript/blob/master/Misc/NegativeResults.PNG |
+| ![](https://github.com/KL-Turner/Gheres-Manuscript/blob/master/Misc/NegativeResults.PNG) |
 |:--:|
 | *Figure 4: Example of a negative result(s) message* |
 
-| ![]https://github.com/KL-Turner/Gheres-Manuscript/blob/master/Misc/NC_SLP003_RH_190302_16_50_4102_SingleTrialSummaryFig.png |
+| ![](https://github.com/KL-Turner/Gheres-Manuscript/blob/master/Misc/NC_SLP003_RH_190302_16_50_4102_SingleTrialSummaryFig.png) |
 |:--:|
 | *Figure 5: Example of a summary figure outlining a scored sleep epoch* |
 
@@ -69,7 +69,7 @@ Note: The figure's visibility is by default set to off to prevent them from popp
 
 If an input outside the bounds of the above parameters, the code will abort and return control to the User with the following error message.
 
-| ![]https://github.com/KL-Turner/Gheres-Manuscript/blob/master/Misc/errorMessage.PNG |
+| ![](https://github.com/KL-Turner/Gheres-Manuscript/blob/master/Misc/errorMessage.PNG) |
 |:--:|
 | *Figure 6: Example error message* |
 
