@@ -245,7 +245,7 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CreateTrialSpectrograms') || 
 %         w0 = 60/(RawData.an_fs/2);  bw = w0/35;
 %         [num,den] = iirnotch(w0, bw);
 %         filtRawNeuro = filtfilt(num, den, RawNeuro);
-          filtRawNeuro=RawNeuro;
+          filtRawNeuro=RawNeuro-mean(RawNeuro);
         
         % Spectrogram parameters
         params.tapers = [5 9];
