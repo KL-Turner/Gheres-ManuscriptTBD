@@ -23,8 +23,7 @@ function [GT_AnalysisInfo] = GT_MainScript()
 %________________________________________________________________________________________________________________________
 
 %% BLOCK PURPOSE: [0] Set parameters to be used for sleep scoring characterization
-clear 
-clc
+boom;
 rawDataDirectory = dir('*_RawData.mat');
 rawDataFiles = char({rawDataDirectory.name}');
 animalFile = rawDataFiles(1, :);
