@@ -58,9 +58,10 @@ if ok == 0
     ballVelocityThreshold = 1e-2;
     GT_AnalysisInfo.thresholds.(['binarizedBallVelocity_' strDay]) = ballVelocityThreshold;
 end
-
+Rest_link=round(downSampled_Fs); % flags animal active if rest period is < this duration
+Run_link=round(downSampled_Fs/3); %flads animal at rest if active period is <this duration
 binarizedBallVelocity = abs(diff(resampledBallVelocity, 1)) > GT_AnalysisInfo.thresholds.(['binarizedBallVelocity_' strDay]);
-[linkedBinarizedVelocity] = GT_LinkBinaryEvents(gt(binarizedBallVelocity,0), [round(downSampled_Fs/3), 0]);
+[linkedBinarizedVelocity] = GT_LinkBinaryEvents(gt(binarizedBallVelocity,0), [Rest_link, Run_link]);
 
 inds = linkedBinarizedVelocity == 0;
 restVelocity = mean(resampledBallVelocity(inds));
