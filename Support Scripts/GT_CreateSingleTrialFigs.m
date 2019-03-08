@@ -55,15 +55,15 @@ solenoidTail_YVals = 1.20*max(CBV)*ones(size(solenoidTail));
 sleeping_YVal = 1.30*max(CBV);
 
 %% Figure
-singleSleepTrial = figure('visible', 'off');
+singleSleepTrial = figure;
 ax1 = subplot(5,1,1);
-plot(timeVec, ballVelocity, 'LineWidth', 1, 'color', colors('ash grey'));
+plot(timeVec, ballVelocity, 'LineWidth', 1, 'color', GT_colors('ash grey'));
 hold on;
 axis tight
 ylabel('Degrees');
 yyaxis right
 ylim([6 15]);
-plot(1:length(HeartRate), HeartRate, 'LineWidth', 1, 'color', colors('carrot orange'));
+plot(1:length(HeartRate), HeartRate, 'LineWidth', 1, 'color', GT_colors('carrot orange'));
 ylabel('Heart Rate (Hz)');
 title([animalID ' ' fileID ' Sleep Scoring']);
 set(gca, 'Ticklength', [0 0])
@@ -71,22 +71,22 @@ legend('ball velocity', 'heart rate', 'Location', 'NorthEast')
 
 ax2 = subplot(5,1,2:3);
 yyaxis right
-plot(timeVec, delta, '-', 'LineWidth', 1, 'color', colors('sapphire'));
+plot(timeVec, delta, '-', 'LineWidth', 1, 'color', GT_colors('sapphire'));
 hold on
-plot(timeVec, theta, '-', 'LineWidth', 1, 'color', colors('harvest gold'));
-plot(timeVec, gamma, '-', 'LineWidth', 1, 'color', colors('royal purple'));
+plot(timeVec, theta, '-', 'LineWidth', 1, 'color', GT_colors('harvest gold'));
+plot(timeVec, gamma, '-', 'LineWidth', 1, 'color', GT_colors('royal purple'));
 ylim([-2 10])
 ylabel('Normalized Power')
 
 yyaxis left
-plot(timeVec, CBV, 'color', colors('Dark Candy Apple Red'), 'LineWidth', 2);
+plot(timeVec, CBV, 'color', GT_colors('Dark Candy Apple Red'), 'LineWidth', 2);
 hold on;
 for sleepT = 1:length(sleepTimes)
-    scatter(sleepTimes{sleepT, 1}, (ones(1, length(sleepTimes{sleepT, 1})))*sleeping_YVal, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', colors('rich electric blue'))
+    scatter(sleepTimes{sleepT, 1}, (ones(1, length(sleepTimes{sleepT, 1})))*sleeping_YVal, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', GT_colors('rich electric blue'))
 end
-scatter(solenoidContra, solenoidContra_YVals, 'v', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', colors('raspberry'));
-scatter(solenoidIpsi, solenoidIpsi, 'v', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', colors('teal blue'));
-scatter(solenoidTail, solenoidTail_YVals, 'v', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', colors('rose pink'));
+scatter(solenoidContra, solenoidContra_YVals, 'v', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', GT_colors('raspberry'));
+scatter(solenoidIpsi, solenoidIpsi, 'v', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', GT_colors('teal blue'));
+scatter(solenoidTail, solenoidTail_YVals, 'v', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', GT_colors('rose pink'));
 
 title('Normalized CBV reflectance and individual neural bands of interest');
 ylabel('Reflectance (%)')

@@ -25,8 +25,6 @@ function [GT_AnalysisInfo] = GT_MainScript()
 %% BLOCK PURPOSE: [0] Set parameters to be used for sleep scoring characterization
 clear 
 clc
-id = 'signal:filtfilt:ParseSOS';
-warning('off', id)
 rawDataDirectory = dir('*_RawData.mat');
 rawDataFiles = char({rawDataDirectory.name}');
 animalFile = rawDataFiles(1, :);
@@ -255,8 +253,8 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CreateTrialSpectrograms') || 
         params.fpass = [0.1 100];
         movingwin1 = [1 1/5];
         movingwin5 = [5 1/5]; 
-        [Neural_S1, Neural_T1, Neural_F1] = mtspecgramc(filtRawNeuro, movingwin1, params);
-        [Neural_S5, Neural_T5, Neural_F5] = mtspecgramc(filtRawNeuro, movingwin5, params);
+        [Neural_S1, Neural_T1, Neural_F1] = mtspecgramc_GPU(filtRawNeuro, movingwin1, params);
+        [Neural_S5, Neural_T5, Neural_F5] = mtspecgramc_GPU(filtRawNeuro, movingwin5, params);
  
         SpectrogramData.FiveSec.S{blockFourProg, 1} = Neural_S5';
         SpectrogramData.FiveSec.T{blockFourProg, 1}  = Neural_T5;
@@ -381,8 +379,6 @@ if guiParams.saveFigsToggle == true
     end
 end
 cd(curDir);
-warning('on', id)
-clear id 
 
 end
 

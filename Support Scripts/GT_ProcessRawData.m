@@ -21,14 +21,14 @@ strDay = GT_ConvertDate(fileDate);
 trialDuration_Seconds = 300;
 expectedLength = trialDuration_Seconds*RawData.an_fs;
 
-% Delta [1 - 4 Hz]
-[SleepScoringData.deltaBandPower, SleepScoringData.downSampled_Fs] = GT_ProcessNeuro(RawData, 'Delta', trialDuration_Seconds);
-
-% Theta [4 - 8 Hz]
-[SleepScoringData.thetaBandPower, ~] = GT_ProcessNeuro(RawData, 'Theta', trialDuration_Seconds);
-
-% Gamma Band [40 - 100]
-[SleepScoringData.gammaBandPower, ~] = GT_ProcessNeuro(RawData, 'Gam', trialDuration_Seconds);
+% % Delta [1 - 4 Hz]
+ [SleepScoringData.deltaBandPower, SleepScoringData.downSampled_Fs] = GT_ProcessNeuro(RawData, 'Delta', trialDuration_Seconds);
+% 
+% % Theta [4 - 8 Hz]
+ [SleepScoringData.thetaBandPower, ~] = GT_ProcessNeuro(RawData, 'Theta', trialDuration_Seconds);
+% 
+% % Gamma Band [40 - 100]
+ [SleepScoringData.gammaBandPower, ~] = GT_ProcessNeuro(RawData, 'Gam', trialDuration_Seconds);
 
 %% Save solenoid times (in seconds).
 % Identify the solenoids by amplitude

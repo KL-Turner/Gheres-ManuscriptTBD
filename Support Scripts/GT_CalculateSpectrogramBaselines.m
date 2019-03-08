@@ -40,7 +40,7 @@ end
 
 for ii = 1:length(restFileList)
     fileID = restFileList{ii, 1};
-    strDay = ConvertDate(fileID(1:6));
+    strDay = GT_ConvertDate(fileID(1:6));
     S1_data = Neural_restS1{ii, 1};
     S5_data = Neural_restS5{ii, 1};
     s1Length = size(S1_data, 2);
@@ -83,7 +83,7 @@ for day = 1:length(uniqueDays)
     x = 1;
     for field = 1:length(fields)
         if strcmp(fields{field}(7:12), uniqueDays{day})
-            stringDay = ConvertDate(uniqueDays{day});
+            stringDay = GT_ConvertDate(uniqueDays{day});
             S_avgs.OneSec.(stringDay){x, 1} = trialRestData.(fields{field}).OneSec.S_avg;
             S_avgs.FiveSec.(stringDay){x, 1} = trialRestData.(fields{field}).FiveSec.S_avg;
             x = x + 1;

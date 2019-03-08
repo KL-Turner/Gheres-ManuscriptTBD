@@ -34,15 +34,15 @@ for dT = 1:length(dataTypes)
     dataType = char(dataTypes(dT));   % Load each loop iteration's fieldname as a character string
     
     % Use the RestCriteria we specified earlier to find all resting events that are greater than the criteria
-    [restLogical] = FilterEvents(GT_AnalysisInfo.RestData.(dataType), RestCriteria);   % Output is a logical
-    [puffLogical] = FilterEvents(GT_AnalysisInfo.RestData.(dataType), puffCriteria);   % Output is a logical
+    [restLogical] = GT_FilterEvents(GT_AnalysisInfo.RestData.(dataType), RestCriteria);   % Output is a logical
+    [puffLogical] = GT_FilterEvents(GT_AnalysisInfo.RestData.(dataType), puffCriteria);   % Output is a logical
     combRestLogical = logical(restLogical.*puffLogical);
     allRestFiles = GT_AnalysisInfo.RestData.(dataType).fileIDs(combRestLogical, :);   % Overall logical for all resting file names that meet criteria
     allRestDurations = GT_AnalysisInfo.RestData.(dataType).durations(combRestLogical, :);
     allRestEventTimes = GT_AnalysisInfo.RestData.(dataType).eventTimes(combRestLogical, :);
     restingData = GT_AnalysisInfo.RestData.(dataType).data(combRestLogical, :);   % Pull out data from all those resting files that meet criteria
     
-    uniqueDays = GetUniqueDays(GT_AnalysisInfo.RestData.(dataType).fileIDs);   % Find the unique days of imaging
+    uniqueDays = GT_GetUniqueDays(GT_AnalysisInfo.RestData.(dataType).fileIDs);   % Find the unique days of imaging
     uniqueFiles = unique(GT_AnalysisInfo.RestData.(dataType).fileIDs);   % Find the unique files from the filelist. This removes duplicates
     % since most files have more than one resting event
     numberOfFiles = length(unique(GT_AnalysisInfo.RestData.(dataType).fileIDs));   % Find the number of unique files
@@ -92,7 +92,7 @@ for dT = 1:length(dataTypes)
         z = 1;
         for x = 1:length(finalFileIDs)
             fileID = finalFileIDs{x, 1}(1:6);
-            date{y, 1} = ConvertDate(uniqueDays{y, 1});
+            date{y, 1} = GT_ConvertDate(uniqueDays{y, 1});
             if strcmp(fileID, uniqueDays{y, 1}) == 1
                 tempData.(date{y, 1}){z, 1} = finalGT_AnalysisInfo.RestData{x, 1};
                 z = z + 1;

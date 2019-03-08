@@ -47,6 +47,7 @@ if ismember(neurType, [{'MUApower'}, {'Gam'}, {'Beta'}, {'Alpha'}, {'Theta'}, {'
     [sos1, g1] = zp2sos(z1, p1, k1);
     longNeuro = filtfilt(sos1, g1, filtNeuro.^2);
     neuro = max(resample(longNeuro, neuroFs, analogFs), 0);
+    %neuro = max(downsample(longNeuro, round(analogFs/neuroFs,0)), 0);
 end
 
 end
