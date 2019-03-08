@@ -53,10 +53,28 @@ if isempty(sub_dCritDowns) == 0
 end
 
 %% Link periods of bin_wf==1 together if less than dCrit(2)
+dBinWF = diff(gt(binWF, 0)); %reestablish state change indecies 
+upInd = find(dBinWF == 1); %find when animal starts running
+downInd = find(dBinWF == -1); %find when animal stops running
+if size(dBinWF, 1) == 1
+    if binWF(end) > 0
+        downInd = horzcat(downInd, length(binWF));
+    end
+    if binWF(1) > 0
+        upInd = horzcat(1, upInd);
+    end
+else
+    if binWF(end) > 0
+        downInd = vertcat(downInd, length(binWF));
+    end
+    if binWF(1) > 0
+        upInd = vertcat(1, upInd);
+    end
+end
 hitimes = downInd - upInd;
-blips = find(lt(hitimes, dCrit(2)) == 1);
+blips = find(lt(hitimes, dCrit(2)) == 1); %find periods where animal moves less than threshold duration
 if isempty(blips) == 0
-    for b = 1:length(blips)
+    for b = 1:length(blips) %Mark below threshold points as rest
         start = upInd(blips(b));
         stop = downInd(blips(b));
         binWF(start:stop) = 0;
