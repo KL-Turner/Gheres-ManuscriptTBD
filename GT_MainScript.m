@@ -25,6 +25,8 @@ function [GT_AnalysisInfo] = GT_MainScript()
 %% BLOCK PURPOSE: [0] Set parameters to be used for sleep scoring characterization
 clear 
 clc
+id = 'signal:filtfilt:ParseSOS';
+warning('off', id)
 rawDataDirectory = dir('*_RawData.mat');
 rawDataFiles = char({rawDataDirectory.name}');
 animalFile = rawDataFiles(1, :);
@@ -379,6 +381,8 @@ if guiParams.saveFigsToggle == true
     end
 end
 cd(curDir);
+warning('on', id)
+clear id 
 
 end
 
