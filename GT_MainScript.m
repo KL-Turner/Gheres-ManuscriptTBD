@@ -242,9 +242,10 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CreateTrialSpectrograms') || 
         RawNeuro = RawData.Neuro;
         
         % Remove 60 Hz noise
-        w0 = 60/(RawData.an_fs/2);  bw = w0/35;
-        [num,den] = iirnotch(w0, bw);
-        filtRawNeuro = filtfilt(num, den, RawNeuro);
+%         w0 = 60/(RawData.an_fs/2);  bw = w0/35;
+%         [num,den] = iirnotch(w0, bw);
+%         filtRawNeuro = filtfilt(num, den, RawNeuro);
+          filtRawNeuro=RawNeuro;
         
         % Spectrogram parameters
         params.tapers = [5 9];
