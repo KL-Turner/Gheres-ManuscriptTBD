@@ -31,10 +31,10 @@ if strcmp(message, 'Complete')
         end
     else
         structSaved = 'no';
-    end 
+    end
     
     % Note if the user denoted whether or not to save the figs from the analysis. Control for whether the analysis
-    % was successful or not,
+    % was successful or no
     if guiParams.saveFigsToggle == true
         try
             if length(GT_AnalysisInfo.(guiParams.scoringID).data.fileIDs) >= 1
@@ -47,7 +47,6 @@ if strcmp(message, 'Complete')
         figsSaved = 'none';
     end
     
-    % If the analysis did not detect any sleep scoring epochs...
     if isempty(GT_AnalysisInfo.(guiParams.scoringID).data)
         msg = msgbox({'Sleep Scoring Analysis Results:', ...
             ' ', ...
@@ -60,14 +59,14 @@ if strcmp(message, 'Complete')
             [' - Summary figures: ' figsSaved],...
             ' '}, 'Analysis Complete', 'warn');
         waitfor(msg)
-    else   % The analysis did detect any sleep scoring epochs...
-        % Determine how many minutes of sleep were found.
+    else
         sleepTime = 0;
         numberOfTrials = length(unique(GT_AnalysisInfo.(guiParams.scoringID).data.fileIDs));
         for f = 1:length(GT_AnalysisInfo.(guiParams.scoringID).data.binTimes)
             sleepTime = sleepTime + length(GT_AnalysisInfo.(guiParams.scoringID).data.binTimes{f,1});
         end
-        sleepTime_min = (sleepTime*5)/60;     
+        sleepTime_min = (sleepTime*5)/60;
+        
         msg = msgbox({'Sleep Scoring Analysis Results:', ...
             ' ', ...
             ['Parameters ID: ' guiParams.scoringID], ...
@@ -84,8 +83,6 @@ if strcmp(message, 'Complete')
             ' '}, 'Analysis Complete', 'help');
         waitfor(msg)
     end
-    
-% 'Invalid' message is called when the GT_CheckGUIVals detects an incorrect input parameter to the GUI.
 elseif strcmp(message, 'Invalid')
     msg = msgbox({'One of the parameters you entered is not a valid criteria. Please check the README.md document for a list of valid inputs.'...
         ' ',...

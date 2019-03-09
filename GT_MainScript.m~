@@ -26,14 +26,14 @@ function [GT_AnalysisInfo] = GT_MainScript()
 %% BLOCK PURPOSE: [0] Set parameters to be used for sleep scoring characterization.
 boom;   % function set to clear, clc, close all
 
-% Pull a list (m by n character array) corresponding to all _rawdata.mat files in the current directory.
+% pull a list (m by n character array) corresponding to all _rawdata.mat files in the current directory
 rawDataDirectory = dir('*_RawData.mat');
 rawDataFiles = char({rawDataDirectory.name}');
-animalFile = rawDataFiles(1, :);   % Use the first file in the list of _rawdata.mat files.
-[animalID, hem, ~, ~] = GT_GetFileInfo(animalFile);   % Pull the animal's ID tag and imaged hemisphere.
+animalFile = rawDataFiles(1, :);   % use the first file in the list of _rawdata.mat files
+[animalID, hem, ~, ~] = GT_GetFileInfo(animalFile);   % pull the animal's ID tag and imaged hemisphere
 
-% Check if this specific animal's AnalysisInfo file already exists in the directory. If it does, load it and this current
-% iteration will be added to it under a unique scoring ID. If it does not exist, create an empty one and set the checklist to false.
+% check if this specific animal's AnalysisInfo file already exists in the directory. If it does, load it and this current
+% iteration will be added to it under a unique scoring ID. If it does not exist, create an empty one and set all checklists to false.
 analysisInfo = dir('*_GT_AnalysisInfo.mat');
 if ~isempty(analysisInfo)
     load(analysisInfo.name);
@@ -44,27 +44,30 @@ else
     GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines = false;
 end
 
-% Check if this animal's Spectrograms have already been analyzed. If they have, load it. If not, set to empty.
 specDataFile = dir('*_GT_SpectrogramData.mat');
 if ~isempty(specDataFile)
     load(specDataFile.name);
 end
 
-% Close any left-over loading bars from prior analysis. Initiate a global variable for the GUI's button state (GO button)
-% and set its default value to off.
+if ~isempty(analysisInfo)
+    load(analysisInfo.name);
+else
+    GT_AnalysisInfo.analysisChecklist.GT_ProcessRawData = false;
+    GT_AnalysisInfo.analysisChecklist.GT_CategorizeData = false;
+    GT_AnalysisInfo.analysisChecklist.GT_CreateTrialSpectrograms = false;
+    GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines = false;
+end
+
 GT_multiWaitbar('CloseAll');
 clear global buttonState
 global buttonState
 buttonState = 0;
 
-% Open the GUI and prompt user for the analysis' sleep scoring parameters. For more info, check the README.txt.
-% The GUI will stay open until the GO. button is pressed. While the GUI is waiting for the buttonState change, it
-% constantly updates the output values.
+% GUI for parameter settings
 [updatedGUI] = GT_ScoringParameters;
 while buttonState == 0
     drawnow()
     if buttonState == 1
-        % When GO. button is pressed, gather the GUI's outputs and save them into a guiParams struct.
         guiResults = guidata(updatedGUI);
         guiParams.awakeDuration = str2double(guiResults.awakeDuration.String);
         guiParams.minSleepTime = str2double(guiResults.minSleepTime.String);
@@ -82,17 +85,15 @@ while buttonState == 0
         guiParams.rerunSpecData = guiResults.rerunSpecData.Value;
         guiParams.rerunBase = guiResults.rerunBase.Value;
         closereq
-        break;   % Leave the while loop.
+        break;
     end
     ...
 end
 
-% TEMPORARY - Override GUI's baseline/categorize data toggle buttons. These analysis runs quickly as-is, and the current
-% version of this script is not able to catch changes in the awakeDuration variable that influences these categorizations.
 guiParams.rerunBase = true;
 guiParams.rerunCatData = true;
 
-% Handle invalid inputs to GUI by ending the function and popping an error message.
+% Handle invalid inputs to GUI
 [Error] = GT_CheckGUIVals(guiParams);
 if Error == true
     GT_MessageAlert('Invalid', GT_AnalysisInfo, guiParams)

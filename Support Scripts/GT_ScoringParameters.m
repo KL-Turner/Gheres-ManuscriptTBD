@@ -1,4 +1,31 @@
 function varargout = GT_ScoringParameters(varargin)
+%________________________________________________________________________________________________________________________
+% Written by Kevin L. Turner
+% The Pennsylvania State University, Dept. of Biomedical Engineering
+% https://github.com/KL-Turner
+%________________________________________________________________________________________________________________________
+%
+%   Purpose: Create a GUI to prompt the user for sleep scoring parameters. Created via Matlab's 'guide' GUI design.
+%            Parameter default values are set during guide creation. 
+%            Toggle button default values are set in the function GT_ScoringParameters_OpeningFcn.m (SEE BELOW)
+%                   % Set default values for toggle buttons.
+%                   set(handles.neurToggle, 'Value', 1);
+%                   set(handles.ballToggle, 'Value', 1);
+%                   set(handles.hrToggle, 'Value', 1);
+%                   set(handles.saveStructToggle, 'Value', 1);
+%                   set(handles.saveFigsToggle, 'Value', 1);
+%
+%            The GUI begins analysis when the GO. button is pressed through the function goButton_Callback.m (SEE BELOW)
+%                   GT_StartAnalysis;   % When GO button is pressed, enter this function.
+%________________________________________________________________________________________________________________________
+%
+%   Inputs: None. Calling this function opens the GUI, whose default parameters are set via the nested functions below.
+%
+%   Outputs: The GUI outputs a summary of the variable results that can be accessed with the Matlab function guidata.
+%
+%   Last Revised: March 8th, 2019
+%________________________________________________________________________________________________________________________
+
 % GT_SCORINGPARAMETERS MATLAB code for GT_ScoringParameters.fig
 %      GT_SCORINGPARAMETERS, by itself, creates a new GT_SCORINGPARAMETERS or raises the existing
 %      singleton*.
@@ -55,6 +82,7 @@ function GT_ScoringParameters_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for GT_ScoringParameters
 handles.output = hObject;
 
+% Set default values for toggle buttons.
 set(handles.neurToggle, 'Value', 1);
 set(handles.ballToggle, 'Value', 1);
 set(handles.hrToggle, 'Value', 1);
@@ -65,11 +93,8 @@ set(handles.saveFigsToggle, 'Value', 1);
 % Update handles structure
 guidata(hObject, handles);
 
-
-
 % UIWAIT makes GT_ScoringParameters wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
-
 
 % --- Outputs from this function are returned to the command line.
 function varargout = GT_ScoringParameters_OutputFcn(hObject, eventdata, handles) 
@@ -81,8 +106,6 @@ function varargout = GT_ScoringParameters_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
-
-
 function awakeDuration_Callback(hObject, eventdata, handles)
 % hObject    handle to awakeDuration (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -90,7 +113,6 @@ function awakeDuration_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of awakeDuration as text
 %        str2double(get(hObject,'String')) returns contents of awakeDuration as a double
-
 
 % --- Executes during object creation, after setting all properties.
 function awakeDuration_CreateFcn(hObject, eventdata, handles)
@@ -103,8 +125,6 @@ function awakeDuration_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
 
 function minSleepTime_Callback(hObject, eventdata, handles)
 % hObject    handle to minSleepTime (see GCBO)
@@ -155,7 +175,6 @@ function ballCrit_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of ballCrit as text
 %        str2double(get(hObject,'String')) returns contents of ballCrit as a double
 
-
 % --- Executes during object creation, after setting all properties.
 function ballCrit_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to ballCrit (see GCBO)
@@ -168,8 +187,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
 function hrCrit_Callback(hObject, eventdata, handles)
 % hObject    handle to hrCrit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -177,7 +194,6 @@ function hrCrit_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of hrCrit as text
 %        str2double(get(hObject,'String')) returns contents of hrCrit as a double
-
 
 % --- Executes during object creation, after setting all properties.
 function hrCrit_CreateFcn(hObject, eventdata, handles)
@@ -191,8 +207,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-
 function scoringID_Callback(hObject, eventdata, handles)
 % hObject    handle to scoringID (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -200,7 +214,6 @@ function scoringID_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of scoringID as text
 %        str2double(get(hObject,'String')) returns contents of scoringID as a double
-
 
 % --- Executes during object creation, after setting all properties.
 function scoringID_CreateFcn(hObject, eventdata, handles)
@@ -214,7 +227,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
 % --- Executes on button press in neurToggle.
 function neurToggle_Callback(hObject, eventdata, handles)
 % hObject    handle to neurToggle (see GCBO)
@@ -222,7 +234,6 @@ function neurToggle_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of neurToggle
-
 
 % --- Executes on button press in ballToggle.
 function ballToggle_Callback(hObject, eventdata, handles)
@@ -232,7 +243,6 @@ function ballToggle_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of ballToggle
 
-
 % --- Executes on button press in hrToggle.
 function hrToggle_Callback(hObject, eventdata, handles)
 % hObject    handle to hrToggle (see GCBO)
@@ -240,7 +250,6 @@ function hrToggle_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of hrToggle
-
 
 % --- Executes on button press in saveStructToggle.
 function saveStructToggle_Callback(hObject, eventdata, handles)
@@ -250,7 +259,6 @@ function saveStructToggle_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of saveStructToggle
 
-
 % --- Executes on button press in saveFigsToggle.
 function saveFigsToggle_Callback(hObject, eventdata, handles)
 % hObject    handle to saveFigsToggle (see GCBO)
@@ -259,14 +267,13 @@ function saveFigsToggle_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of saveFigsToggle
 
-
 % --- Executes on button press in goButton.
 function goButton_Callback(hObject, eventdata, handles)
 % hObject    handle to goButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-GT_StartAnalysis;
 
+GT_StartAnalysis;   % When GO button is pressed, enter this function.
 
 % --- Executes on button press in rerunProcData.
 function rerunProcData_Callback(hObject, eventdata, handles)
@@ -276,7 +283,6 @@ function rerunProcData_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of rerunProcData
 
-
 % --- Executes on button press in rerunCatData.
 function rerunCatData_Callback(hObject, eventdata, handles)
 % hObject    handle to rerunCatData (see GCBO)
@@ -285,7 +291,6 @@ function rerunCatData_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of rerunCatData
 
-
 % --- Executes on button press in rerunSpecData.
 function rerunSpecData_Callback(hObject, eventdata, handles)
 % hObject    handle to rerunSpecData (see GCBO)
@@ -293,7 +298,6 @@ function rerunSpecData_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of rerunSpecData
-
 
 % --- Executes on button press in rerunBase.
 function rerunBase_Callback(hObject, eventdata, handles)
