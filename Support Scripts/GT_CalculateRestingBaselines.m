@@ -1,8 +1,8 @@
 function [GT_AnalysisInfo] = GT_CalculateRestingBaselines(GT_AnalysisInfo, guiParams)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
-% Ph.D. Candidate, Department of Bioengineering
-% The Pennsylvania State University
+% The Pennsylvania State University, Dept. of Biomedical Engineering
+% https://github.com/KL-Turner
 %________________________________________________________________________________________________________________________
 %
 %   Purpose: This function finds the resting baseline for all fields of the GT_AnalysisInfo.RestData.mat structure, for each unique day
@@ -14,7 +14,7 @@ function [GT_AnalysisInfo] = GT_CalculateRestingBaselines(GT_AnalysisInfo, guiPa
 %
 %   Outputs: SleepRestEventData.mat struct
 %
-%   Last Revision: October 4th, 2018
+%   Last Revision: March 8th, 2019
 %________________________________________________________________________________________________________________________
 
 % The GT_AnalysisInfo.RestData.mat struct has all resting events, regardless of duration. We want to set the threshold for rest as anything

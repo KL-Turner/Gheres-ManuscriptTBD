@@ -1,8 +1,8 @@
 function GT_AddSleepParameters(sleepScoringDataFile)
 %________________________________________________________________________________________________________________________
-% Written by Kevin L. Turner 
-% Ph.D. Candidate, Department of Bioengineering 
-% The Pennsylvania State University
+% Written by Kevin L. Turner
+% The Pennsylvania State University, Dept. of Biomedical Engineering
+% https://github.com/KL-Turner
 %________________________________________________________________________________________________________________________
 %
 %   Purpose: This function serves to add the relevant sleep parameters to each ProcData file, the most notable being the
