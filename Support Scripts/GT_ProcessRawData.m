@@ -5,7 +5,7 @@ function [GT_AnalysisInfo] = GT_ProcessRawData(rawDataFile, GT_AnalysisInfo)
 % https://github.com/KL-Turner
 %________________________________________________________________________________________________________________________
 %
-%   Purpose:
+%   Purpose: Appropriately resample and filter the various analog signals.
 %________________________________________________________________________________________________________________________
 %
 %   Inputs:
@@ -15,20 +15,22 @@ function [GT_AnalysisInfo] = GT_ProcessRawData(rawDataFile, GT_AnalysisInfo)
 %   Last Revised:
 %________________________________________________________________________________________________________________________
 
+% Load the RawData.mat file from the current directory. Identify the file info.
 load(rawDataFile)
 [animalID, hem, fileDate, fileID] = GT_GetFileInfo(rawDataFile);
 strDay = GT_ConvertDate(fileDate);
 trialDuration_Seconds = 300;
 expectedLength = trialDuration_Seconds*RawData.an_fs;
 
-% % Delta [1 - 4 Hz]
- [SleepScoringData.deltaBandPower, SleepScoringData.downSampled_Fs] = GT_ProcessNeuro(RawData, 'Delta', trialDuration_Seconds);
-% 
-% % Theta [4 - 8 Hz]
- [SleepScoringData.thetaBandPower, ~] = GT_ProcessNeuro(RawData, 'Theta', trialDuration_Seconds);
-% 
-% % Gamma Band [40 - 100]
- [SleepScoringData.gammaBandPower, ~] = GT_ProcessNeuro(RawData, 'Gam', trialDuration_Seconds);
+%% Process the neural data into desired frequency bands.
+% Delta [1-4 Hz]
+[SleepScoringData.deltaBandPower, SleepScoringData.downSampled_Fs] = GT_ProcessNeuro(RawData, 'Delta', trialDuration_Seconds);
+ 
+% Theta [4-8 Hz]
+[SleepScoringData.thetaBandPower, ~] = GT_ProcessNeuro(RawData, 'Theta', trialDuration_Seconds);
+ 
+% Gamma Band [40-100]
+[SleepScoringData.gammaBandPower, ~] = GT_ProcessNeuro(RawData, 'Gam', trialDuration_Seconds);
 
 %% Save solenoid times (in seconds).
 % Identify the solenoids by amplitude
@@ -37,31 +39,31 @@ SleepScoringData.Sol.solenoidIpsilateral = find(diff(RawData.Sol) == 2) / RawDat
 SleepScoringData.Sol.solenoidTail = find(diff(RawData.Sol) == 3) / RawData.an_fs;
 
 %% Downsample and binarize the ball velocity.
-% Trim any additional data points for resample
+% Trim any additional data points for resample.
 trimmedBallVelocity = RawData.vBall(1:min(expectedLength, length(RawData.vBall)));
 
-% Filter then downsample the ball velocity waveform to desired frequency
-downSampled_Fs = RawData.dal_fr;   % Downsample to CBV Camera Fs
+% Filter then downsample the ball velocity waveform to desired frequency.
+downSampled_Fs = RawData.dal_fr;   % Downsample to CBV Camera Fs.
 ballVelocityFilterThreshold = 20;
 ballVelocityFilterOrder = 2;
 [z, p, k] = butter(ballVelocityFilterOrder, ballVelocityFilterThreshold / (RawData.an_fs / 2), 'low');
 [sos, g] = zp2sos(z, p, k);
 filteredBallVelocity = filtfilt(sos, g, trimmedBallVelocity);
-
 resampledBallVelocity = resample(filteredBallVelocity, downSampled_Fs, RawData.an_fs);
 
-% Binarize the ball velocity waveform
-[ok] = GT_CheckForThreshold(['binarizedBallVelocity_' strDay], animalID, GT_AnalysisInfo);
+% Check for this day's threshold value to binarize the ball velocity.
+[ok] = GT_CheckForThreshold(['binarizedBallVelocity_' strDay], GT_AnalysisInfo);
 
 if ok == 0
-%     [ballVelocityThreshold] = GT_CreateBallVelocityThreshold(resampledBallVelocity, downSampled_Fs);
-    ballVelocityThreshold = 1e-2;
+    % If this day doesn't have a previously defined threshold, prompt the user to create one.
+    [ballVelocityThreshold] = GT_CreateBallVelocityThreshold(resampledBallVelocity, downSampled_Fs);
     GT_AnalysisInfo.thresholds.(['binarizedBallVelocity_' strDay]) = ballVelocityThreshold;
 end
-Rest_link=round(downSampled_Fs); % flags animal active if rest period is < this duration
-Run_link=round(downSampled_Fs/3); %flads animal at rest if active period is <this duration
+
+restLink = round(downSampled_Fs);   % Flags animal active if rest period is < this duration.
+runLink = round(downSampled_Fs/3);   % Flads animal at rest if active period is < this duration.
 binarizedBallVelocity = abs(diff(resampledBallVelocity, 1)) > GT_AnalysisInfo.thresholds.(['binarizedBallVelocity_' strDay]);
-[linkedBinarizedVelocity] = GT_LinkBinaryEvents(gt(binarizedBallVelocity,0), [Rest_link, Run_link]);
+[linkedBinarizedVelocity] = GT_LinkBinaryEvents(gt(binarizedBallVelocity,0), [restLink, runLink]);
 
 inds = linkedBinarizedVelocity == 0;
 restVelocity = mean(resampledBallVelocity(inds));
@@ -71,7 +73,7 @@ SleepScoringData.binBallVelocity = binarizedBallVelocity;
 SleepScoringData.CBV = RawData.barrels.CBVrefl_barrels;
 SleepScoringData.HeartRate = RawData.HR;
 
-%% Save the processed rawdata structure.
+% Save the processed new structure to the current directory.
 save([animalID '_' hem '_' fileID '_SleepScoringData.mat'] , 'SleepScoringData');
 
 end

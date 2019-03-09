@@ -1,4 +1,22 @@
-function cancel = GT_multiWaitbar( label, varargin )
+function cancel = GT_multiWaitbar(label, varargin)
+%________________________________________________________________________________________________________________________
+% Edited by Kevin L. Turner
+% The Pennsylvania State University, Dept. of Biomedical Engineering
+% https://github.com/KL-Turner
+%________________________________________________________________________________________________________________________
+%
+%   **This function is only lightly edited to fix a few timing issues. Full credit goes to the author, Ben Tordoff.
+%
+%   Purpose: Create a loading bar to display analysis progress.
+%________________________________________________________________________________________________________________________
+%
+%   Inputs: See detailed descriptions below.
+%
+%   Outputs: -
+%
+%   Last Revised: March 8th, 2019
+%________________________________________________________________________________________________________________________
+
 %multiWaitbar: add, remove or update an entry on the multi waitbar
 %
 %   multiWaitbar(LABEL,VALUE) adds a waitbar for the specified label, or

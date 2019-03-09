@@ -99,49 +99,49 @@ if Error == true
     return;
 end
 
-% Progress Bars
+% Create a set of loading bars to inform the user of the analysis' progress. A set of brief delays (pause) are used to
+% smoothen out the initial pop-up display and loading of the bars.
 pause(0.25)
-GT_multiWaitbar('Processing RawData Files', 0, 'Color', [0.720000 0.530000 0.040000]);
-pause(0.25)
-GT_multiWaitbar('Categorizing Behavioral Data', 0, 'Color', [0.720000 0.530000 0.040000]);
-pause(0.25)
-GT_multiWaitbar('Finding Resting Epochs (Data Types)', 0, 'Color', [0.720000 0.530000 0.040000]);
-pause(0.25)
-GT_multiWaitbar('Finding Resting Epochs (Files per Data Type)', 0, 'Color', [0.720000 0.530000 0.040000]);
-pause(0.25)
-GT_multiWaitbar('Creating Neural Spectrograms', 0, 'Color', [0.720000 0.530000 0.040000]);
-pause(0.25)
-GT_multiWaitbar('Calculating Resting Baselines', 0, 'Color', [0.720000 0.530000 0.040000]);
-pause(0.25)
-GT_multiWaitbar('Normalizing Data by Baselines', 0, 'Color', [0.720000 0.530000 0.040000]);
-pause(0.25)
-GT_multiWaitbar('Running Sleep Scoring Analysis (part 1)', 0, 'Color', [0.720000 0.530000 0.040000]);
-pause(0.25)
-GT_multiWaitbar('Running Sleep Scoring Analysis (part 2)', 0, 'Color', [0.720000 0.530000 0.040000]);
-pause(0.25)
+GT_multiWaitbar('Processing RawData Files', 0, 'Color', [0.720000 0.530000 0.040000]); pause(0.25);
+GT_multiWaitbar('Categorizing Behavioral Data', 0, 'Color', [0.720000 0.530000 0.040000]); pause(0.25);
+GT_multiWaitbar('Finding Resting Epochs (Data Types)', 0, 'Color', [0.720000 0.530000 0.040000]); pause(0.25);
+GT_multiWaitbar('Finding Resting Epochs (Files per Data Type)', 0, 'Color', [0.720000 0.530000 0.040000]); pause(0.25);
+GT_multiWaitbar('Creating Neural Spectrograms', 0, 'Color', [0.720000 0.530000 0.040000]); pause(0.25);
+GT_multiWaitbar('Calculating Resting Baselines', 0, 'Color', [0.720000 0.530000 0.040000]); pause(0.25);
+GT_multiWaitbar('Normalizing Data by Baselines', 0, 'Color', [0.720000 0.530000 0.040000]); pause(0.25);
+GT_multiWaitbar('Running Sleep Scoring Analysis (part 1)', 0, 'Color', [0.720000 0.530000 0.040000]); pause(0.25);
+GT_multiWaitbar('Running Sleep Scoring Analysis (part 2)', 0, 'Color', [0.720000 0.530000 0.040000]); pause(0.25);
 if guiParams.saveFigsToggle == true
-    GT_multiWaitbar('Generating Single Trial Summary Figures', 0, 'Color', [0.720000 0.530000 0.040000]);
+    GT_multiWaitbar('Generating Single Trial Summary Figures', 0, 'Color', [0.720000 0.530000 0.040000]); pause(0.25)
 end
 
-%% BLOCK PURPOSE: [1] Analyze each RawData file to bandpass filter and downsample the various analog signals.
+%% BLOCK PURPOSE: [1] Analyze each RawData file to appropriately filter and downsample the various analog signals.
+% If this block's results are not a saved field OR this block has never been ran OR the user has prompted to re-run... 
 if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_ProcessRawData') || GT_AnalysisInfo.analysisChecklist.GT_ProcessRawData == false || guiParams.rerunProcData == true 
     for blockOneProg = 1:size(rawDataFiles, 1)
         rawDataFile = rawDataFiles(blockOneProg, :);
+        % Feed the function one file at a time along with the summary structure.
         [GT_AnalysisInfo] = GT_ProcessRawData(rawDataFile, GT_AnalysisInfo);
-        GT_multiWaitbar('Processing RawData Files', blockOneProg/size(rawDataFiles, 1));
+        GT_multiWaitbar('Processing RawData Files', blockOneProg/size(rawDataFiles, 1));   % Update progress bar.
     end
+    % When finished with each file, save the summary structure and set the checklist for this block to true.
     GT_AnalysisInfo.analysisChecklist.GT_ProcessRawData = true;
     save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
-else
+else   % If this analysis has already been ran and this is a subsequent iteration...
     for blockOneProg = 1:size(rawDataFiles, 1)
+        % Quickly cycle through the progress for ... visual satisfaction.
         GT_multiWaitbar('Processing RawData Files', blockOneProg/size(rawDataFiles, 1));
         pause(0.1)
     end
 end
+
+% Pull a list (m by n character array) corresponding to all _SleepScoringData.mat files in the current directory.
+% These files are created by GT_ProcessRawData.m function. Whether that block has just finished running or was skipped
+% because the analysis has already previously ran, load in the filenames of the SleepScoringData.mat structures.
 sleepScoringDataDirectory = dir('*_SleepScoringData.mat');
 sleepScoringDataFiles = char({sleepScoringDataDirectory.name}');
 
-%% BLOCK PURPOSE: [2] Categorize the animal's behavior using ball velocity.
+%% BLOCK PURPOSE: [2] Categorize the animal's behavior, in this case that is ball (running) velocity.
 if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_AnalysisInfo.analysisChecklist.GT_CategorizeData == false || guiParams.rerunCatData == true 
     for blockTwoProg = 1:size(sleepScoringDataFiles, 1)
         sleepScoringDataFile = sleepScoringDataFiles(blockTwoProg, :);

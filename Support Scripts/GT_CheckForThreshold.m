@@ -1,4 +1,4 @@
-function [ok] = GT_CheckForThreshold(sfield, animalID, GT_AnalysisInfo)
+function [ok] = GT_CheckForThreshold(sfield, GT_AnalysisInfo)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
 % The Pennsylvania State University, Dept. of Biomedical Engineering
@@ -7,21 +7,24 @@ function [ok] = GT_CheckForThreshold(sfield, animalID, GT_AnalysisInfo)
 % Adapted from code written by Dr. Aaron T. Winder: https://github.com/awinde
 %________________________________________________________________________________________________________________________
 %
-%   Purpose:
+%   Purpose: Check for a threshold value for a given day.
 %________________________________________________________________________________________________________________________
 %
-%   Inputs:
+%   Inputs: sfield (string) corresponding to the threhold name (ball, force, whiskers, etc) and string day.
+%           GT_AnalysisInfo (struct) containing this analysis' information and sleep scoring results.
 %
-%   Outputs: 
+%   Outputs: ok (double) of whether the threshold exists or not.
 %
-%   Last Revised: February 29th, 2019
+%   Last Revised: March 8th, 2019
 %________________________________________________________________________________________________________________________
 
-% Navigate to Shared Variables folder
 ok = 0;
+% If the summary structure does not have a thresholds field, create one.
 if ~isfield(GT_AnalysisInfo, 'thresholds')
     GT_AnalysisInfo.thresholds = [];
 else
+    % If the summary structure does have a thresholds field, check that a threshold exists for the specific
+    % parameter of interest (ball, whisk, foce, etc) on this specific day.
     if isfield(GT_AnalysisInfo.thresholds, sfield)
         ok = 1;
     end
