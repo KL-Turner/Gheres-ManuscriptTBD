@@ -127,11 +127,11 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_ProcessRawData') || GT_Analys
     % When finished with each file, save the summary structure and set the checklist for this block to true.
     GT_AnalysisInfo.analysisChecklist.GT_ProcessRawData = true;
     save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
-else   % If this analysis has already been ran and this is a subsequent iteration...
+else
+    % If this analysis has already been ran and this is a subsequent iteration...
     for blockOneProg = 1:size(rawDataFiles, 1)
-        % Quickly cycle through the progress for ... visual satisfaction.
-        GT_multiWaitbar('Processing RawData Files', blockOneProg/size(rawDataFiles, 1));
-        pause(0.1)
+        % Quickly cycle through the progress bar for ... visual satisfaction.
+        GT_multiWaitbar('Processing RawData Files', blockOneProg/size(rawDataFiles, 1)); pause(0.1)
     end
 end
 
@@ -142,25 +142,29 @@ sleepScoringDataDirectory = dir('*_SleepScoringData.mat');
 sleepScoringDataFiles = char({sleepScoringDataDirectory.name}');
 
 %% BLOCK PURPOSE: [2] Categorize the animal's behavior, in this case that is ball (running) velocity.
+% If this block's results are not a saved field OR this block has never been ran OR the user has prompted to re-run... 
 if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_AnalysisInfo.analysisChecklist.GT_CategorizeData == false || guiParams.rerunCatData == true 
     for blockTwoProg = 1:size(sleepScoringDataFiles, 1)
         sleepScoringDataFile = sleepScoringDataFiles(blockTwoProg, :);
+        % Feed the function one file at a time along with the summary structure.
         [GT_AnalysisInfo] = GT_CategorizeData(sleepScoringDataFile, GT_AnalysisInfo);
-        GT_multiWaitbar('Categorizing Behavioral Data', blockTwoProg/size(sleepScoringDataFiles, 1));
+        GT_multiWaitbar('Categorizing Behavioral Data', blockTwoProg/size(sleepScoringDataFiles, 1));   % Update progress bar.
     end
 else
+    % If this analysis has already been ran and this is a subsequent iteration...
     for blockTwoProg = 1:size(sleepScoringDataFiles, 1)
-        GT_multiWaitbar('Categorizing Behavioral Data', blockTwoProg/size(sleepScoringDataFiles, 1));
-        pause(0.1)
+        % Quickly cycle through the progress bar for ... visual satisfaction.
+        GT_multiWaitbar('Categorizing Behavioral Data', blockTwoProg/size(sleepScoringDataFiles, 1)); pause(0.1);
     end
 end
 
-%% BLOCK PURPOSE: [3] Find resting epochs. (This block is programmatically coupled with Block [2])
-% To properly utilize the progress bars, this function's code has been pasted into this block. 
+%% BLOCK PURPOSE: [3] Find resting epochs during periods of quiescence. (This block is programmatically coupled with Block [2])
+% To properly utilize the progress bars, the original function's code has been pasted into this block. 
+% If this block's results are not a saved field OR this block has never been ran OR the user has prompted to re-run... 
 dataTypes = {'CBV', 'deltaBandPower', 'thetaBandPower', 'gammaBandPower'};
 if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_AnalysisInfo.analysisChecklist.GT_CategorizeData == false || guiParams.rerunCatData == true
     for blockThreeProgA = 1:length(dataTypes)
-        GT_multiWaitbar('Finding Resting Epochs (Data Types)', blockThreeProgA/length(dataTypes));
+        GT_multiWaitbar('Finding Resting Epochs (Data Types)', blockThreeProgA/length(dataTypes));   % Update progress bar.
         restVals = cell(size(sleepScoringDataFiles, 1), 1);
         eventTimes = cell(size(sleepScoringDataFiles, 1), 1);
         durations = cell(size(sleepScoringDataFiles, 1), 1);
@@ -215,7 +219,7 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_Analys
             puffDistances{blockThreeProgB} = trialPuffDistances';
             fileIDs{blockThreeProgB} = repmat({fileID}, 1, length(trialEventTimes));
             fileDates{blockThreeProgB} = repmat({fileDate}, 1, length(trialEventTimes));
-            GT_multiWaitbar('Finding Resting Epochs (Files per Data Type)', blockThreeProgB/size(rawDataFiles,1));
+            GT_multiWaitbar('Finding Resting Epochs (Files per Data Type)', blockThreeProgB/size(rawDataFiles,1));   % Update progress bar.
         end
         
         GT_AnalysisInfo.RestData.(dataTypes{blockThreeProgA}).data = [restVals{:}]';
@@ -229,15 +233,17 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_Analys
     GT_AnalysisInfo.analysisChecklist.GT_CategorizeData = true;
     save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
 else
+    % If this analysis has already been ran and this is a subsequent iteration...
     for blockThreeProgB = 1:size(sleepScoringDataFiles, 1)
+        % Quickly cycle through the progress bar for ... visual satisfaction.
         GT_multiWaitbar('Finding Resting Epochs (Data Types)', blockThreeProgB/size(sleepScoringDataFiles, 1));
-        GT_multiWaitbar('Finding Resting Epochs (Files per Data Type)', blockThreeProgB/size(sleepScoringDataFiles, 1));
-        pause(0.1)
+        GT_multiWaitbar('Finding Resting Epochs (Files per Data Type)', blockThreeProgB/size(sleepScoringDataFiles, 1)); pause(0.1);
     end
 end
 
 %% BLOCK PURPOSE: [4] Calculate the neural spectrogram for each file.
 % To properly utilize the progress bars, this function's code has been pasted into this block. 
+% If this block's results are not a saved field OR this block has never been ran OR the user has prompted to re-run... 
 if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CreateTrialSpectrograms') || GT_AnalysisInfo.analysisChecklist.GT_CreateTrialSpectrograms == false || guiParams.rerunSpecData == true 
     for blockFourProg = 1:size(rawDataFiles, 1)
         rawDataFile = rawDataFiles(blockFourProg, :);
@@ -246,10 +252,10 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CreateTrialSpectrograms') || 
         RawNeuro = RawData.Neuro;
         
         % Remove 60 Hz noise
-%         w0 = 60/(RawData.an_fs/2);  bw = w0/35;
-%         [num,den] = iirnotch(w0, bw);
-%         filtRawNeuro = filtfilt(num, den, RawNeuro);
-          filtRawNeuro=RawNeuro-mean(RawNeuro);
+        %  w0 = 60/(RawData.an_fs/2);  bw = w0/35;
+        % [num,den] = iirnotch(w0, bw);
+        % filtRawNeuro = filtfilt(num, den, RawNeuro);
+        filtRawNeuro = RawNeuro - mean(RawNeuro);
         
         % Spectrogram parameters
         params.tapers = [5 9];
@@ -270,47 +276,51 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CreateTrialSpectrograms') || 
         SpectrogramData.Notes.params = params;
         SpectrogramData.Notes.movingwin5 = movingwin5;
         SpectrogramData.Notes.movingwin1 = movingwin1;
-        GT_multiWaitbar('Creating Neural Spectrograms', blockFourProg/size(rawDataFiles, 1));
+        GT_multiWaitbar('Creating Neural Spectrograms', blockFourProg/size(rawDataFiles, 1));   % Update progress bar.
     end
     save([animalID '_GT_SpectrogramData'], 'SpectrogramData', '-v7.3');
     GT_AnalysisInfo.analysisChecklist.GT_CreateTrialSpectrograms = true;
     save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
 else
+    % If this analysis has already been ran and this is a subsequent iteration...
     for blockFourProg = 1:size(rawDataFiles, 1)
-        GT_multiWaitbar('Creating Neural Spectrograms', blockFourProg/size(rawDataFiles, 1));
-        pause(0.1)
+        % Quickly cycle through the progress bar for ... visual satisfaction.
+        GT_multiWaitbar('Creating Neural Spectrograms', blockFourProg/size(rawDataFiles, 1)); pause(0.1);
     end
 end
 
 %% BLOCK PURPOSE: [5] Determine resting baseline values using the animal's behavior flags.
+% If this block's results are not a saved field OR this block has never been ran OR the user has prompted to re-run... 
 if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') || GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines == false || guiParams.rerunBase == true
     [GT_AnalysisInfo] = GT_CalculateRestingBaselines(GT_AnalysisInfo, guiParams);
     [GT_AnalysisInfo] = GT_CalculateSpectrogramBaselines(GT_AnalysisInfo, SpectrogramData);
     for blockFiveProg = 1:size(sleepScoringDataFiles, 1)
-        GT_multiWaitbar('Calculating Resting Baselines', blockFiveProg/size(sleepScoringDataFiles, 1));
+        GT_multiWaitbar('Calculating Resting Baselines', blockFiveProg/size(sleepScoringDataFiles, 1));   % Update progress bar.
         pause(0.1)
     end
     save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
 else
     for blockFiveProg = 1:size(sleepScoringDataFiles, 1)
-        GT_multiWaitbar('Calculating Resting Baselines', blockFiveProg/size(sleepScoringDataFiles, 1));
-        pause(0.1)
+        % Quickly cycle through the progress bar for ... visual satisfaction.
+        GT_multiWaitbar('Calculating Resting Baselines', blockFiveProg/size(sleepScoringDataFiles, 1)); pause(0.1);
     end
 end
 
 %% BLOCK PURPOSE: [6] Normalize data by resting baselines. (This block is programmatically coupled with Block [5])
+% If this block's results are not a saved field OR this block has never been ran OR the user has prompted to re-run... 
 if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') || GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines == false || guiParams.rerunBase == true
     for blockSixProg = 1:size(sleepScoringDataFiles, 1)
         sleepScoringDataFile = sleepScoringDataFiles(blockSixProg, :);
         [GT_AnalysisInfo] = GT_NormalizeData(sleepScoringDataFile, GT_AnalysisInfo, SpectrogramData);
-        GT_multiWaitbar('Normalizing Data by Baselines', blockSixProg/size(sleepScoringDataFiles, 1));
+        GT_multiWaitbar('Normalizing Data by Baselines', blockSixProg/size(sleepScoringDataFiles, 1));   % Update progress bar.
     end
     GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines = true;
     save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
 else
+    % If this analysis has already been ran and this is a subsequent iteration...
     for blockSixProg = 1:size(sleepScoringDataFiles, 1)
-        GT_multiWaitbar('Normalizing Data by Baselines', blockSixProg/size(sleepScoringDataFiles, 1));
-        pause(0.1)
+        % Quickly cycle through the progress bar for ... visual satisfaction.
+        GT_multiWaitbar('Normalizing Data by Baselines', blockSixProg/size(sleepScoringDataFiles, 1)); pause(0.1);
     end
 end
 
@@ -319,13 +329,13 @@ GT_AnalysisInfo.(guiParams.scoringID).guiParams = guiParams;
 for blockSevenProgA = 1:size(sleepScoringDataFiles, 1)
     sleepScoringDataFile = sleepScoringDataFiles(blockSevenProgA, :);
     GT_AddSleepParameters(sleepScoringDataFile);
-    GT_multiWaitbar('Running Sleep Scoring Analysis (part 1)', blockSevenProgA/size(sleepScoringDataFiles, 1));
+    GT_multiWaitbar('Running Sleep Scoring Analysis (part 1)', blockSevenProgA/size(sleepScoringDataFiles, 1));   % Update progress bar.
 end
 
 for blockSevenProgB = 1:size(sleepScoringDataFiles, 1)
     sleepScoringDataFile = sleepScoringDataFiles(blockSevenProgB, :);
     [GT_AnalysisInfo] = GT_AddSleepLogicals(sleepScoringDataFile, GT_AnalysisInfo, guiParams, blockSevenProgB);
-    GT_multiWaitbar('Running Sleep Scoring Analysis (part 2)', blockSevenProgB/size(sleepScoringDataFiles, 1));
+    GT_multiWaitbar('Running Sleep Scoring Analysis (part 2)', blockSevenProgB/size(sleepScoringDataFiles, 1));   % Update progress bar.
 end
 
 [GT_AnalysisInfo] = GT_FindSleepData(sleepScoringDataFiles, GT_AnalysisInfo, guiParams);   % Create struct containing sleep epochs
@@ -359,7 +369,7 @@ if guiParams.saveFigsToggle == true
         for blockEightProg = 1:size(uniqueSleepFiles, 1)
             uniqueSleepFile = ([animalID '_' hem '_' char(uniqueSleepFiles(blockEightProg, :)) '_SleepScoringData.mat']);
             GT_CreateSingleTrialFigs(uniqueSleepFile, GT_AnalysisInfo, guiParams);
-            GT_multiWaitbar('Generating Single Trial Summary Figures', blockEightProg/size(uniqueSleepFiles, 1));
+            GT_multiWaitbar('Generating Single Trial Summary Figures', blockEightProg/size(uniqueSleepFiles, 1));   % Update progress bar.
         end
     end
 end

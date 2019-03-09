@@ -1,60 +1,35 @@
-function [GT_AnalysisInfo] = GT_CategorizeData(sleepScoringDataFile, GT_AnalysisInfo)
-%___________________________________________________________________________________________________
-% Edited by Kevin L. Turner 
-% Ph.D. Candidate, Department of Bioengineering 
-% The Pennsylvania State University
+function GT_CategorizeData(sleepScoringDataFile)
+%________________________________________________________________________________________________________________________
+% Written by Kevin L. Turner
+% The Pennsylvania State University, Dept. of Biomedical Engineering
+% https://github.com/KL-Turner
 %
-% Originally written by Aaron T. Winder
+% Adapted from code written by Dr. Aaron T. Winder: https://github.com/awinde
+%________________________________________________________________________________________________________________________
 %
-%   Last Revised: August 8th, 2018
-%___________________________________________________________________________________________________
+%   Purpose: Categorize animal's behavior and add a 'flags' field to each loaded file.
+%           
+%            Stimulation: Run Score - measure of the intensity of runing before and after onset of a puff. 
+%                         A 0 indicates no runing, a 1 indicates maximum runing over a 1 second period.
 %
-%   Author: Aaron Winder
-%   Affiliation: Engineering Science and Mechanics, Penn State University
-%   https://github.com/awinde
+%            Runing: Duration - the time, in seconds, from onset to cessation of a runing event.
+%                    Rest Time - the duration of resting behavior prior to onset of the volitional run
+%                    Run Score - a measure of the intensity of runing for the duration of the run a
+%                                maximum run for the whole duration will give a score of 1. No runing will 
+%                                give a score of 0.
+%                    Puff Distance - The time, in seconds, between the onset of each run an every puff
+%                                administered during the trial
+%            Rest: Duration - the time, in seconds without any detected runing or body movement.
+%                  Start Time - the trial time corresponding to the cessation of all volitional movement.
+%________________________________________________________________________________________________________________________
 %
-%   DESCRIPTION: Identifies periods of sensory stimulation, volitional
-%   movement, and rest. Calculates relevant details for each behavioral
-%   period:
-%           Stimulation:    Run Score - measure of the intensity of 
-%                           runing before and after onset of a puff. 
-%                           A 0 indicates no runing, a 1 indicates 
-%                           maximum runing over a 1 second period.
-%                           Movement Score - Same as run score except
-%                           uses the force sensor beneath the animal to
-%                           detect body movment.
+%   Inputs: fileID (string) of file to be categorized.
+%           GT_AnalysisInfo (stuct) summary structure of sleep scoring analysis.
 %
-%           Runing:       Duration - the time, in seconds, from onset to
-%                           cessation of a runing event.
-%                           Rest Time - the duration of resting behavior
-%                           prior to onset of the volitional run
-%                           Run Score - a measure of the intensity of
-%                           runing for the duration of the run a
-%                           maximum run for the whole duration will give
-%                           a score of 1. No runing will give a score of
-%                           0.
-%                           Movement Score - Same as run score exept uses
-%                           the force sensor beneath the animal to detect
-%                           body movement over the duration of the
-%                           volitional run.
-%                           Puff Distance - The time, in seconds, between
-%                           the onset of each run an every puff
-%                           administered during the trial.
+%   Outputs: None. Saves the flags field to each SleepScoringData.mat structure in the current directory.
 %
-%
-%          Rest:            Duration - the time, in seconds without any 
-%                           detected runing or body movement.
-%                           Start Time - the trial time corresponding to
-%                           the cessation of all volitional movement.
-%   
-%_______________________________________________________________
-%   PARAMETERS:             
-%                           filename - [string] file identifier                      
-%_______________________________________________________________
-%   RETURN:                     
-%                           None, output of the script is additions to the
-%                           SleepScoringData structure.
-%_______________________________________________________________
+%   Last Revised: March 8th, 2019
+%________________________________________________________________________________________________________________________
 
 load(sleepScoringDataFile)
 downSampled_Fs = SleepScoringData.downSampled_Fs;
@@ -73,19 +48,19 @@ modBinVel = SleepScoringData.binBallVelocity;
 % Link the binarized runing for use in GetRunningData function
 binVel = GT_LinkBinaryEvents(gt(modBinVel,0), [linkThresh breakThresh]*downSampled_Fs);
 
-% Added 2/6/18 with atw. Code throws errors if binRuns(1)=1 and binRuns(2) = 0, or if 
+% Added 2/6/18 with atw. Code throws errors if binRuns(1) = 1 and binRuns(2) = 0, or if 
 % binRuns(1) = 0 and binRuns(2) = 1. This happens in GetRunningData because starts of 
 % runs are detected by taking the derivative of binRuns. Purpose of following lines is to 
 % handle trials where the above conditions occur and avoid difficult dimension errors.
-if binVel(1)==0 && binVel(2)==1
+if binVel(1) == 0 && binVel(2) == 1
     binVel(1) = 1;
-elseif binVel(1)==1 && binVel(2)==0
+elseif binVel(1) == 1 && binVel(2) == 0
     binVel(1) = 0;
 end
 
-if binVel(end)==0 && binVel(end-1)==1
+if binVel(end) == 0 && binVel(end - 1) == 1
     binVel(end) = 1;
-elseif binVel(end)==1 && binVel(end-1)==0
+elseif binVel(end) == 1 && binVel(end - 1) == 0
     binVel(end) = 0;
 end
 
@@ -104,23 +79,6 @@ end
 save(sleepScoringDataFile, 'SleepScoringData');
 
 function [puffTimes] = GetPuffTimes(SleepScoringData)
-%   function [Puff_Times] = GetPuffTimes(SleepScoringData)
-%
-%   Author: Aaron Winder
-%   Affiliation: Engineering Science and Mechanics, Penn State University
-%   https://github.com/awinde
-%
-%   DESCRIPTION: Gets the time in seconds of all puffs administered during
-%   a trial.
-%   
-%_______________________________________________________________
-%   PARAMETERS:             
-%                       SleepScoringData - [struct] structure obtained using the 
-%                       function ProcessSleepScoringDataFile.
-%_______________________________________________________________
-%   RETURN:                     
-%                       Puff_Times - [array] time in seconds of all puffs              
-%_______________________________________________________________
 
 solNames = fieldnames(SleepScoringData.Sol);
 puffList = cell(1, length(solNames));
@@ -132,33 +90,6 @@ end
 puffTimes = cell2mat(puffList);
 
 function [Stim] = GetStimData(SleepScoringData)
-%   function [Stim] = GetStimData(SleepScoringData)
-%
-%   Author: Aaron Winder
-%   Affiliation: Engineering Science and Mechanics, Penn State University
-%   https://github.com/awinde
-%
-%   DESCRIPTION: Returns details on puffs administered during a trial.
-%   Including: 
-%                           Run Score - measure of the intensity of 
-%                           runing before and after onset of a puff. 
-%                           A 0 indicates no runing, a 1 indicates 
-%                           maximum runing over a 1 second period.
-%                           Movement Score - Same as run score except
-%                           uses the force sensor beneath the animal to
-%                           detect body movment.
-%   
-%_______________________________________________________________
-%   PARAMETERS:             
-%                       SleepScoringData - [struct] structure obtained using the 
-%                       function ProcessSleepScoringDataFile.    
-%_______________________________________________________________
-%   RETURN:                     
-%                       Stim - [struct] structure containing a nested 
-%                       structure for each puff administered. Each nested 
-%                       structure contains details about puffs from a
-%                       single solenoid.
-%_______________________________________________________________
 
 % Setup
 downSampled_Fs = SleepScoringData.downSampled_Fs;
@@ -222,52 +153,19 @@ puffTimeCell = mat2cell(puffTimeElapsed', ones(max(length(puffTimes), 1), 1));
 Stim.PuffDistance = puffTimeCell;
 
 function [Run] = GetRunningData(SleepScoringData, binarizedRuns)
-%   function [Run] = GetRunningData(SleepScoringData, Bin_wwf)
-%
-%   Author: Aaron Winder
-%   Affiliation: Engineering Science and Mechanics, Penn State University
-%   https://github.com/awinde
-%
-%   DESCRIPTION: Returns details on runs which occurred during a trial.
-%   Including:
-%                           Duration - the time, in seconds, from onset to
-%                           cessation of a runing event.
-%                           Rest Time - the duration of resting behavior
-%                           prior to onset of the volitional run
-%                           Run Score - a measure of the intensity of
-%                           runing for the duration of the run a
-%                           maximum run for the whole duration will give
-%                           a score of 1. No runing will give a score of
-%                           0.
-%                           Movement Score - Same as run score exept uses
-%                           the force sensor beneath the animal to detect
-%                           body movement over the duration of the
-%                           volitional run.
-%                           Puff Distance - The time, in seconds, between
-%                           the onset of each run an every puff
-%                           administered during the trial.
-%_______________________________________________________________
-%   PARAMETERS:             
-%                       SleepScoringData - [struct] structure obtained using the 
-%                       function ProcessSleepScoringDataFile.    
-%_______________________________________________________________
-%   RETURN:                     
-%                       Run - [struct] structure containing a nested 
-%                       structure for each run performed.
-%_______________________________________________________________
 
-%% Setup
+% Setup
 downSampled_Fs = SleepScoringData.downSampled_Fs;
 
-%% Get Puff Times
+% Get Puff Times
 [puffTimes] = GetPuffTimes(SleepScoringData);
 
-%% Find the starts of runing
+% Find the starts of runing
 runEdge = diff(binarizedRuns);
 runSamples = find(runEdge > 0);
 runStarts = runSamples / downSampled_Fs;
 
-%% Classify each runing event by duration, runing intensity, rest durations
+% Classify each runing event by duration, runing intensity, rest durations
 sampleVec = 1:length(binarizedRuns); 
 
 % Identify periods of runing/resting, include beginning and end of trial
@@ -338,35 +236,14 @@ Run.runScore = runInt';
 Run.puffDistance = puffTimeCell;
 
 function [Rest] = GetRestData(SleepScoringData)
-%   function [Rest] = GetRestData(SleepScoringData)
-%
-%   Author: Aaron Winder
-%   Affiliation: Engineering Science and Mechanics, Penn State University
-%   https://github.com/awinde
-%
-%   DESCRIPTION: Returns details on periods of rest during a trial.
-%   Including:
-%          Rest:            Duration - the time, in seconds without any 
-%                           detected runing or body movement.
-%                           Start Time - the trial time corresponding to
-%                           the cessation of all volitional movement.   
-%_______________________________________________________________
-%   PARAMETERS:             
-%                       SleepScoringData - [struct] structure obtained using the 
-%                       function ProcessSleepScoringDataFile.    
-%_______________________________________________________________
-%   RETURN:                     
-%                       Rest - [struct] structure containing a nested 
-%                       structure for each period of rest.
-%_______________________________________________________________
 
 % Setup
 downSampled_Fs = SleepScoringData.downSampled_Fs;
 
-%% Get stimulation times
+% Get stimulation times
 [puffTimes] = GetPuffTimes(SleepScoringData);
 
-%% Recalculate linked binarized wwf without omitting any possible runs,
+% Recalculate linked binarized wwf without omitting any possible runs,
 % this avoids inclusion of brief runer movements in periods of rest.
 
 % Assume that runs at the beginning/end of trial continue outside of the
@@ -380,7 +257,7 @@ linkThresh = 0.5; % seconds
 breakThresh = 0;% seconds
 binarizedRuns = GT_LinkBinaryEvents(gt(modBinarizedRuns, 0), [linkThresh breakThresh]*downSampled_Fs);
 
-%% Combine binarizedRuns, binarizedForceSensor, and puffTimes, to find periods of rest. 
+% Combine binarizedRuns, binarizedForceSensor, and puffTimes, to find periods of rest. 
 
 % Add puff times into the Bin_wf
 puffInds = round(puffTimes*downSampled_Fs);
