@@ -1,4 +1,4 @@
-function [S,f,Serr]=GT_mtspectrumc(data,params)
+function [S,f,Serr] = GT_mtspectrumc(data,params)
 %________________________________________________________________________________________________________________________
 % Utilized in analysis by Kevin L. Turner
 % The Pennsylvania State University, Dept. of Biomedical Engineering
@@ -58,20 +58,20 @@ function [S,f,Serr]=GT_mtspectrumc(data,params)
 
 if nargin < 1; error('Need data'); end;
 if nargin < 2; params=[]; end;
-[tapers,pad,Fs,fpass,err,trialave,params]=getparams(params);
+[tapers,pad,Fs,fpass,err,trialave,params]=GT_getparams(params);
 if nargout > 2 && err(1)==0; 
 %   Cannot compute error bars with err(1)=0. Change params and run again. 
     error('When Serr is desired, err(1) has to be non-zero.');
 end;
-data=change_row_to_column(data);
+data=GT_change_row_to_column(data);
 N=size(data,1);
 nfft=max(2^(nextpow2(N)+pad),N);
-[f,findx]=getfgrid(Fs,nfft,fpass); 
-tapers=dpsschk(tapers,N,Fs); % check tapers
-J=mtfftc(data,tapers,nfft,Fs);
+[f,findx]=GT_getfgrid(Fs,nfft,fpass); 
+tapers = GT_dpsschk(tapers,N,Fs); % check tapers
+J=GT_mtfftc(data,tapers,nfft,Fs);
 J=J(findx,:,:);
 S=squeeze(mean(conj(J).*J,2));
 if trialave; S=squeeze(mean(S,2));end;
 if nargout==3; 
-   Serr=specerr(S,J,err,trialave);
+   Serr=GT_specerr(S,J,err,trialave);
 end;

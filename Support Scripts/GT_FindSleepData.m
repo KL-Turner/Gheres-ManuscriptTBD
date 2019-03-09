@@ -5,41 +5,43 @@ function [GT_AnalysisInfo] = GT_FindSleepData(sleepScoringDataFiles, GT_Analysis
 % https://github.com/KL-Turner
 %________________________________________________________________________________________________________________________
 %
-%   Purpose: This function uses the sleep logicals in each SleepScoringData file to find periods where there are 60 seconds of 
-%            consecutive ones within the sleep logical (12 or more). If a SleepScoringData file's sleep logical contains one or
-%            more of these 60 second periods, each of those bins is gathered from the data and put into the SleepEventData.mat
-%            struct along with the file's name. 
+%   Purpose: This function uses the sleep logicals in each SleepScoringData file to find periods where there are a defined
+%            number of consecutive ones within the sleep logical. If a SleepScoringData file's sleep logical contains one or
+%            more of these n second periods, each of those bins is gathered from the data and put into the GT_AnalysisInfo
+%            struct along with the file's name and corresponding bin times. 
 %________________________________________________________________________________________________________________________
 %
-%   Inputs: The function loops through each SleepScoringData file within the current folder - no inputs to the function itself
-%           This was done as it was easier to add to the SleepEventData struct instead of loading it and then adding to it
-%           with each SleepScoringData loop.
+%   Inputs: sleepScoringDataFiles (m by n character array) with the list of file IDs
+%           GT_AnalysisInfo.mat (stuct) with the scoring analysis summary info.
+%           guiParams.mat (struct) with the scoring parameters from the GUI.
 %
-%   Outputs: SleepEventData.mat struct
+%   Outputs: GT_AnalysisInfo.mat (struct) with the results of the analysis.
 %________________________________________________________________________________________________________________________
 
 %% BLOCK PURPOSE: Create sleep scored data structure.
 % Identify sleep epochs and place in SleepEventData.mat structure
 GT_AnalysisInfo.(guiParams.scoringID).data = [];
 sleepBins = guiParams.minSleepTime / 5;
-for sF = 1:size(sleepScoringDataFiles, 1)           % Loop through the list of SleepScoringData files
+for sF = 1:size(sleepScoringDataFiles, 1) 
     sleepScoringDataFile = sleepScoringDataFiles(sF, :);
-    [~, ~, ~, fileID] = GT_GetFileInfo(sleepScoringDataFile);     % Gather file info
-    load(sleepScoringDataFile);                             % Load in sleepScoringDataFile associated with character string
+    [~, ~, ~, fileID] = GT_GetFileInfo(sleepScoringDataFile);
+    load(sleepScoringDataFile);   
     
+    % Reset variables so that the cells aren't left over from previous iteration.
     clear deltaPower thetaPower gammaPower ballVelocity HeartRate CBV BinTimes
     clear cellDeltaPower cellThetaPower cellGammaPower cellBallVelocity cellHeartRate cellCBV cellBinTimes
     clear mat2CellDeltaPower mat2CellThetaPower mat2CellGammaPower mat2CellBallVelocity mat2CellHeartRate mat2CellCBV mat2CellBinTimes
     clear matDeltaPower matThetaPower matGammaPower matBallVelocity matHeartRate matCBV matBinTimes
     
+    % Find the corresponding sleep logical for the current file ID.
     for pF = 1:length(GT_AnalysisInfo.(guiParams.scoringID).FileIDs)
         if strcmp(char(GT_AnalysisInfo.(guiParams.scoringID).FileIDs{pF,1}), fileID)
             sleepLogical = GT_AnalysisInfo.(guiParams.scoringID).Logicals.sleepLogical{pF, 1};
         end
     end
     
-    targetTime = ones(1, sleepBins);   % Target time 
-    sleepIndex = find(conv(sleepLogical, targetTime) >= sleepBins) - (sleepBins - 1);   % Find the periods of time where there are at least 11 more
+    targetTime = ones(1, sleepBins);
+    sleepIndex = find(conv(sleepLogical, targetTime) >= sleepBins) - (sleepBins - 1); 
     % 5 second epochs following. This is not the full list.
     if isempty(sleepIndex)  % If sleepIndex is empty, skip this file
         % Skip file
@@ -56,7 +58,7 @@ for sF = 1:size(sleepScoringDataFiles, 1)           % Loop through the list of S
             BinTimes{indexCount, 1} = 5*fixedSleepIndex(indexCount);
         end
         
-        indexBreaks = find(fixedSleepIndex(2:end) - fixedSleepIndex(1:end - 1) > 1);    % Find if there are numerous sleep periods
+        indexBreaks = find(fixedSleepIndex(2:end) - fixedSleepIndex(1:end - 1) > 1);   % Find if there are numerous sleep periods
         
         if isempty(indexBreaks)   % If there is only one period of sleep in this file and not multiple
             matDeltaPower = cell2mat(deltaPower);
@@ -184,7 +186,7 @@ for sF = 1:size(sleepScoringDataFiles, 1)           % Loop through the list of S
             end
         end
         
-        %% BLOCK PURPOSE: Save the data in the SleepEventData struct
+        %% BLOCK PURPOSE: Save the data in the GT_AnalysisInfo struct
         if isempty(GT_AnalysisInfo.(guiParams.scoringID).data)  % If the structure is empty, we need a special case to format the struct properly
             for cellLength = 1:size(cellDeltaPower, 2)   % Loop through however many sleep epochs this file has
                 GT_AnalysisInfo.(guiParams.scoringID).data.deltaBandPower{cellLength, 1} = cellDeltaPower{1, 1};

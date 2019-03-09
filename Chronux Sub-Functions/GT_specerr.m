@@ -1,4 +1,4 @@
-function Serr=GT_specerr(S,J,err,trialave,numsp)
+function Serr = GT_specerr(S,J,err,trialave,numsp)
 %________________________________________________________________________________________________________________________
 % Utilized in analysis by Kevin L. Turner
 % The Pennsylvania State University, Dept. of Biomedical Engineering

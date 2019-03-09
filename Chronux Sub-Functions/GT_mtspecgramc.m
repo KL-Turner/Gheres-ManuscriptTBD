@@ -70,18 +70,18 @@ if length(params.tapers)==3 & movingwin(1)~=params.tapers(2);
     error('Duration of data in params.tapers is inconsistent with movingwin(1), modify params.tapers(2) to proceed')
 end
 
-[tapers,pad,Fs,fpass,err,trialave,params]=getparams(params);
+[tapers,pad,Fs,fpass,err,trialave,params]=GT_getparams(params);
 if nargout > 3 && err(1)==0; 
 %   Cannot compute error bars with err(1)=0. change params and run again.
     error('When Serr is desired, err(1) has to be non-zero.');
 end;
-data=change_row_to_column(data);
+data=GT_change_row_to_column(data);
 [N,Ch]=size(data);
 Nwin=round(Fs*movingwin(1)); % number of samples in window
 Nstep=round(movingwin(2)*Fs); % number of samples to step through
 nfft=max(2^(nextpow2(Nwin)+pad),Nwin);
 f=getfgrid(Fs,nfft,fpass); Nf=length(f);
-params.tapers=dpsschk(tapers,Nwin,Fs); % check tapers
+params.tapers=GT_dpsschk(tapers,Nwin,Fs); % check tapers
 
 winstart=1:Nstep:N-Nwin+1;
 nw=length(winstart); 
@@ -98,11 +98,11 @@ for n=1:nw;
    indx=winstart(n):winstart(n)+Nwin-1;
    datawin=data(indx,:);
    if nargout==4
-     [s,f,serr]=mtspectrumc(datawin,params);
+     [s,f,serr]=GT_mtspectrumc(datawin,params);
      Serr(1,n,:,:)=squeeze(serr(1,:,:));
      Serr(2,n,:,:)=squeeze(serr(2,:,:));
    else
-     [s,f]=mtspectrumc(datawin,params);
+     [s,f]=GT_mtspectrumc(datawin,params);
    end
    S(n,:,:)=s;
 end;

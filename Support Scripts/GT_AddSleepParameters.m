@@ -5,37 +5,32 @@ function GT_AddSleepParameters(sleepScoringDataFile)
 % https://github.com/KL-Turner
 %________________________________________________________________________________________________________________________
 %
-%   Purpose: This function serves to add the relevant sleep parameters to each ProcData file, the most notable being the
-%            delta power that will be normalized by the current day's DeltaBandBaseline, which was obtained from the 
-%            whisking events. The other parameters include the raw CBV from both hemispheres, the raw neural data from
-%            both hemispheres (as well as the non-normalized Gamma band power), the Heart Rate, and whisker acceleration.
+%   Purpose: This function serves to add the relevant sleep parameters to each SleepScoringData file, the most notable being
+%            the delta and theta power that will be normalized by the current day's baseline, which was obtained from the 
+%            resting events. The other parameters include the raw CBV, the Heart Rate, and the ball velocity.
 %________________________________________________________________________________________________________________________
 %
-%   Inputs: ProcData and RawData files from the same 5 minute imaging session. The RawData file contains the raw neural
-%           data, while the ProcData file contains the Delta and Gamma bands, and the whisker position used to calculate
-%           the acceleration. The raw CBV is in both files - either can be used. The Heart Rate is then calculated from 
-%           the raw CBV.
+%   Inputs: sleepScoringDataFile (string) ID of file whose parameters are to be chunked into 5 second bins.
 %
-%   Outputs: 5 second bins of each of the previously mentioned parameters that are either relevenat for sleep scoring, 
-%            or for post-scoring analysis.
+%   Outputs: None - saves the SleepScoringData.mat struct to the current directory.
 %________________________________________________________________________________________________________________________
 
-%% BLOCK PURPOSE: Create folder for the Neural Data of each electrode
+%% BLOCK PURPOSE: Chunk the neural data from the electrode
 load(sleepScoringDataFile)
 
-Delta = SleepScoringData.normDeltaBandPower;   % Right electrode Delta power signal
-Theta = SleepScoringData.normThetaBandPower;   % Right electrode Theta power signal
-Gamma = SleepScoringData.normGammaBandPower;   % Right electrode Gamma power signal
+Delta = SleepScoringData.normDeltaBandPower;
+Theta = SleepScoringData.normThetaBandPower;
+Gamma = SleepScoringData.normGammaBandPower;
 
 % Smooth the signal with a 1 Hz low pass 4th-order butterworth filter
 % Sampling Rate is 30 Hz for Delta, Theta, and Gamma signals
 [B, A] = butter(4, 1 / (30 / 2), 'low');  
-DeltaNeuro = filtfilt(B, A, Delta);   % Filtered right electrode Delta power signal
-ThetaNeuro = filtfilt(B, A, Theta);   % Filtered right electrode Delta power signal
-GammaNeuro = filtfilt(B, A, Gamma);   % Filtered right electrode Gamma power signal
+DeltaNeuro = filtfilt(B, A, Delta);
+ThetaNeuro = filtfilt(B, A, Theta);
+GammaNeuro = filtfilt(B, A, Gamma);
 
 % Divide the neural signals into five second bins and put them in a cell array
-tempDeltaStruct = cell(60, 1);   % Pre-allocate cell array
+tempDeltaStruct = cell(60, 1);
 tempThetaStruct = cell(60, 1);
 tempGammaStruct = cell(60, 1);
 
@@ -55,51 +50,51 @@ for neuralBins = 1:60   % loop through all 9000 samples across 5 minutes in 5 se
     end
 end
 
-SleepScoringData.SleepParameters.deltaBandPower = tempDeltaStruct;   % Place the data in the ProcData struct to later be saved
+SleepScoringData.SleepParameters.deltaBandPower = tempDeltaStruct;
 SleepScoringData.SleepParameters.thetaBandPower = tempThetaStruct;
 SleepScoringData.SleepParameters.gammaBandPower = tempGammaStruct;
 
 
-%% BLOCK PURPOSE: Create folder for the Whisker Acceleration
-ballVelocity = SleepScoringData.binBallVelocity;     % Unfiltered whisker angle
+%% BLOCK PURPOSE: Chunk the ball velocity
+ballVelocity = SleepScoringData.binBallVelocity;
 
-% Find the number of whiskerBins due to frame drops.
-ballBinNumber = ceil(length(ballVelocity) / 150);
+% Find the number of ball bins.
+ballBinNumber = ceil(length(ballVelocity) / 30);
 
 % Divide the signal into five second bins and put them in a cell array
-tempBallStruct = cell(ballBinNumber, 1);   % Pre-allocate cell array
+tempBallStruct = cell(ballBinNumber, 1);
 
-for ballBins = 1:ballBinNumber  % loop through all 9000 samples across 5 minutes in 5 second bins (60 total)
+for ballBins = 1:ballBinNumber  
     if ballBins == 1
-        tempBallStruct(ballBins, 1) = {(ballVelocity(ballBins:150))};  % Samples 1 to 150
+        tempBallStruct(ballBins, 1) = {(ballVelocity(ballBins:150))}; 
     elseif ballBins == ballBinNumber
-        tempBallStruct(ballBins, 1) = {(ballVelocity((((150*(ballBins - 1)) + 1)):end))};  % Samples 8701 to end. which changes due to dropped frames
+        tempBallStruct(ballBins, 1) = {(ballVelocity((((150*(ballBins - 1)) + 1)):end))};
     else
-        tempBallStruct(ballBins, 1) = {(ballVelocity((((150*(ballBins - 1)) + 1)):(150*ballBins)))};  % Samples 151 to 300, etc...
+        tempBallStruct(ballBins, 1) = {(ballVelocity((((150*(ballBins - 1)) + 1)):(150*ballBins)))};
     end
 end
-SleepScoringData.SleepParameters.ballVelocity = tempBallStruct;   % Place the data in the ProcData struct to later be saved
+SleepScoringData.SleepParameters.ballVelocity = tempBallStruct;
 
-%% BLOCK PURPOSE: Create folder for the Heart Rate
+%% BLOCK PURPOSE: Chunk the Heart Rate into five second bins
 % Find the heart rate from the current ProcData file
 HeartRate = SleepScoringData.HeartRate;
 
 % Divide the signal into five second bins and put them in a cell array
-tempHRStruct = cell(60, 1);   % Pre-allocate cell array
+tempHRStruct = cell(60, 1); 
 
-for HRBins = 1:60  % loop through all 297 samples across 5 minutes in 5 second bins (60 total)
+for HRBins = 1:60  
     if HRBins == 1
-        tempHRStruct(HRBins, 1) = {HeartRate(HRBins:5)};  % Samples 1 to 5
+        tempHRStruct(HRBins, 1) = {HeartRate(HRBins:5)};
     elseif HRBins == 60
-        tempHRStruct(HRBins, 1) = {HeartRate((((5*(HRBins - 1)) + 1)):end)};  % Samples 297 to end.
+        tempHRStruct(HRBins, 1) = {HeartRate((((5*(HRBins - 1)) + 1)):end)};
     else
-        tempHRStruct(HRBins, 1) = {HeartRate((((5*(HRBins - 1)) + 1)):(5*HRBins))};  % Samples 6 to 10, etc...
+        tempHRStruct(HRBins, 1) = {HeartRate((((5*(HRBins - 1)) + 1)):(5*HRBins))}; 
     end
 end
 
-SleepScoringData.SleepParameters.HeartRate = tempHRStruct;   % Place the data in the ProcData struct to later be saved
+SleepScoringData.SleepParameters.HeartRate = tempHRStruct;
 
-%% BLOCK PURPOSE: Create folder for the left and right CBV data
+%% BLOCK PURPOSE: Chunk the  CBV data
 CBV = SleepScoringData.normCBV;
 
 [D, C] = butter(4, 1 / (30 / 2), 'low');  
@@ -107,15 +102,15 @@ FiltCBV = filtfilt(D, C, CBV);
 
 tempCBVStruct = cell(60, 1);   % Pre-allocate cell array 
 
-for CBVBins = 1:60   % loop through all 9000 samples across 5 minutes in 5 second bins (60 total)
+for CBVBins = 1:60  
     if CBVBins == 1
-        tempCBVStruct(CBVBins, 1) = {FiltCBV(CBVBins:150)};  % Samples 1 to 150
+        tempCBVStruct(CBVBins, 1) = {FiltCBV(CBVBins:150)};
     else
-        tempCBVStruct(CBVBins, 1) = {FiltCBV((((150*(CBVBins - 1)) + 1)):(150*CBVBins))};  % Samples 151 to 300, etc...
+        tempCBVStruct(CBVBins, 1) = {FiltCBV((((150*(CBVBins - 1)) + 1)):(150*CBVBins))};
     end
 end
 
-SleepScoringData.SleepParameters.CBV = tempCBVStruct;   % Place the data in the ProcData struct to later be saved
+SleepScoringData.SleepParameters.CBV = tempCBVStruct; 
 
 save(sleepScoringDataFile, 'SleepScoringData');
 

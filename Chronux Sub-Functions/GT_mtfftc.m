@@ -22,7 +22,7 @@ function J=GT_mtfftc(data,tapers,nfft,Fs)
 % Output:
 %       J (fft in form frequency index x taper index x channels/trials)
 if nargin < 4; error('Need all input arguments'); end;
-data=change_row_to_column(data);
+data=GT_change_row_to_column(data);
 [NC,C]=size(data); % size of data
 [NK K]=size(tapers); % size of tapers
 if NK~=NC; error('length of tapers is incompatible with length of data'); end;
