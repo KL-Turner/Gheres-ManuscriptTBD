@@ -80,7 +80,7 @@ data=GT_change_row_to_column(data);
 Nwin=round(Fs*movingwin(1)); % number of samples in window
 Nstep=round(movingwin(2)*Fs); % number of samples to step through
 nfft=max(2^(nextpow2(Nwin)+pad),Nwin);
-f=getfgrid(Fs,nfft,fpass); Nf=length(f);
+f=GT_getfgrid(Fs,nfft,fpass); Nf=length(f);
 params.tapers=GT_dpsschk(tapers,Nwin,Fs); % check tapers
 
 winstart=1:Nstep:N-Nwin+1;

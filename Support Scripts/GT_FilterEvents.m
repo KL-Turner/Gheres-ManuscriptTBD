@@ -1,44 +1,23 @@
 function [FiltArray] = GT_FilterEvents(DataStruct, Criteria)
-%___________________________________________________________________________________________________
-% Edited by Kevin L. Turner 
-% Ph.D. Candidate, Department of Bioengineering 
-% The Pennsylvania State University
+%________________________________________________________________________________________________________________________
+% Edited by Kevin L. Turner
+% The Pennsylvania State University, Dept. of Biomedical Engineering
+% https://github.com/KL-Turner
 %
-% Originally written by Aaron T. Winder
+% Adapted from code written by Dr. Aaron T. Winder: https://github.com/awinde
+%________________________________________________________________________________________________________________________
 %
-%   Last Revised: August 9th, 2018
-%___________________________________________________________________________________________________
+%   Purpose: Filter a given structure based on a list of criteria.
+%________________________________________________________________________________________________________________________
 %
-%   Author: Aaron Winder
-%   Affiliation: Engineering Science and Mechanics, Penn State University
-%   https://github.com/awinde
+%   Inputs: DataStruct (struct) of data to be filtered.
+%           Criteria (struct) with three fields, 'Fieldname (string)', Comparison (lt, gt, equal), and Value (double).
 %
-%   DESCRIPTION: Filters a data structure according to a set of
-%   user-defined criteria.
-%   
-%_______________________________________________________________
-%   PARAMETERS:             
-%               DataStruct - [structure] contains the data to be filtered.
+%   Outputs: FiltArray (logical) array of values that met criteria.
 %
-%               Criteria - [structure] contains fieldnames with 
-%                   instructions on how to filter DataStruct:
-%                       Required fields:
-%                           Fieldname - [cells of strings] the fieldnames of
-%                           DataStruct to be used for filtering
-%
-%                           Comparison - [cells of strings] instruction of how to
-%                           filter the fieldnames. This input in restricted
-%                           to the three commands: 'gt','lt','equal'.
-%
-%                           Value - [cell of doubles] the value that the data in 
-%                           Criteria.Fieldnames should be compared to using
-%                           the instruction in Criteria.Comparison.
-%_______________________________________________________________
-%   RETURN:                     
-%               FiltArray - [logical array] an array for filtering the 
-%                   data in "DataStruct" according the instructions in
-%                   "Fieldnames".
-%_______________________________________________________________
+%   Last Revised: March 9th, 2019
+%________________________________________________________________________________________________________________________
+
 FName = Criteria.Fieldname;
 Comp = Criteria.Comparison;
 Val = Criteria.Value;

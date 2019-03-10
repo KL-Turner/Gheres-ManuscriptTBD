@@ -262,8 +262,8 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CreateTrialSpectrograms') || 
         params.fpass = [0.1 100];
         movingwin1 = [1 1/5];
         movingwin5 = [5 1/5]; 
-        [Neural_S1, Neural_T1, Neural_F1] = mtspecgramc_GPU(filtRawNeuro, movingwin1, params);
-        [Neural_S5, Neural_T5, Neural_F5] = mtspecgramc_GPU(filtRawNeuro, movingwin5, params);
+        [Neural_S1, Neural_T1, Neural_F1] = GT_mtspecgramc(filtRawNeuro, movingwin1, params);
+        [Neural_S5, Neural_T5, Neural_F5] = GT_mtspecgramc(filtRawNeuro, movingwin5, params);
  
         SpectrogramData.FiveSec.S{blockFourProg, 1} = Neural_S5';
         SpectrogramData.FiveSec.T{blockFourProg, 1}  = Neural_T5;
@@ -314,7 +314,7 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') |
     for blockSixProg = 1:size(sleepScoringDataFiles, 1)
         sleepScoringDataFile = sleepScoringDataFiles(blockSixProg, :);
         % Feed the function one file at a time along with the summary structure and SpectrogramData structure.
-        [GT_AnalysisInfo] = GT_NormalizeData(sleepScoringDataFile, GT_AnalysisInfo, SpectrogramData);
+        GT_NormalizeData(sleepScoringDataFile, GT_AnalysisInfo, SpectrogramData);
         GT_multiWaitbar('Normalizing Data by Baselines', blockSixProg/size(sleepScoringDataFiles, 1));   % Update progress bar.
     end
     % When finished with each file, save the summary structure and set the checklist for this block to true.

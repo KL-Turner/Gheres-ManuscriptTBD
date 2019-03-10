@@ -1,16 +1,20 @@
-function [GT_AnalysisInfo] = GT_NormalizeData(sleepScoringDataFile, GT_AnalysisInfo, SpectrogramData)
+function GT_NormalizeData(sleepScoringDataFile, GT_AnalysisInfo, SpectrogramData)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
-% Ph.D. Candidate, Department of Bioengineering
-% The Pennsylvania State University
+% The Pennsylvania State University, Dept. of Biomedical Engineering
+% https://github.com/KL-Turner
 %________________________________________________________________________________________________________________________
 %
-%   Purpose: //
+%   Purpose: Normalize spectrograms and other data by the unique day's resting baseline values.
 %________________________________________________________________________________________________________________________
 %
-%   Inputs: //
+%   Inputs: sleepScoringDataFile (string) file ID to be normalized.
+%           GT_AnalysisInfo.mat (struct) of sleep scoring results summary.
+%           SpectrogramData.mat (struct) of spectrogram data for each file.
 %
-%   Outputs: //
+%   Outputs: None - saves normalized value to each SleepScoringData.mat file.
+%
+%   Last Revised: March 9th, 2019
 %________________________________________________________________________________________________________________________
 
 load(sleepScoringDataFile)
