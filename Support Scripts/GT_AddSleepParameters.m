@@ -57,20 +57,20 @@ SleepScoringData.SleepParameters.gammaBandPower = tempGammaStruct;
 
 %% BLOCK PURPOSE: Chunk the ball velocity
 ballVelocity = SleepScoringData.binBallVelocity;
-
+Bin_width=5*SleepScoringData.downSampled_Fs; %Set up a five second duration bin for binning locomotion data 3-11-19 KWG
 % Find the number of ball bins.
-ballBinNumber = ceil(length(ballVelocity) / 30);
-
+ballBinNumber = ceil(length(ballVelocity) / Bin_width);
+%ballBinNumber=floor(length(ballVelocity)/30);
 % Divide the signal into five second bins and put them in a cell array
 tempBallStruct = cell(ballBinNumber, 1);
 
 for ballBins = 1:ballBinNumber  
     if ballBins == 1
-        tempBallStruct(ballBins, 1) = {(ballVelocity(ballBins:150))}; 
+        tempBallStruct(ballBins, 1) = {(ballVelocity(ballBins:Bin_width))}; 
     elseif ballBins == ballBinNumber
-        tempBallStruct(ballBins, 1) = {(ballVelocity((((150*(ballBins - 1)) + 1)):end))};
+        tempBallStruct(ballBins, 1) = {(ballVelocity((((Bin_width*(ballBins - 1)) + 1)):end))};
     else
-        tempBallStruct(ballBins, 1) = {(ballVelocity((((150*(ballBins - 1)) + 1)):(150*ballBins)))};
+        tempBallStruct(ballBins, 1) = {(ballVelocity((((Bin_width*(ballBins - 1)) + 1)):(Bin_width*ballBins)))};
     end
 end
 SleepScoringData.SleepParameters.ballVelocity = tempBallStruct;

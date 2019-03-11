@@ -36,8 +36,8 @@ downSampled_Fs = SleepScoringData.downSampled_Fs;
 
 %% Process binary runing waveform to detect runing events
 % Setup parameters for link_binary_events
-linkThresh = 0.5;   % seconds, Link events < 0.5 seconds apart
-breakThresh = 0;   % seconds changed by atw on 2/6/18 from 0.07
+linkThresh = 1;   % seconds, Link events < 0.5 seconds apart
+breakThresh = 0.5;   % seconds changed by atw on 2/6/18 from 0.07
 
 % Assume that runs at the beginning/end of trial continue outside of the
 % trial time. This will link any event occurring within "link_thresh"
@@ -47,7 +47,7 @@ modBinVel = SleepScoringData.binBallVelocity;
 
 % Link the binarized runing for use in GetRunningData function
 binVel = GT_LinkBinaryEvents(gt(modBinVel,0), [linkThresh breakThresh]*downSampled_Fs);
-
+%binVel=SleepScoringData.LinkedBallVelocity;
 % Added 2/6/18 with atw. Code throws errors if binRuns(1) = 1 and binRuns(2) = 0, or if 
 % binRuns(1) = 0 and binRuns(2) = 1. This happens in GetRunningData because starts of 
 % runs are detected by taking the derivative of binRuns. Purpose of following lines is to 

@@ -26,6 +26,9 @@ function [GT_AnalysisInfo] = GT_MainScript_GPU()
 %% BLOCK PURPOSE: [0] Set parameters to be used for sleep scoring characterization.
 boom;   % function set to clear, clc, close all
 
+id = 'signal:filtfilt:ParseSOS';
+warning('off', id)
+
 % Pull a list (m by n character array) corresponding to all _rawdata.mat files in the current directory.
 rawDataDirectory = dir('*_RawData.mat');
 rawDataFiles = char({rawDataDirectory.name}');
@@ -147,7 +150,7 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_Analys
     for blockTwoProg = 1:size(sleepScoringDataFiles, 1)
         sleepScoringDataFile = sleepScoringDataFiles(blockTwoProg, :);
         % Feed the function one file at a time along with the summary structure.
-        [GT_AnalysisInfo] = GT_CategorizeData(sleepScoringDataFile, GT_AnalysisInfo);
+        GT_CategorizeData(sleepScoringDataFile);
         GT_multiWaitbar('Categorizing Behavioral Data', blockTwoProg/size(sleepScoringDataFiles, 1));   % Update progress bar.
     end
 else
@@ -415,6 +418,8 @@ end
 
 % Change back to the original directory.
 cd(curDir);
+warning('on', id)
+clear id 
 
 end
 

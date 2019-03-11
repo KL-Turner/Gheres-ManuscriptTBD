@@ -70,6 +70,7 @@ restVelocity = mean(resampledBallVelocity(inds));
 
 SleepScoringData.ballVelocity = resampledBallVelocity - restVelocity;
 SleepScoringData.binBallVelocity = binarizedBallVelocity;
+%SleepScoringData.LinkedBallVelocity=linkedBinarizedVelocity;
 SleepScoringData.CBV = RawData.barrels.CBVrefl_barrels;
 SleepScoringData.HeartRate = RawData.HR;
 
