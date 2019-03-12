@@ -21,7 +21,9 @@ load(rawDataFile)
 strDay = GT_ConvertDate(fileDate);
 trialDuration_Seconds = 300;
 expectedLength = trialDuration_Seconds*RawData.an_fs;
-
+[~, tr, ~, HR] = FindHeartRate(RawData.barrels.CBVrefl_barrels, RawData.dal_fr);
+RawData.HR = HR;
+RawData.HR_tr = tr;
 %% Process the neural data into desired frequency bands.
 % Delta [1-4 Hz]
 [SleepScoringData.deltaBandPower, SleepScoringData.downSampled_Fs] = GT_ProcessNeuro(RawData, 'Delta', trialDuration_Seconds);
