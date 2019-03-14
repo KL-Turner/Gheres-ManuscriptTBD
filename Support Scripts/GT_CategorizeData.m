@@ -253,8 +253,8 @@ downSampled_Fs = SleepScoringData.downSampled_Fs;
 modBinarizedRuns = SleepScoringData.binBallVelocity;
 modBinarizedRuns([1, end]) = 1;
 
-linkThresh = 0.5; % seconds
-breakThresh = 0;% seconds
+linkThresh = 1.0; % seconds
+breakThresh = 0.5;% seconds
 binarizedRuns = GT_LinkBinaryEvents(gt(modBinarizedRuns, 0), [linkThresh breakThresh]*downSampled_Fs);
 
 % Combine binarizedRuns, binarizedForceSensor, and puffTimes, to find periods of rest. 

@@ -118,7 +118,8 @@ set(gca, 'Ticklength', [0 0]);
 set(gca,'YColor', GT_colors('Dark Candy Apple Red'));
 
 ax3 = subplot(5,1,4:5);
-imagesc(SleepScoringData.Spectrograms.FiveSec.T5, SleepScoringData.Spectrograms.FiveSec.F5, SleepScoringData.Spectrograms.FiveSec.S5_Norm)
+%imagesc(SleepScoringData.Spectrograms.FiveSec.T5, SleepScoringData.Spectrograms.FiveSec.F5, SleepScoringData.Spectrograms.FiveSec.S5_Norm)
+imagesc(SleepScoringData.Spectrograms.OneSec.T1, SleepScoringData.Spectrograms.OneSec.F1, SleepScoringData.Spectrograms.OneSec.S1_Norm)
 axis xy
 caxis([-1 2])
 title('Normalized spectrogram - caxis default [-1:2]')

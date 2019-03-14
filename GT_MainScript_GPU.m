@@ -124,7 +124,7 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_ProcessRawData') || GT_Analys
     for blockOneProg = 1:size(rawDataFiles, 1)
         rawDataFile = rawDataFiles(blockOneProg, :);
         % Feed the function one file at a time along with the summary structure.
-        [GT_AnalysisInfo] = GT_ProcessRawData(rawDataFile, GT_AnalysisInfo);
+        [GT_AnalysisInfo] = GT_ProcessRawData_GPU(rawDataFile, GT_AnalysisInfo);
         GT_multiWaitbar('Processing RawData Files', blockOneProg/size(rawDataFiles, 1));   % Update progress bar.
     end
     % When finished with each file, save the summary structure and set the checklist for this block to true.
@@ -390,6 +390,14 @@ if guiParams.saveFigsToggle == true
             GT_CreateSingleTrialFigs(uniqueSleepFile, GT_AnalysisInfo, guiParams);
             GT_multiWaitbar('Generating Single Trial Summary Figures', blockEightProg/size(uniqueSleepFiles, 1));   % Update progress bar.
         end
+%     else
+%         uniqueSleepFiles = unique(GT_AnalysisInfo.(guiParams.scoringID).data.fileIDs);
+%          for blockEightProg = 1:size(uniqueSleepFiles, 1)
+%             uniqueSleepFile = ([animalID '_' hem '_' char(uniqueSleepFiles(blockEightProg, :)) '_SleepScoringData.mat']);
+%             % Feed the function one file at a time along with the summary structure and gui parameters.
+%             GT_CreateSingleTrialFigs_NoSleep(uniqueSleepFile, GT_AnalysisInfo, guiParams);
+%             GT_multiWaitbar('Generating Single Trial Summary Figures', blockEightProg/size(uniqueSleepFiles, 1));   % Update progress bar.
+%         end
     end
 end
 

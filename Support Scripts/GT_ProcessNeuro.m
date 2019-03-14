@@ -48,7 +48,7 @@ if ismember(neurType, [{'MUApower'}, {'Gam'}, {'Beta'}, {'Alpha'}, {'Theta'}, {'
     [z, p, k] = butter(4, fpass/(analogFs/2));
     [sos, g] = zp2sos(z, p, k);
     filtNeuro = filtfilt(sos, g, neuralData - mean(neuralData));
-    [z1, p1, k1] = butter(4, 10/(analogFs/2), 'low');
+    [z1, p1, k1] = butter(4, 1/(analogFs/2), 'low');%changed from 10Hz to 1Hz lowpass filter of neural data
     [sos1, g1] = zp2sos(z1, p1, k1);
     longNeuro = filtfilt(sos1, g1, filtNeuro.^2);
     % WARNING. Certain 3rd-party image processing packages have been caught using identical function names

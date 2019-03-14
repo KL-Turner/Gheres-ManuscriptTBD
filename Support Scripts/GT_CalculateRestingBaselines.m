@@ -21,11 +21,11 @@ function [GT_AnalysisInfo] = GT_CalculateRestingBaselines(GT_AnalysisInfo, guiPa
 % that is greater than 10 seconds.
 RestCriteria.Fieldname = {'durations'};
 RestCriteria.Comparison = {'gt'};
-RestCriteria.Value = {5};
+RestCriteria.Value = {15}; %minimum duration in seconds to classify as true rest. Changed to 15sec 3-13-19 KWG
 
 puffCriteria.Fieldname = {'puffDistances'};
 puffCriteria.Comparison = {'gt'};
-puffCriteria.Value = {5};
+puffCriteria.Value = {5}; %duration after whisker stimulus to consider start of resting period.
 
 % Find the fieldnames of GT_AnalysisInfo.RestData and loop through each field. Each fieldname should be a different dataType of interest.
 % These will typically be CBV, Delta, Theta, Gamma, and MUA
