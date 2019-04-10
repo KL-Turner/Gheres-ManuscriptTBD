@@ -21,7 +21,7 @@ load(rawDataFile)
 strDay = GT_ConvertDate(fileDate);
 trialDuration_Seconds = 300;
 expectedLength = trialDuration_Seconds*RawData.an_fs;
-[~, tr, ~, HR] = GT_FindHeartRate_GPU(RawData.barrels.CBVrefl_barrels, RawData.dal_fr);
+[~, tr, ~, HR] = GT_FindHeartRate_GPU(RawData.IOS.barrels.CBVrefl, RawData.dal_fr);
 RawData.HR = HR;
 RawData.HR_tr = tr;
 %% Process the neural data into desired frequency bands.
@@ -39,7 +39,9 @@ RawData.HR_tr = tr;
 SleepScoringData.Sol.solenoidContralateral = find(diff(RawData.Sol) == 1) / RawData.an_fs;
 SleepScoringData.Sol.solenoidIpsilateral = find(diff(RawData.Sol) == 2) / RawData.an_fs;
 SleepScoringData.Sol.solenoidTail = find(diff(RawData.Sol) == 3) / RawData.an_fs;
-
+SleepScoringData.Opto.OptoStim(1,:)=find(diff(round(RawData.LED,0))>0)/RawData.an_fs;
+SleepScoringData.Opto.OptoStim(2,:)=find(diff(round(RawData.LED,0))<0)/RawData.an_fs;
+SleepScoringData.StimParams=RawData.AcquistionParams;
 %% Downsample and binarize the ball velocity.
 % Trim any additional data points for resample.
 trimmedBallVelocity = RawData.vBall(1:min(expectedLength, length(RawData.vBall)));
@@ -73,7 +75,7 @@ restVelocity = mean(resampledBallVelocity(inds));
 SleepScoringData.ballVelocity = resampledBallVelocity - restVelocity;
 SleepScoringData.binBallVelocity = binarizedBallVelocity;
 %SleepScoringData.LinkedBallVelocity=linkedBinarizedVelocity;
-SleepScoringData.CBV = RawData.barrels.CBVrefl_barrels;
+SleepScoringData.CBV = RawData.IOS.barrels.CBVrefl;
 SleepScoringData.HeartRate = RawData.HR;
 
 % Save the processed new structure to the current directory.

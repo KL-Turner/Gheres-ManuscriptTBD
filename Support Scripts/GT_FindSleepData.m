@@ -21,7 +21,7 @@ function [GT_AnalysisInfo] = GT_FindSleepData(sleepScoringDataFiles, GT_Analysis
 %% BLOCK PURPOSE: Create sleep scored data structure.
 % Identify sleep epochs and place in SleepEventData.mat structure
 GT_AnalysisInfo.(guiParams.scoringID).data = [];
-sleepBins = guiParams.minSleepTime / 5;
+sleepBins = (guiParams.minSleepTime / 5)+2;%Add 2 to account for +5sec pad before and +5 sec pad after sleep event
 for sF = 1:size(sleepScoringDataFiles, 1) 
     sleepScoringDataFile = sleepScoringDataFiles(sF, :);
     [~, ~, ~, fileID] = GT_GetFileInfo(sleepScoringDataFile);
@@ -39,7 +39,9 @@ for sF = 1:size(sleepScoringDataFiles, 1)
             sleepLogical = GT_AnalysisInfo.(guiParams.scoringID).Logicals.sleepLogical{pF, 1};
         end
     end
-    
+    StateChanges=diff(sleepLogical); 
+    sleepLogical(StateChanges==1)=1;
+    sleepLogical(find(StateChanges==-1)+1)=1;
     targetTime = ones(1, sleepBins);
     sleepIndex = find(conv(sleepLogical, targetTime) >= sleepBins) - (sleepBins - 1); 
     % 5 second epochs following. This is not the full list.

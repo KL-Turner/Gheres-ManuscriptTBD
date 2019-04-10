@@ -46,7 +46,7 @@ end
 solenoidContra = floor(SleepScoringData.Sol.solenoidContralateral);
 solenoidIpsi = floor(SleepScoringData.Sol.solenoidIpsilateral);
 solenoidTail = floor(SleepScoringData.Sol.solenoidTail);
-
+OptoStim=floor(SleepScoringData.Opto.OptoStim(1,:));
 %% BLOCK PURPOSE: Load in data and apply smoothing filters.
 [B, A] = butter(4, 4 / (30 / 2), 'low');
 HeartRate = zeros(1,300);
@@ -55,7 +55,22 @@ HeartRate(1) = HeartRate(2);
 HeartRate(299:end) = HeartRate(298);
 
 [D, C] = butter(4, 0.5/ (30 / 2), 'low');
-CBV = filtfilt(D, C, SleepScoringData.normCBV(1:end - 1))*100;
+if isempty(OptoStim)
+    CBV = filtfilt(D, C, SleepScoringData.normCBV(1:end - 1))*100;
+else
+    FlashCatch=diff(SleepScoringData.normCBV*100);
+    if max(FlashCatch)>=10
+        HoldRefl=SleepScoringData.normCBV;
+        Flash_Points=HoldRefl>=(3*std(SleepScoringData.normCBV));
+        HoldRefl(Flash_Points)=NaN;
+        [Interp_Data,Interp_Points]=fillmissing(HoldRefl,'spline');
+        Interp_Refl=Interp_Data;
+        CBV = filtfilt(D, C, Interp_Refl(1:end - 1))*100;
+    else
+        CBV = filtfilt(D, C, SleepScoringData.normCBV(1:end - 1))*100;
+    end
+end
+
 timeVec = (1:length(CBV))/30;
 delta = filtfilt(D, C, SleepScoringData.normDeltaBandPower);
 theta = filtfilt(D, C, SleepScoringData.normThetaBandPower);
@@ -74,6 +89,7 @@ ball_YVals = 1.10*max(CBV)*ones(size(binBallVelocity));
 solenoidContra_YVals = 1.20*max(CBV)*ones(size(solenoidContra));
 solenoidIpsi_YVals = 1.20*max(CBV)*ones(size(solenoidIpsi));
 solenoidTail_YVals = 1.20*max(CBV)*ones(size(solenoidTail));
+OptoStim_YVals=1.20*max(CBV)*ones(size(OptoStim));
 sleeping_YVal = 1.30*max(CBV)*ones(size(sleepPoints));
 
 %% Figure
@@ -84,7 +100,7 @@ hold on;
 axis tight
 ylabel('a.u.');
 yyaxis right
-ylim([6 15]);
+ylim([2 15]);
 plot(1:length(HeartRate), HeartRate, 'LineWidth', 1, 'color', GT_colors('carrot orange'));
 ylabel('Heart Rate (Hz)');
 animalname=strrep(animalID,'_',' ');
@@ -109,17 +125,18 @@ scatter(sleepPoints,sleeping_YVal, 'MarkerEdgeColor', 'k', 'MarkerFaceColor', GT
 scatter(solenoidContra, solenoidContra_YVals, 'v', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', GT_colors('raspberry'));
 scatter(solenoidIpsi, solenoidIpsi_YVals, 'v', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', GT_colors('teal blue'));
 scatter(solenoidTail, solenoidTail_YVals, 'v', 'MarkerEdgeColor', 'k', 'MarkerFaceColor', GT_colors('rose pink'));
+scatter(OptoStim,OptoStim_YVals,'v','MarkerEdgeColor','k','MarkerFaceColor',GT_colors('baby blue eyes'));
 
 title('Normalized CBV reflectance and individual neural bands of interest');
 ylabel('Reflectance (%)','Color', GT_colors('Dark Candy Apple Red'))
-ylim([(min(CBV)+min(CBV)*0.25),max(sleeping_YVal)+(max(sleeping_YVal)*0.1)]);
-legend('CBV', 'sleep epochs', 'contra stim', 'ipsi stim', 'tail stim', 'delta power', 'theta power', 'gamma power', 'Location', 'NorthEast')
+ylim([(min(CBV)+min(CBV)*0.25),max(sleeping_YVal)+(max(sleeping_YVal)*0.25)]);
+legend('CBV', 'sleep epochs', 'contra stim', 'ipsi stim', 'tail stim','Opto stim', 'delta power', 'theta power', 'gamma power', 'Location', 'NorthEast')
 set(gca, 'Ticklength', [0 0]);
 set(gca,'YColor', GT_colors('Dark Candy Apple Red'));
 
 ax3 = subplot(5,1,4:5);
-%imagesc(SleepScoringData.Spectrograms.FiveSec.T5, SleepScoringData.Spectrograms.FiveSec.F5, SleepScoringData.Spectrograms.FiveSec.S5_Norm)
-imagesc(SleepScoringData.Spectrograms.OneSec.T1, SleepScoringData.Spectrograms.OneSec.F1, SleepScoringData.Spectrograms.OneSec.S1_Norm)
+imagesc(SleepScoringData.Spectrograms.FiveSec.T5, SleepScoringData.Spectrograms.FiveSec.F5, SleepScoringData.Spectrograms.FiveSec.S5_Norm)
+%imagesc(SleepScoringData.Spectrograms.OneSec.T1, SleepScoringData.Spectrograms.OneSec.F1, SleepScoringData.Spectrograms.OneSec.S1_Norm)
 axis xy
 caxis([-1 2])
 title('Normalized spectrogram - caxis default [-1:2]')
