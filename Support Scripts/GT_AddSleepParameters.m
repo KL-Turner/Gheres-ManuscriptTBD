@@ -20,40 +20,53 @@ load(sleepScoringDataFile)
 
 Delta = SleepScoringData.normDeltaBandPower;
 Theta = SleepScoringData.normThetaBandPower;
+Spindle=SleepScoringData.normSpindlePower;
 Gamma = SleepScoringData.normGammaBandPower;
+Ripple=SleepScoringData.normRipplePower;
 
-% Smooth the signal with a 1 Hz low pass 4th-order butterworth filter
+% Smooth the signal with a 2 Hz low pass 4th-order butterworth filter
 % Sampling Rate is 30 Hz for Delta, Theta, and Gamma signals
-[B, A] = butter(4, 1 / (30 / 2), 'low');  
+[B, A] = butter(4, 2 / (30 / 2), 'low');  
 DeltaNeuro = filtfilt(B, A, Delta);
 ThetaNeuro = filtfilt(B, A, Theta);
+SpindleNeuro=filtfilt(B,A,Spindle);
 GammaNeuro = filtfilt(B, A, Gamma);
+RippleNeuro=filtfilt(B,A,Ripple);
 
 % Divide the neural signals into five second bins and put them in a cell array
 tempDeltaStruct = cell(60, 1);
 tempThetaStruct = cell(60, 1);
+tempSpindleStruct=cell(60,1);
 tempGammaStruct = cell(60, 1);
+tempRippleStruct = cell(60, 1);
 
 for neuralBins = 1:60   % loop through all 9000 samples across 5 minutes in 5 second bins (60 total)
     if neuralBins == 1
         tempDeltaStruct(neuralBins, 1) = {DeltaNeuro(neuralBins:150)};
         tempThetaStruct(neuralBins, 1) = {ThetaNeuro(neuralBins:150)};
+        tempSpindleStruct(neuralBins, 1) = {SpindleNeuro(neuralBins:150)};
         tempGammaStruct(neuralBins, 1) = {GammaNeuro(neuralBins:150)};
+        tempRippleStruct(neuralBins, 1) = {RippleNeuro(neuralBins:150)};
     elseif neuralBins == 60
         tempDeltaStruct(neuralBins, 1) = {DeltaNeuro((((150*(neuralBins - 1)) + 1)):end)};   % Samples 151 to 300, etc...
         tempThetaStruct(neuralBins, 1) = {ThetaNeuro((((150*(neuralBins - 1)) + 1)):end)};
+        tempSpindleStruct(neuralBins, 1) = {SpindleNeuro((((150*(neuralBins-1))+1)):end)};
         tempGammaStruct(neuralBins, 1) = {GammaNeuro((((150*(neuralBins - 1)) + 1)):end)};
+        tempRippleStruct(neuralBins, 1) = {RippleNeuro((((150*(neuralBins - 1)) + 1)):end)};
     else
         tempDeltaStruct(neuralBins, 1) = {DeltaNeuro((((150*(neuralBins - 1)) + 1)):(150*neuralBins))};  % Samples 151 to 300, etc... 
         tempThetaStruct(neuralBins, 1) = {ThetaNeuro((((150*(neuralBins - 1)) + 1)):(150*neuralBins))};
-        tempGammaStruct(neuralBins, 1) = {GammaNeuro((((150*(neuralBins - 1)) + 1)):(150*neuralBins))};    
+        tempSpindleStruct(neuralBins, 1) = {SpindleNeuro((((150*(neuralBins-1))+1)):(150*neuralBins))};
+        tempGammaStruct(neuralBins, 1) = {GammaNeuro((((150*(neuralBins - 1)) + 1)):(150*neuralBins))};
+        tempRippleStruct(neuralBins, 1) = {RippleNeuro((((150*(neuralBins - 1)) + 1)):(150*neuralBins))};
     end
 end
 
 SleepScoringData.SleepParameters.deltaBandPower = tempDeltaStruct;
 SleepScoringData.SleepParameters.thetaBandPower = tempThetaStruct;
+SleepScoringData.SleepParameters.spindlePower=tempSpindleStruct;
 SleepScoringData.SleepParameters.gammaBandPower = tempGammaStruct;
-
+SleepScoringData.SleepParameters.ripplePower = tempRippleStruct;
 
 %% BLOCK PURPOSE: Chunk the ball velocity
 ballVelocity = SleepScoringData.binBallVelocity;
@@ -93,6 +106,22 @@ for HRBins = 1:60
 end
 
 SleepScoringData.SleepParameters.HeartRate = tempHRStruct;
+
+%% BLOCK PURPOSE: Chunk the Binarized EMG data
+TheAtonia=SleepScoringData.Flags.Atonia;
+
+tempEMGStruct=cell(60,1);
+
+for EMGBins=1:60
+    if EMGBins==1
+        tempEMGStruct(EMGBins,1)={TheAtonia(EMGBins:5)};
+    elseif EMGBins==60
+        tempEMGStruct(EMGBins,1)={TheAtonia((((5*(EMGBins-1))+1)):end)};
+    else
+        tempEMGStruct(EMGBins,1)={TheAtonia((((5*(EMGBins-1))+1)):(5*EMGBins))};
+    end
+end
+SleepScoringData.SleepParameters.EMG=tempEMGStruct;
 
 %% BLOCK PURPOSE: Chunk the  CBV data
 CBV = SleepScoringData.normCBV;

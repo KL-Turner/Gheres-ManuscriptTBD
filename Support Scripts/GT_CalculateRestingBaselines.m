@@ -103,11 +103,13 @@ for dT = 1:length(dataTypes)
     % find the means of each unique day
     for x = 1:size(date, 1)
         tempData_means{x, 1} = cellfun(@(x) mean(x), tempData.(date{x, 1}));    % LH date-specific means
+        tempData_stanDev{x,1}=cellfun(@(x) std(x),tempData.(date{x,1}));
     end
     
     % Save the means into the Baseline struct under the current loop iteration with the associated dates
     for x = 1:length(uniqueDays)
-        GT_AnalysisInfo.baselines.(dataType).(date{x, 1}) = mean(tempData_means{x, 1});    % LH date-specific means
+        GT_AnalysisInfo.baselines.(dataType).(date{x, 1}).Avg = mean(tempData_means{x, 1});    % LH date-specific means
+        GT_AnalysisInfo.baselines.(dataType).(date{x, 1}).stanDev = mean(tempData_stanDev{x, 1});
     end
 end
 

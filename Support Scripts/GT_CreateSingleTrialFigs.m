@@ -54,7 +54,7 @@ HeartRate(2:298) = filtfilt(B, A, SleepScoringData.HeartRate);
 HeartRate(1) = HeartRate(2);
 HeartRate(299:end) = HeartRate(298);
 
-[D, C] = butter(4, 0.5/ (30 / 2), 'low');
+[D, C] = butter(4, 1/ (30 / 2), 'low');
 if isempty(OptoStim)
     CBV = filtfilt(D, C, SleepScoringData.normCBV(1:end - 1))*100;
 else

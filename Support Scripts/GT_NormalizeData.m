@@ -24,7 +24,9 @@ strDay = GT_ConvertDate(fileDate);
 cbvBaseline = GT_AnalysisInfo.baselines.CBV.(strDay);
 deltaBaseline = GT_AnalysisInfo.baselines.deltaBandPower.(strDay);
 thetaBaseline = GT_AnalysisInfo.baselines.thetaBandPower.(strDay);
+spindleBaseline=GT_AnalysisInfo.baselines.spindlePower.(strDay);
 gammaBaseline = GT_AnalysisInfo.baselines.gammaBandPower.(strDay);
+rippleBaseline=GT_AnalysisInfo.baselines.ripplePower.(strDay);
 oneSpecBaseline = GT_AnalysisInfo.baselines.Spectrograms.OneSec.(strDay);
 fiveSpecBaseline = GT_AnalysisInfo.baselines.Spectrograms.FiveSec.(strDay);
 
@@ -52,10 +54,14 @@ SleepScoringData.Spectrograms.FiveSec.T5 = T5;
 SleepScoringData.Spectrograms.OneSec.F1 = F1;
 SleepScoringData.Spectrograms.FiveSec.F5 = F5;
 
-SleepScoringData.normCBV = (SleepScoringData.CBV - cbvBaseline) ./ cbvBaseline;
-SleepScoringData.normDeltaBandPower = (SleepScoringData.deltaBandPower - deltaBaseline) ./ deltaBaseline;
-SleepScoringData.normThetaBandPower = (SleepScoringData.thetaBandPower - thetaBaseline) ./ thetaBaseline;
-SleepScoringData.normGammaBandPower = (SleepScoringData.gammaBandPower - gammaBaseline) ./ gammaBaseline;
+%% Z-Score normalize data to awake resting baselines
+SleepScoringData.normCBV = (SleepScoringData.CBV - cbvBaseline.Avg) ./ cbvBaseline.Avg;
+SleepScoringData.normDeltaBandPower = (SleepScoringData.deltaBandPower - deltaBaseline.Avg) ./ deltaBaseline.stanDev;
+SleepScoringData.normThetaBandPower = (SleepScoringData.thetaBandPower - thetaBaseline.Avg) ./ thetaBaseline.stanDev;
+SleepScoringData.normSpindlePower = (SleepScoringData.spindlePower - spindleBaseline.Avg) ./ spindleBaseline.stanDev;
+SleepScoringData.normGammaBandPower = (SleepScoringData.gammaBandPower - gammaBaseline.Avg) ./ gammaBaseline.stanDev;
+SleepScoringData.normRipplePower=(SleepScoringData.ripplePower-rippleBaseline.Avg)./rippleBaseline.stanDev;
+
 save(sleepScoringDataFile, 'SleepScoringData');
 
 end

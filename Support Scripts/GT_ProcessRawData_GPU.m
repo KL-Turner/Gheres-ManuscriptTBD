@@ -28,20 +28,57 @@ RawData.HR_tr = tr;
 % Delta [1-4 Hz]
 [SleepScoringData.deltaBandPower, SleepScoringData.downSampled_Fs] = GT_ProcessNeuro(RawData, 'Delta', trialDuration_Seconds);
  
-% Theta [4-8 Hz]
-[SleepScoringData.thetaBandPower, ~] = GT_ProcessNeuro(RawData, 'Theta', trialDuration_Seconds);
+% Theta [4-10 Hz]
+[SleepScoringData.thetaBandPower, ~] = GT_ProcessNeuro(RawData, 'BergelTheta', trialDuration_Seconds);
+
+% Sleep Spindle [10-17 Hz]
+[SleepScoringData.spindlePower, ~] = GT_ProcessNeuro(RawData, 'SullivanSpindle', trialDuration_Seconds);
  
-% Gamma Band [40-100]
+% Gamma Band [40-95]
 [SleepScoringData.gammaBandPower, ~] = GT_ProcessNeuro(RawData, 'Gam', trialDuration_Seconds);
+
+% Hippocampal Ripple [95-200]
+[SleepScoringData.ripplePower, ~] = GT_ProcessNeuro(RawData, 'SullivanRipple', trialDuration_Seconds);
+
+%% Filter EMG Data in to multi unit frequency band
+[SleepScoringData.EMG,~]=GT_ProcessNeuro(RawData,'EMGpower',trialDuration_Seconds);
+GT_AnalysisInfo.thresholds.EMGData(GT_AnalysisInfo.thresholds.count,:)=SleepScoringData.EMG(1:expectedLength);
 
 %% Save solenoid times (in seconds).
 % Identify the solenoids by amplitude
 SleepScoringData.Sol.solenoidContralateral = find(diff(RawData.Sol) == 1) / RawData.an_fs;
 SleepScoringData.Sol.solenoidIpsilateral = find(diff(RawData.Sol) == 2) / RawData.an_fs;
 SleepScoringData.Sol.solenoidTail = find(diff(RawData.Sol) == 3) / RawData.an_fs;
-SleepScoringData.Opto.OptoStim(1,:)=find(diff(round(RawData.LED,0))>0)/RawData.an_fs;
-SleepScoringData.Opto.OptoStim(2,:)=find(diff(round(RawData.LED,0))<0)/RawData.an_fs;
+% Identify Opto laser stimulus times
+SleepScoringData.Opto.OptoStim(1,:)=find(diff(round(RawData.LED,0))>0)/RawData.an_fs; %Laser ON times
+SleepScoringData.Opto.OptoStim(2,:)=find(diff(round(RawData.LED,0))<0)/RawData.an_fs; %Laser OFF times
+SleepScoringData.Opto.StimWindows=SleepScoringData.Opto.OptoStim(1,:);
 SleepScoringData.StimParams=RawData.AcquistionParams;
+SleepScoringData.StimParams.an_fs=RawData.an_fs;
+SleepScoringData.StimParams.dal_fr=RawData.dal_fr;
+OptoStimWin=SleepScoringData.StimParams.Laser_Duration;
+% Remove laser pulse times keep just stim start times
+if ~isempty(SleepScoringData.Opto.OptoStim)
+Stim_On=SleepScoringData.Opto.OptoStim(1,1);
+Stim_Off=Stim_On+OptoStimWin;
+Stim_Count=length(SleepScoringData.Opto.StimWindows);
+Counter=1;
+while Counter<=Stim_Count
+                Low_Bound=find(SleepScoringData.Opto.StimWindows>Stim_On);
+                Upper_Bound=find(SleepScoringData.Opto.StimWindows<Stim_Off);
+                The_Stim_Win=intersect(Low_Bound,Upper_Bound);
+                SleepScoringData.Opto.StimWindows(The_Stim_Win)=[];
+                if (Counter+1)<=numel(SleepScoringData.Opto.StimWindows)
+                    Stim_On=SleepScoringData.Opto.StimWindows(Counter+1);
+                    Stim_Off=Stim_On+OptoStimWin;
+                end
+                Stim_Count=numel(SleepScoringData.Opto.StimWindows);
+                Counter=Counter+1;
+end
+else
+    fprintf('No optogenetic stimulus this trial\n')
+end
+
 %% Downsample and binarize the ball velocity.
 % Trim any additional data points for resample.
 trimmedBallVelocity = RawData.vBall(1:min(expectedLength, length(RawData.vBall)));
@@ -54,7 +91,8 @@ ballVelocityFilterOrder = 2;
 [sos, g] = zp2sos(z, p, k);
 filteredBallVelocity = filtfilt(sos, g, trimmedBallVelocity);
 resampledBallVelocity = resample(filteredBallVelocity, downSampled_Fs, RawData.an_fs);
-
+GT_AnalysisInfo.thresholds.BallData(GT_AnalysisInfo.thresholds.count,:)=filteredBallVelocity(1:expectedLength);
+GT_AnalysisInfo.thresholds.count=GT_AnalysisInfo.thresholds.count+1;
 % Check for this day's threshold value to binarize the ball velocity.
 [ok] = GT_CheckForThreshold(['binarizedBallVelocity_' strDay], GT_AnalysisInfo);
 
@@ -72,7 +110,7 @@ binarizedBallVelocity = abs(diff(resampledBallVelocity, 1)) > GT_AnalysisInfo.th
 inds = linkedBinarizedVelocity == 0;
 restVelocity = mean(resampledBallVelocity(inds));
 
-SleepScoringData.ballVelocity = resampledBallVelocity - restVelocity;
+SleepScoringData.ballVelocity =resampledBallVelocity; %resampledBallVelocity - restVelocity;
 SleepScoringData.binBallVelocity = binarizedBallVelocity;
 %SleepScoringData.LinkedBallVelocity=linkedBinarizedVelocity;
 SleepScoringData.CBV = RawData.IOS.barrels.CBVrefl;
