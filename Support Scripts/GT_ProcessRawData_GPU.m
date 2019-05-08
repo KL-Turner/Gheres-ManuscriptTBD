@@ -53,6 +53,8 @@ SleepScoringData.Sol.solenoidTail = find(diff(RawData.Sol) == 3) / RawData.an_fs
 SleepScoringData.Opto.OptoStim(1,:)=find(diff(round(RawData.LED,0))>0)/RawData.an_fs; %Laser ON times
 SleepScoringData.Opto.OptoStim(2,:)=find(diff(round(RawData.LED,0))<0)/RawData.an_fs; %Laser OFF times
 SleepScoringData.Opto.StimWindows=SleepScoringData.Opto.OptoStim(1,:);
+SleepScoringData.Opto.CBV=RawData.IOS.barrels.CBVrefl;
+
 SleepScoringData.StimParams=RawData.AcquistionParams;
 SleepScoringData.StimParams.an_fs=RawData.an_fs;
 SleepScoringData.StimParams.dal_fr=RawData.dal_fr;
@@ -62,6 +64,11 @@ if ~isempty(SleepScoringData.Opto.OptoStim)
 Stim_On=SleepScoringData.Opto.OptoStim(1,1);
 Stim_Off=Stim_On+OptoStimWin;
 Stim_Count=length(SleepScoringData.Opto.StimWindows);
+
+flashframes=find(diff(SleepScoringData.Opto.CBV>=50))+1;
+SleepScoringData.Opto.CBV(flashframes)=NaN;
+SleepScoringData.Opto.CBV=fillmissing(SleepScoringData.Opto.CBV,'spline');
+
 Counter=1;
 while Counter<=Stim_Count
                 Low_Bound=find(SleepScoringData.Opto.StimWindows>Stim_On);

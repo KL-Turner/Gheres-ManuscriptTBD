@@ -16,7 +16,7 @@ function [Error] = GT_CheckGUIVals(guiParams)
 %   Last Revised: March 8th, 2019
 %________________________________________________________________________________________________________________________
 
-if guiParams.neurCrit <= 1   % Neural LFP needs to be greater than 1-fold change of baseline.
+if guiParams.neurCrit <= 0   % Neural LFP needs to be greater than 1-fold change of baseline.
     Error = true;
 elseif guiParams.ballCrit < 0   % There cannot be less than 0 binarized events for the ball velocity.
     Error = true;

@@ -45,13 +45,13 @@ for bins = 1:length(SleepScoringData.SleepParameters.thetaBandPower)
 end
 
 % Create logical for the spindle power
-for bins = 1:length(SleepScoringData.SleepParameters.spindlePower)
-    if max(SleepScoringData.SleepParameters.spindlePower{bins}) >= guiParams.neurCrit
-        spindleElectrodeLogical(bins, 1) = 1;
-    else
-        spindleElectrodeLogical(bins, 1) = 0;
-    end
-end
+% for bins = 1:length(SleepScoringData.SleepParameters.spindlePower)
+%     if max(SleepScoringData.SleepParameters.spindlePower{bins}) >= guiParams.neurCrit
+%         spindleElectrodeLogical(bins, 1) = 1;
+%     else
+%         spindleElectrodeLogical(bins, 1) = 0;
+%     end
+% end
 
 % Create logical for the gamma band power
 for bins = 1:length(SleepScoringData.SleepParameters.gammaBandPower)
@@ -63,13 +63,13 @@ for bins = 1:length(SleepScoringData.SleepParameters.gammaBandPower)
 end
 
 % Create logical for the ripple power
-for bins = 1:length(SleepScoringData.SleepParameters.ripplePower)
-    if max(SleepScoringData.SleepParameters.ripplePower{bins}) >= guiParams.neurCrit
-        rippleElectrodeLogical(bins, 1) = 1;
-    else
-        rippleElectrodeLogical(bins, 1) = 0;
-    end
-end
+% for bins = 1:length(SleepScoringData.SleepParameters.ripplePower)
+%     if max(SleepScoringData.SleepParameters.ripplePower{bins}) >= guiParams.neurCrit
+%         rippleElectrodeLogical(bins, 1) = 1;
+%     else
+%         rippleElectrodeLogical(bins, 1) = 0;
+%     end
+% end
 
 % cell function the logicals together and link binary events.
 electrodeLogical1 = arrayfun(@(deltaElectrodeLogical, thetaElectrodeLogical) any(deltaElectrodeLogical + thetaElectrodeLogical), deltaElectrodeLogical, thetaElectrodeLogical);
@@ -91,7 +91,7 @@ GT_AnalysisInfo.(guiParams.scoringID).Logicals.ballLogical{iteration, 1} = ballL
 
 %% BLOCK PURPOSE: Create logical for EMG atonia
 for bins = 1:length(SleepScoringData.SleepParameters.EMG)
-    if sum(SleepScoringData.SleepParameters.EMG{bins}) <= guiParams.ballCrit 
+    if mean(SleepScoringData.SleepParameters.EMG{bins}) >= 0.85 
         EMGLogical(bins, 1) = 1;
     else
         EMGLogical(bins, 1) = 0;
@@ -127,8 +127,15 @@ GT_AnalysisInfo.(guiParams.scoringID).Logicals.heartRateLogical{iteration, 1} = 
 %     end
 % end
 
-sleepLogical1 = electrodeLogical.*ballLogical.*heartRateLogical;
+sleepLogical1 = ballLogical.*EMGLogical;%.*electrodeLogical.**heartRateLogical;
 [sleepLogical] = GT_LinkBinaryEvents(gt(sleepLogical1', 0), [2, 0]);
+REMLogical1=sleepLogical.*gammaElectrodeLogical';
+[REMLogical]=GT_LinkBinaryEvents(gt(REMLogical1',0),[2,0]);
+FindOverlap=sleepLogical==REMLogical;
+SWSLogical=sleepLogical;
+SWSLogical(FindOverlap)=0;
 GT_AnalysisInfo.(guiParams.scoringID).Logicals.sleepLogical{iteration,1} = sleepLogical';
+GT_AnalysisInfo.(guiParams.scoringID).Logicals.REMLogical{iteration,1}=REMLogical';
+GT_AnalysisInfo.(guiParams.scoringID).Logicals.SWSLogical{iteration,1}=SWSLogical';
 
 end 

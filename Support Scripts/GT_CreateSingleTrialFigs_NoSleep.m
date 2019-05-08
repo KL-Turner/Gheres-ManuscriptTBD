@@ -61,7 +61,7 @@ else
     FlashCatch=diff(SleepScoringData.normCBV*100);
     if max(FlashCatch)>=10
         HoldRefl=SleepScoringData.normCBV;
-        Flash_Points=HoldRefl>=(3*std(SleepScoringData.normCBV));
+        Flash_Points=HoldRefl>=mean(SleepScoringData.normCBV)+(3*std(SleepScoringData.normCBV));
         HoldRefl(Flash_Points)=NaN;
         [Interp_Data,Interp_Points]=fillmissing(HoldRefl,'spline');
         Interp_Refl=Interp_Data;
@@ -71,6 +71,7 @@ else
     end
 end
 timeVec = (1:length(CBV))/30;
+EMG=max(filtfilt(D,C,resample(SleepScoringData.EMG,30,20000)),0);
 delta = filtfilt(D, C, SleepScoringData.normDeltaBandPower);
 theta = filtfilt(D, C, SleepScoringData.normThetaBandPower);
 gamma = filtfilt(D, C, SleepScoringData.normGammaBandPower);
@@ -98,14 +99,17 @@ hold on;
 axis tight
 ylabel('a.u.');
 yyaxis right
-ylim([6 15]);
-plot(1:length(HeartRate), HeartRate, 'LineWidth', 1, 'color', GT_colors('carrot orange'));
-ylabel('Heart Rate (Hz)');
+ylim([-5 1]);
+%plot(1:length(HeartRate), HeartRate, 'LineWidth', 1, 'color', GT_colors('carrot orange'));
+plot(timeVec, log10(EMG(1:length(timeVec))), 'LineWidth', 1, 'color', GT_colors('carrot orange'));
+%ylabel('Heart Rate (Hz)');
+ylabel('EMG amplitude (a.u.)');
 animalname=strrep(animalID,'_',' ');
 thefile=strrep(fileID,'_', ' ');
 title([animalname ' ' thefile ' Sleep Scoring']);
 set(gca, 'Ticklength', [0 0])
-legend('ball velocity', 'heart rate', 'Location', 'NorthEast')
+%legend('ball velocity', 'heart rate', 'Location', 'NorthEast')
+legend('ball velocity', 'Nuchal EMG', 'Location', 'NorthEast')
 
 ax2 = subplot(5,1,2:3);
 yyaxis right
@@ -128,7 +132,7 @@ scatter(OptoStim,OptoStim_YVals,'v','MarkerEdgeColor','k','MarkerFaceColor',GT_c
 title('Normalized CBV reflectance and individual neural bands of interest');
 ylabel('Reflectance (%)','Color', GT_colors('Dark Candy Apple Red'))
 if ~isempty(solenoidContra_YVals)
-ylim([(min(CBV)+min(CBV)*0.25),max(solenoidContra_YVals)+(max(solenoidContra_YVals)*0.1)]);
+ylim([(min(CBV)+abs(min(CBV))*-0.25),max(solenoidContra_YVals)+(max(solenoidContra_YVals)*0.1)]);
 end
  
 legend('CBV', 'sleep epochs', 'contra stim', 'ipsi stim', 'tail stim','Opto stim', 'delta power', 'theta power', 'gamma power', 'Location', 'NorthEast')
@@ -146,7 +150,7 @@ xlabel('Time (sec)')
 linkaxes([ax1 ax2 ax3], 'x')
 
 %% Save the file to directory.
-guiParams.scoringID='SleepParams_Test001';
+%guiParams.scoringID='SleepParams_Test001';
 dirpath = ([cd '/Sleep Summary Figs/' guiParams.scoringID '/']);
 savefig(singleSleepTrial, [dirpath animalID '_' hem '_' fileID '_SingleTrialSummaryFig']);%[dirpath animalID '_' hem '_' fileID '_SingleTrialSummaryFig']);
 

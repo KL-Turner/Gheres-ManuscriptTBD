@@ -36,6 +36,13 @@ for dT = 1:length(dataTypes)
     % Use the RestCriteria we specified earlier to find all resting events that are greater than the criteria
     [restLogical] = GT_FilterEvents(GT_AnalysisInfo.RestData.(dataType), RestCriteria);   % Output is a logical
     [puffLogical] = GT_FilterEvents(GT_AnalysisInfo.RestData.(dataType), puffCriteria);   % Output is a logical
+    if ~isequal(length(restLogical),length(puffLogical))
+        if length(restLogical)>length(puffLogical)
+            restLogical=restLogical(1:length(puffLogical));
+        else
+            puffLogical=puffLogical(1:length(restLogical));
+        end
+    end
     combRestLogical = logical(restLogical.*puffLogical);
     allRestFiles = GT_AnalysisInfo.RestData.(dataType).fileIDs(combRestLogical, :);   % Overall logical for all resting file names that meet criteria
     allRestDurations = GT_AnalysisInfo.RestData.(dataType).durations(combRestLogical, :);
@@ -99,19 +106,29 @@ for dT = 1:length(dataTypes)
             end
         end
     end
-    
+    days=fieldnames(tempData);
     % find the means of each unique day
-    for x = 1:size(date, 1)
+    for x = 1:size(days, 1)
         tempData_means{x, 1} = cellfun(@(x) mean(x), tempData.(date{x, 1}));    % LH date-specific means
         tempData_stanDev{x,1}=cellfun(@(x) std(x),tempData.(date{x,1}));
     end
-    
+    ignoredays=0;
     % Save the means into the Baseline struct under the current loop iteration with the associated dates
-    for x = 1:length(uniqueDays)
-        GT_AnalysisInfo.baselines.(dataType).(date{x, 1}).Avg = mean(tempData_means{x, 1});    % LH date-specific means
-        GT_AnalysisInfo.baselines.(dataType).(date{x, 1}).stanDev = mean(tempData_stanDev{x, 1});
+    if ignoredays==1
+        alldays=[tempData_means{1};tempData_means{2}];
+        allstan=[tempData_stanDev{1};tempData_stanDev{2}];
+        AllAvg=mean(alldays);
+        AllStd=mean(allstan);
+        for x = 1:length(uniqueDays)
+            GT_AnalysisInfo.baselines.(dataType).(date{x,1}).Avg = AllAvg;    % LH date-specific means
+            GT_AnalysisInfo.baselines.(dataType).(date{x}).stanDev =AllStd;
+        end
+    else
+        for x = 1:length(days)
+            GT_AnalysisInfo.baselines.(dataType).(date{x, 1}).Avg = mean(tempData_means{x, 1});    % LH date-specific means
+            GT_AnalysisInfo.baselines.(dataType).(date{x, 1}).stanDev = mean(tempData_stanDev{x, 1});
+        end
     end
-end
 
 GT_AnalysisInfo.baselineFileInfo.fileIDs = finalFileIDs;
 GT_AnalysisInfo.baselineFileInfo.eventTimes = finalFileEventTimes;

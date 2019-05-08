@@ -200,7 +200,7 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_Analys
             
             % Initialize cell array for all periods of rest from the loaded file
             trialRestVals = cell(size(trialEventTimes'));
-            for tET = 1:length(trialEventTimes)
+            for tET = 1:length(trialDurations)%trialEventTimes)
                 % Extract the whole duration of the resting event. Coerce the
                 % start index to values above 1 to preclude rounding to 0.
                 startInd = max(floor(trialEventTimes(tET)*downSampled_Fs), 1);           
@@ -360,7 +360,9 @@ if guiParams.saveStructToggle == true
     save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo','-v7.3');
 end
 
-%% BLOCK PURPOSE: [8] Create single trial summary figures if prompted.
+%% Block PURPOSE: [8] Chunk Stimuli w/arousal state
+   % GT_StimEvoked_CBV_001(sleepScringDataFiles,guiParams);
+%% BLOCK PURPOSE: [9] Create single trial summary figures if prompted.
 % If the user prompted for the summary figures to be saved, create each figure for succesfully score files.
 if guiParams.saveFigsToggle == true
     % Determine whether a folder for summary figures already exists.
@@ -391,18 +393,16 @@ if guiParams.saveFigsToggle == true
     % Create a summary figure for each successful trial.
     if ~isempty(GT_AnalysisInfo.(guiParams.scoringID).data)
         uniqueSleepFiles = unique(GT_AnalysisInfo.(guiParams.scoringID).data.fileIDs);
-        for k=1:size(fileIDs,1)
-            filenames{k}=fileIDs{k,1}{1,1};
-        end
-        uniqueNoSleepFiles=setdiff(filenames,uniqueSleepFiles);
+        substructs=fieldnames(GT_AnalysisInfo);
+        uniqueNoSleepFiles=setdiff(GT_AnalysisInfo.(substructs{size(substructs,1)}).FileIDs,uniqueSleepFiles);
         for blockEightProg = 1:size(uniqueSleepFiles, 1)
             uniqueSleepFile = ([animalID '_' hem '_' char(uniqueSleepFiles(blockEightProg, :)) '_SleepScoringData.mat']);
             % Feed the function one file at a time along with the summary structure and gui parameters.
             GT_CreateSingleTrialFigs(uniqueSleepFile, GT_AnalysisInfo, guiParams);
             GT_multiWaitbar('Generating Single Trial Summary Figures', blockEightProg/(size(uniqueSleepFiles, 1)+size(uniqueNoSleepFiles,2)));   % Update progress bar.
         end
-        for blockEightProg = 1:size(uniqueNoSleepFiles, 2)
-            uniqueFile = ([animalID '_' hem '_' char(uniqueNoSleepFiles(1,blockEightProg)) '_SleepScoringData.mat']);
+        for blockEightProg = 1:size(uniqueNoSleepFiles, 1)
+            uniqueFile = ([animalID '_' hem '_' char(uniqueNoSleepFiles(blockEightProg,1)) '_SleepScoringData.mat']);
             % Feed the function one file at a time along with the summary structure and gui parameters.
             GT_CreateSingleTrialFigs_NoSleep(uniqueFile, GT_AnalysisInfo, guiParams);
             GT_multiWaitbar('Generating Single Trial Summary Figures', (blockEightProg+size(uniqueSleepFiles, 1))/(size(uniqueSleepFiles, 1)+size(uniqueNoSleepFiles,2)));   % Update progress bar.
