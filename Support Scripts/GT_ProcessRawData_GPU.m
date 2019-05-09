@@ -44,6 +44,13 @@ RawData.HR_tr = tr;
 [SleepScoringData.EMG,~]=GT_ProcessNeuro(RawData,'EMGpower',trialDuration_Seconds);
 GT_AnalysisInfo.thresholds.EMGData(GT_AnalysisInfo.thresholds.count,:)=SleepScoringData.EMG(1:expectedLength);
 
+%% Get Reflectance data for each ROI
+ROI_name=fieldnames(RawData.IOS);
+for name_num=1:numel(ROI_name)
+SleepScoringData.IOS.(ROI_name{name_num}).CBV=RawData.IOS.(ROI_name{name_num}).CBVrefl;
+SleepScoringData.IOS.(ROI_name{name_num}).PixelMap=RawData.IOS(ROI_name{name_num}).PixelMap;
+end
+
 %% Save solenoid times (in seconds).
 % Identify the solenoids by amplitude
 SleepScoringData.Sol.solenoidContralateral = find(diff(RawData.Sol) == 1) / RawData.an_fs;
@@ -53,22 +60,32 @@ SleepScoringData.Sol.solenoidTail = find(diff(RawData.Sol) == 3) / RawData.an_fs
 SleepScoringData.Opto.OptoStim(1,:)=find(diff(round(RawData.LED,0))>0)/RawData.an_fs; %Laser ON times
 SleepScoringData.Opto.OptoStim(2,:)=find(diff(round(RawData.LED,0))<0)/RawData.an_fs; %Laser OFF times
 SleepScoringData.Opto.StimWindows=SleepScoringData.Opto.OptoStim(1,:);
-SleepScoringData.Opto.CBV=RawData.IOS.barrels.CBVrefl;
-
+for name_num=1:numel(ROI_name)
+SleepScoringData.Opto.IOS.(ROI_name{name_num}).CBV=RawData.IOS.(ROI_name{name_num}).CBVrefl;
+end
 SleepScoringData.StimParams=RawData.AcquistionParams;
 SleepScoringData.StimParams.an_fs=RawData.an_fs;
 SleepScoringData.StimParams.dal_fr=RawData.dal_fr;
 OptoStimWin=SleepScoringData.StimParams.Laser_Duration;
-% Remove laser pulse times keep just stim start times
+
+%% Remove laser pulse times keep just stim start times
 if ~isempty(SleepScoringData.Opto.OptoStim)
 Stim_On=SleepScoringData.Opto.OptoStim(1,1);
 Stim_Off=Stim_On+OptoStimWin;
 Stim_Count=length(SleepScoringData.Opto.StimWindows);
 
-flashframes=find(diff(SleepScoringData.Opto.CBV>=50))+1;
-SleepScoringData.Opto.CBV(flashframes)=NaN;
-SleepScoringData.Opto.CBV=fillmissing(SleepScoringData.Opto.CBV,'spline');
-
+for name_num=1:numel(ROI_name)
+    if strcmpi(ROI_name{name_num},'Pixelwise')==0
+        if name_num==1
+        flashframes=find(diff(SleepScoringData.Opto.IOS.(ROI_name{name_num}).CBV)>=50)+1;
+        end
+        SleepScoringData.Opto.IOS.(ROI_name{name_num}).CBV(flashframes)=NaN;
+        SleepScoringData.Opto.IOS.(ROI_name{name_num}).CBV=fillmissing(SleepScoringData.Opto.IOS.(ROI_name{name_num}).CBV,'spline');
+    else
+        SleepScoringData.Opto.IOS.(ROI_name{name_num}).CBV(flashframes)=NaN;
+        SleepScoringData.Opto.IOS.(ROI_name{name_num}).CBV=fillmissing(SleepScoringData.Opto.IOS.(ROI_name{name_num}).CBV,'spline',2);
+    end
+end
 Counter=1;
 while Counter<=Stim_Count
                 Low_Bound=find(SleepScoringData.Opto.StimWindows>Stim_On);
@@ -120,7 +137,7 @@ restVelocity = mean(resampledBallVelocity(inds));
 SleepScoringData.ballVelocity =resampledBallVelocity; %resampledBallVelocity - restVelocity;
 SleepScoringData.binBallVelocity = binarizedBallVelocity;
 %SleepScoringData.LinkedBallVelocity=linkedBinarizedVelocity;
-SleepScoringData.CBV = RawData.IOS.barrels.CBVrefl;
+%SleepScoringData.CBV = RawData.IOS.barrels.CBVrefl;
 SleepScoringData.HeartRate = RawData.HR;
 
 % Save the processed new structure to the current directory.

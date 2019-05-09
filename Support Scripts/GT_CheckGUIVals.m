@@ -22,9 +22,9 @@ elseif guiParams.ballCrit < 0   % There cannot be less than 0 binarized events f
     Error = true;
 elseif guiParams.hrCrit <= 5 || guiParams.hrCrit >= 16 % Heart rate's physiological range is typically 5-16 Hz.
     Error = true;
-elseif guiParams.awakeDuration < 5 || mod(guiParams.awakeDuration, 5) ~= 0   % Data is in 5 second bins. Must be multiple of 5.
+elseif guiParams.awakeDuration < 5 || mod(guiParams.awakeDuration, 5) ~= 0   % Data is in 1 second bins. Must be multiple of 1.
     Error = true;
-elseif guiParams.minSleepTime < 5 || guiParams.minSleepTime > 300 || mod(guiParams.minSleepTime, 5) ~= 0 % ^same as above.
+elseif guiParams.minSleepTime < 1 || guiParams.minSleepTime > 300 || mod(guiParams.minSleepTime, 1) ~= 0 % ^same as above.
     Error = true;
 else
     Error = false;

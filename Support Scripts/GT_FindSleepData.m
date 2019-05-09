@@ -38,8 +38,8 @@ for sF = 1:size(sleepScoringDataFiles, 1)
     % Find the corresponding sleep logical for the current file ID.
     for pF = 1:length(GT_AnalysisInfo.(guiParams.scoringID).FileIDs)
         if strcmp(char(GT_AnalysisInfo.(guiParams.scoringID).FileIDs{pF,1}), fileID)
-            sleepLogical = GT_AnalysisInfo.(guiParams.scoringID).Logicals.sleepLogical{pF, 1};
-            %REMsleepLogical=GT_AnalysisInfo.(guiParams.scoringID).Logicals.REMLogical{pF, 1}';
+            %sleepLogical = GT_AnalysisInfo.(guiParams.scoringID).Logicals.sleepLogical{pF, 1};
+            sleepLogical=GT_AnalysisInfo.(guiParams.scoringID).Logicals.REMLogical{pF, 1}';
         end
     end
     StateChanges=diff(sleepLogical); 
