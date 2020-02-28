@@ -1,4 +1,4 @@
-function GT_CreateSingleTrialFigs(sleepScoringDataFile, GT_AnalysisInfo, guiParams)
+function GT_CreateSingleTrialFigs_NoSleep(sleepScoringDataFile, GT_AnalysisInfo, guiParams)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
 % The Pennsylvania State University, Dept. of Biomedical Engineering
@@ -23,23 +23,23 @@ load(sleepScoringDataFile);
 
 %% BLOCK PURPOSE: Find the sleeping times from the SleepEventData for this particular trial
 % This loop creates a logical that matches the inputed FileID with all potential sleeping trials.
-for f = 1:length(GT_AnalysisInfo.(guiParams.scoringID).data.fileIDs)
-    if strcmp(GT_AnalysisInfo.(guiParams.scoringID).data.fileIDs{f,1}, fileID)
-        sleepTimeLogical{f, 1} = 1;
-    else
-        sleepTimeLogical{f, 1} = 0;
-    end
-end
+% for f = 1:length(GT_AnalysisInfo.(guiParams.scoringID).data.fileIDs)
+%     if strcmp(GT_AnalysisInfo.(guiParams.scoringID).data.fileIDs{f,1}, fileID)
+%         sleepTimeLogical{f, 1} = 1;
+%     else
+%         sleepTimeLogical{f, 1} = 0;
+%     end
+% end
 
 % Now that we have a logical showing the sleeping events that match this specific trial, we want to pull out the sleep times
 % for that specific trial
-x = 1;
-for f = 1:length(sleepTimeLogical) 
-    if sleepTimeLogical{f, 1} == 1  
-        sleepTimes{x, 1} = GT_AnalysisInfo.(guiParams.scoringID).data.binTimes{f, 1};  % Pull out the associated bin times
-        x = x + 1;
-    end
-end
+% x = 1;
+% for f = 1:length(sleepTimeLogical) 
+%     if sleepTimeLogical{f, 1} == 1  
+%         sleepTimes{x, 1} = GT_AnalysisInfo.(guiParams.scoringID).data.binTimes{f, 1};  % Pull out the associated bin times
+%         x = x + 1;
+%     end
+% end
 
 %% BLOCK PURPOSE: Identify the solenoid timing and location.
 % Identify the solenoid times from the ProcData file.
@@ -70,7 +70,6 @@ else
         CBV = filtfilt(D, C, SleepScoringData.normCBV(1:end - 1))*100;
     end
 end
-
 timeVec = (1:length(CBV))/30;
 delta = filtfilt(D, C, SleepScoringData.normDeltaBandPower);
 theta = filtfilt(D, C, SleepScoringData.normThetaBandPower);
@@ -78,20 +77,19 @@ gamma = filtfilt(D, C, SleepScoringData.normGammaBandPower);
 ballVelocity = SleepScoringData.ballVelocity;
 binBallVelocity = SleepScoringData.binBallVelocity;
 
-sleepPoints=[];
-for k = 1:length(sleepTimes)
-    temp = sleepTimes{k};
-    sleepPoints = horzcat(sleepPoints, temp);
-end
+ sleepPoints=[];
+% for k = 1:length(sleepTimes)
+%     temp = sleepTimes{k};
+%     sleepPoints = horzcat(sleepPoints, temp);
+% end
 
 %% Yvals for behavior Indices
 ball_YVals = 1.10*max(CBV)*ones(size(binBallVelocity));
 solenoidContra_YVals = 1.20*max(CBV)*ones(size(solenoidContra));
 solenoidIpsi_YVals = 1.20*max(CBV)*ones(size(solenoidIpsi));
 solenoidTail_YVals = 1.20*max(CBV)*ones(size(solenoidTail));
-OptoStim_YVals=1.20*max(CBV)*ones(size(OptoStim));
 sleeping_YVal = 1.30*max(CBV)*ones(size(sleepPoints));
-
+OptoStim_YVals=1.20*max(CBV)*ones(size(OptoStim));
 %% Figure
 singleSleepTrial = figure;
 ax1 = subplot(5,1,1);
@@ -100,7 +98,7 @@ hold on;
 axis tight
 ylabel('a.u.');
 yyaxis right
-ylim([2 15]);
+ylim([6 15]);
 plot(1:length(HeartRate), HeartRate, 'LineWidth', 1, 'color', GT_colors('carrot orange'));
 ylabel('Heart Rate (Hz)');
 animalname=strrep(animalID,'_',' ');
@@ -129,7 +127,10 @@ scatter(OptoStim,OptoStim_YVals,'v','MarkerEdgeColor','k','MarkerFaceColor',GT_c
 
 title('Normalized CBV reflectance and individual neural bands of interest');
 ylabel('Reflectance (%)','Color', GT_colors('Dark Candy Apple Red'))
-ylim([(min(CBV)+min(CBV)*0.25),max(sleeping_YVal)+(max(sleeping_YVal)*0.25)]);
+if ~isempty(solenoidContra_YVals)
+ylim([(min(CBV)+min(CBV)*0.25),max(solenoidContra_YVals)+(max(solenoidContra_YVals)*0.1)]);
+end
+ 
 legend('CBV', 'sleep epochs', 'contra stim', 'ipsi stim', 'tail stim','Opto stim', 'delta power', 'theta power', 'gamma power', 'Location', 'NorthEast')
 set(gca, 'Ticklength', [0 0]);
 set(gca,'YColor', GT_colors('Dark Candy Apple Red'));
@@ -145,7 +146,8 @@ xlabel('Time (sec)')
 linkaxes([ax1 ax2 ax3], 'x')
 
 %% Save the file to directory.
+guiParams.scoringID='SleepParams_Test001';
 dirpath = ([cd '/Sleep Summary Figs/' guiParams.scoringID '/']);
-savefig(singleSleepTrial, [dirpath animalID '_' hem '_' fileID '_SingleTrialSummaryFig']);
+savefig(singleSleepTrial, [dirpath animalID '_' hem '_' fileID '_SingleTrialSummaryFig']);%[dirpath animalID '_' hem '_' fileID '_SingleTrialSummaryFig']);
 
 end

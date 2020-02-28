@@ -21,11 +21,11 @@ function [GT_AnalysisInfo] = GT_CalculateRestingBaselines(GT_AnalysisInfo, guiPa
 % that is greater than 10 seconds.
 RestCriteria.Fieldname = {'durations'};
 RestCriteria.Comparison = {'gt'};
-RestCriteria.Value = {5};
+RestCriteria.Value = {15}; %minimum duration in seconds to classify as true rest. Changed to 15sec 3-13-19 KWG
 
 puffCriteria.Fieldname = {'puffDistances'};
 puffCriteria.Comparison = {'gt'};
-puffCriteria.Value = {5};
+puffCriteria.Value = {5}; %duration after whisker stimulus to consider start of resting period.
 
 % Find the fieldnames of GT_AnalysisInfo.RestData and loop through each field. Each fieldname should be a different dataType of interest.
 % These will typically be CBV, Delta, Theta, Gamma, and MUA
@@ -103,11 +103,13 @@ for dT = 1:length(dataTypes)
     % find the means of each unique day
     for x = 1:size(date, 1)
         tempData_means{x, 1} = cellfun(@(x) mean(x), tempData.(date{x, 1}));    % LH date-specific means
+        tempData_stanDev{x,1}=cellfun(@(x) std(x),tempData.(date{x,1}));
     end
     
     % Save the means into the Baseline struct under the current loop iteration with the associated dates
     for x = 1:length(uniqueDays)
-        GT_AnalysisInfo.baselines.(dataType).(date{x, 1}) = mean(tempData_means{x, 1});    % LH date-specific means
+        GT_AnalysisInfo.baselines.(dataType).(date{x, 1}).Avg = mean(tempData_means{x, 1});    % LH date-specific means
+        GT_AnalysisInfo.baselines.(dataType).(date{x, 1}).stanDev = mean(tempData_stanDev{x, 1});
     end
 end
 

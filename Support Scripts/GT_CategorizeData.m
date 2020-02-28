@@ -1,4 +1,4 @@
-function GT_CategorizeData(sleepScoringDataFile)
+function GT_CategorizeData(sleepScoringDataFile,BinarizedEMGAtonia)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
 % The Pennsylvania State University, Dept. of Biomedical Engineering
@@ -36,8 +36,8 @@ downSampled_Fs = SleepScoringData.downSampled_Fs;
 
 %% Process binary runing waveform to detect runing events
 % Setup parameters for link_binary_events
-linkThresh = 0.5;   % seconds, Link events < 0.5 seconds apart
-breakThresh = 0;   % seconds changed by atw on 2/6/18 from 0.07
+linkThresh = 1;   % seconds, Link events < 0.5 seconds apart
+breakThresh = 0.5;   % seconds changed by atw on 2/6/18 from 0.07
 
 % Assume that runs at the beginning/end of trial continue outside of the
 % trial time. This will link any event occurring within "link_thresh"
@@ -47,7 +47,7 @@ modBinVel = SleepScoringData.binBallVelocity;
 
 % Link the binarized runing for use in GetRunningData function
 binVel = GT_LinkBinaryEvents(gt(modBinVel,0), [linkThresh breakThresh]*downSampled_Fs);
-
+%binVel=SleepScoringData.LinkedBallVelocity;
 % Added 2/6/18 with atw. Code throws errors if binRuns(1) = 1 and binRuns(2) = 0, or if 
 % binRuns(1) = 0 and binRuns(2) = 1. This happens in GetRunningData because starts of 
 % runs are detected by taking the derivative of binRuns. Purpose of following lines is to 
@@ -73,19 +73,22 @@ end
 [SleepScoringData.Flags.stim] = GetStimData(SleepScoringData);
 
 % Identify and separate resting data
-[SleepScoringData.Flags.rest] = GetRestData(SleepScoringData);
+[SleepScoringData.Flags.rest] = GetRestData(SleepScoringData,BinarizedEMGAtonia);
 
+SleepScoringData.Flags.Atonia=BinarizedEMGAtonia;
 % Save SleepScoringData structure
 save(sleepScoringDataFile, 'SleepScoringData');
 
 function [puffTimes] = GetPuffTimes(SleepScoringData)
 
 solNames = fieldnames(SleepScoringData.Sol);
+solNames{numel(solNames)+1}='Opto';
 puffList = cell(1, length(solNames));
 
-for sN = 1:length(solNames)
+for sN = 1:length(solNames)-1
     puffList{sN} = SleepScoringData.Sol.(solNames{sN});
 end
+puffList{length(solNames)}=SleepScoringData.Opto.StimWindows;
 
 puffTimes = cell2mat(puffList);
 
@@ -102,6 +105,7 @@ postTime = 1;
 
 % Get puffer IDs
 solNames = fieldnames(SleepScoringData.Sol);
+solNames{numel(solNames)+1}='Opto';
 Stim.solenoidName = cell(length(puffTimes), 1);
 Stim.eventTime = zeros(length(puffTimes), 1);
 Stim.runScore_Pre = zeros(length(puffTimes), 1);
@@ -109,7 +113,11 @@ Stim.runScore_Post = zeros(length(puffTimes), 1);
 i = 1;
 
 for sN = 1:length(solNames)
-    solPuffTimes = SleepScoringData.Sol.(solNames{sN});
+    if sN==length(solNames)
+        solPuffTimes = SleepScoringData.Opto.StimWindows;
+    else
+        solPuffTimes = SleepScoringData.Sol.(solNames{sN});
+    end
     for spT = 1:length(solPuffTimes) 
         if trialDuration - solPuffTimes(spT) <= postTime
             disp(['Puff at time: ' solPuffTimes(spT) ' is too close to trial end'])
@@ -161,9 +169,17 @@ downSampled_Fs = SleepScoringData.downSampled_Fs;
 [puffTimes] = GetPuffTimes(SleepScoringData);
 
 % Find the starts of runing
+% if binarizedRuns(1)==0
 runEdge = diff(binarizedRuns);
 runSamples = find(runEdge > 0);
 runStarts = runSamples / downSampled_Fs;
+% else
+%     runEdge=diff(binarizedRuns);
+%     runSamples(1)=1;
+%     runSamples(2:end)=find(runEdge>0);
+%     runStarts(1)=1/downSampled_Fs;
+%     runStarts(2:end)=runSamples/downSampled_Fs;
+% end
 
 % Classify each runing event by duration, runing intensity, rest durations
 sampleVec = 1:length(binarizedRuns); 
@@ -235,7 +251,7 @@ Run.restTime = restDur';
 Run.runScore = runInt';
 Run.puffDistance = puffTimeCell;
 
-function [Rest] = GetRestData(SleepScoringData)
+function [Rest] = GetRestData(SleepScoringData,BinarizedEMG)
 
 % Setup
 downSampled_Fs = SleepScoringData.downSampled_Fs;
@@ -253,8 +269,8 @@ downSampled_Fs = SleepScoringData.downSampled_Fs;
 modBinarizedRuns = SleepScoringData.binBallVelocity;
 modBinarizedRuns([1, end]) = 1;
 
-linkThresh = 0.5; % seconds
-breakThresh = 0;% seconds
+linkThresh = 1.0; % seconds
+breakThresh = 0.5;% seconds
 binarizedRuns = GT_LinkBinaryEvents(gt(modBinarizedRuns, 0), [linkThresh breakThresh]*downSampled_Fs);
 
 % Combine binarizedRuns, binarizedForceSensor, and puffTimes, to find periods of rest. 
@@ -262,7 +278,7 @@ binarizedRuns = GT_LinkBinaryEvents(gt(modBinarizedRuns, 0), [linkThresh breakTh
 % Add puff times into the Bin_wf
 puffInds = round(puffTimes*downSampled_Fs);
 binarizedRuns(puffInds) = 1;
-
+binarizedRuns(BinarizedEMG)=1; %Flags periods of muscle atonia to prevent counting sleep as active waking -KWG 04-23-19
 % Find index for end of runing event
 edge = diff(binarizedRuns);
 samples = find([not(binarizedRuns(1)) edge < 0]);

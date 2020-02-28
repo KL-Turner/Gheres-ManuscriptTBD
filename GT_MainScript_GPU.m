@@ -1,4 +1,4 @@
-function [GT_AnalysisInfo] = GT_MainScript()
+function [GT_AnalysisInfo] = GT_MainScript_GPU()
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
 % The Pennsylvania State University, Dept. of Biomedical Engineering
@@ -123,13 +123,20 @@ end
 if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_ProcessRawData') || GT_AnalysisInfo.analysisChecklist.GT_ProcessRawData == false || guiParams.rerunProcData == true 
     for blockOneProg = 1:size(rawDataFiles, 1)
         rawDataFile = rawDataFiles(blockOneProg, :);
+        if blockOneProg==1
+            GT_AnalysisInfo.thresholds.EMGData(1:size(rawDataFiles, 1),(1:(300*20000)))=NaN;
+            GT_AnalysisInfo.thresholds.BallData(1:size(rawDataFiles, 1),(1:(300*20000)))=NaN;
+            GT_AnalysisInfo.thresholds.count=1;
+        end
         % Feed the function one file at a time along with the summary structure.
-        [GT_AnalysisInfo] = GT_ProcessRawData(rawDataFile, GT_AnalysisInfo);
+        [GT_AnalysisInfo] = GT_ProcessRawData_GPU(rawDataFile, GT_AnalysisInfo);
         GT_multiWaitbar('Processing RawData Files', blockOneProg/size(rawDataFiles, 1));   % Update progress bar.
     end
+    % Find threshold EMG data to identify periods of atonia
+    [GT_AnalysisInfo]=GT_FindAtonia(GT_AnalysisInfo);
     % When finished with each file, save the summary structure and set the checklist for this block to true.
     GT_AnalysisInfo.analysisChecklist.GT_ProcessRawData = true;
-    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
+    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo','-v7.3');
 else
     % If this analysis has already been ran and this is a subsequent iteration...
     for blockOneProg = 1:size(rawDataFiles, 1)
@@ -149,8 +156,9 @@ sleepScoringDataFiles = char({sleepScoringDataDirectory.name}');
 if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_AnalysisInfo.analysisChecklist.GT_CategorizeData == false || guiParams.rerunCatData == true 
     for blockTwoProg = 1:size(sleepScoringDataFiles, 1)
         sleepScoringDataFile = sleepScoringDataFiles(blockTwoProg, :);
+         Downsampled_EMG=logical(resample(double(GT_AnalysisInfo.thresholds.EMG_Atonia(blockTwoProg,:)),30,20000));
         % Feed the function one file at a time along with the summary structure.
-        GT_CategorizeData(sleepScoringDataFile);
+        GT_CategorizeData(sleepScoringDataFile,Downsampled_EMG);
         GT_multiWaitbar('Categorizing Behavioral Data', blockTwoProg/size(sleepScoringDataFiles, 1));   % Update progress bar.
     end
 else
@@ -164,7 +172,7 @@ end
 %% BLOCK PURPOSE: [3] Find resting epochs during periods of quiescence. (This block is programmatically coupled with Block [2])
 % To properly utilize the progress bars, the original function's code has been pasted into this block. 
 % If this block's results are not a saved field OR this block has never been ran OR the user has prompted to re-run... 
-dataTypes = {'CBV', 'deltaBandPower', 'thetaBandPower', 'gammaBandPower'};
+dataTypes = {'CBV', 'deltaBandPower', 'thetaBandPower', 'gammaBandPower','ripplePower','spindlePower'};
 if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_AnalysisInfo.analysisChecklist.GT_CategorizeData == false || guiParams.rerunCatData == true
     for blockThreeProgA = 1:length(dataTypes)
         GT_multiWaitbar('Finding Resting Epochs (Data Types)', blockThreeProgA/length(dataTypes));   % Update progress bar.
@@ -178,7 +186,6 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_Analys
         for blockThreeProgB = 1:size(sleepScoringDataFiles, 1)
             sleepScoringDataFile = sleepScoringDataFiles(blockThreeProgB, :);
             load(sleepScoringDataFile);
-            
             % Get the date and file identifier for the data to be saved with each resting event
             [~, ~, fileDate, fileID] = GT_GetFileInfo(sleepScoringDataFile);
             
@@ -233,7 +240,7 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CategorizeData') || GT_Analys
     end
     % When finished with each file, save the summary structure and set the checklist for this block to true.
     GT_AnalysisInfo.analysisChecklist.GT_CategorizeData = true;
-    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
+    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo','-v7.3');
 else
     % If this analysis has already been ran and this is a subsequent iteration...
     for blockThreeProgB = 1:size(sleepScoringDataFiles, 1)
@@ -265,8 +272,8 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CreateTrialSpectrograms') || 
         params.fpass = [0.1 100];
         movingwin1 = [1 1/5];
         movingwin5 = [5 1/5]; 
-        [Neural_S1, Neural_T1, Neural_F1] = GT_mtspecgramc(filtRawNeuro, movingwin1, params);
-        [Neural_S5, Neural_T5, Neural_F5] = GT_mtspecgramc(filtRawNeuro, movingwin5, params);
+        [Neural_S1, Neural_T1, Neural_F1] = GT_mtspecgramc_GPU(filtRawNeuro, movingwin1, params);
+        [Neural_S5, Neural_T5, Neural_F5] = GT_mtspecgramc_GPU(filtRawNeuro, movingwin5, params);
  
         SpectrogramData.FiveSec.S{blockFourProg, 1} = Neural_S5';
         SpectrogramData.FiveSec.T{blockFourProg, 1}  = Neural_T5;
@@ -283,7 +290,7 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CreateTrialSpectrograms') || 
     % When finished with each file, save the summary structure and set the checklist for this block to true.
     save([animalID '_GT_SpectrogramData'], 'SpectrogramData', '-v7.3');
     GT_AnalysisInfo.analysisChecklist.GT_CreateTrialSpectrograms = true;
-    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
+    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo','-v7.3');
 else
     % If this analysis has already been ran and this is a subsequent iteration...
     for blockFourProg = 1:size(rawDataFiles, 1)
@@ -303,7 +310,7 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') |
         % Quickly cycle through the progress bar for ... visual satisfaction.
         GT_multiWaitbar('Calculating Resting Baselines', blockFiveProg/size(sleepScoringDataFiles, 1)); pause(0.1);   % Update progress bar. 
     end
-    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
+    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo','-v7.3');
 else
     for blockFiveProg = 1:size(sleepScoringDataFiles, 1)
         % Quickly cycle through the progress bar for ... visual satisfaction.
@@ -322,7 +329,7 @@ if ~isfield(GT_AnalysisInfo.analysisChecklist, 'GT_CalculateRestingBaselines') |
     end
     % When finished with each file, save the summary structure and set the checklist for this block to true.
     GT_AnalysisInfo.analysisChecklist.GT_CalculateRestingBaselines = true;
-    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
+    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo','-v7.3');
 else
     % If this analysis has already been ran and this is a subsequent iteration...
     for blockSixProg = 1:size(sleepScoringDataFiles, 1)
@@ -350,7 +357,7 @@ end
 [GT_AnalysisInfo] = GT_FindSleepData(sleepScoringDataFiles, GT_AnalysisInfo, guiParams);   % Create struct containing sleep epochs
 
 if guiParams.saveStructToggle == true
-    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo');
+    save([animalID '_GT_AnalysisInfo.mat'], 'GT_AnalysisInfo','-v7.3');
 end
 
 %% BLOCK PURPOSE: [8] Create single trial summary figures if prompted.
@@ -384,12 +391,30 @@ if guiParams.saveFigsToggle == true
     % Create a summary figure for each successful trial.
     if ~isempty(GT_AnalysisInfo.(guiParams.scoringID).data)
         uniqueSleepFiles = unique(GT_AnalysisInfo.(guiParams.scoringID).data.fileIDs);
+        for k=1:size(fileIDs,1)
+            filenames{k}=fileIDs{k,1}{1,1};
+        end
+        uniqueNoSleepFiles=setdiff(filenames,uniqueSleepFiles);
         for blockEightProg = 1:size(uniqueSleepFiles, 1)
             uniqueSleepFile = ([animalID '_' hem '_' char(uniqueSleepFiles(blockEightProg, :)) '_SleepScoringData.mat']);
             % Feed the function one file at a time along with the summary structure and gui parameters.
             GT_CreateSingleTrialFigs(uniqueSleepFile, GT_AnalysisInfo, guiParams);
-            GT_multiWaitbar('Generating Single Trial Summary Figures', blockEightProg/size(uniqueSleepFiles, 1));   % Update progress bar.
+            GT_multiWaitbar('Generating Single Trial Summary Figures', blockEightProg/(size(uniqueSleepFiles, 1)+size(uniqueNoSleepFiles,2)));   % Update progress bar.
         end
+        for blockEightProg = 1:size(uniqueNoSleepFiles, 2)
+            uniqueFile = ([animalID '_' hem '_' char(uniqueNoSleepFiles(1,blockEightProg)) '_SleepScoringData.mat']);
+            % Feed the function one file at a time along with the summary structure and gui parameters.
+            GT_CreateSingleTrialFigs_NoSleep(uniqueFile, GT_AnalysisInfo, guiParams);
+            GT_multiWaitbar('Generating Single Trial Summary Figures', (blockEightProg+size(uniqueSleepFiles, 1))/(size(uniqueSleepFiles, 1)+size(uniqueNoSleepFiles,2)));   % Update progress bar.
+        end
+%     else
+%         uniqueNoSleepFiles = unique(GT_AnalysisInfo.(guiParams.scoringID).data.fileIDs);
+%          for blockEightProg = 1:size(uniqueNoSleepFiles, 1)
+%             uniqueNoSleepFile = ([animalID '_' hem '_' char(uniqueNoSleepFiles(blockEightProg, :)) '_SleepScoringData.mat']);
+%             % Feed the function one file at a time along with the summary structure and gui parameters.
+%             GT_CreateSingleTrialFigs_NoSleep(uniqueNoSleepFile, GT_AnalysisInfo, guiParams);
+%             GT_multiWaitbar('Generating Single Trial Summary Figures', blockEightProg/size(uniqueNoSleepFiles, 1));   % Update progress bar.
+%         end
     end
 end
 
@@ -398,23 +423,23 @@ GT_MessageAlert('Complete', GT_AnalysisInfo, guiParams);
 GT_multiWaitbar('CloseAll');
 
 % Display the summary figures (if they exist) and if the user prompted for them to be saved.
-if guiParams.saveFigsToggle == true
-    % Find the figures' location
-    if exist(['Sleep Summary Figs/' guiParams.scoringID '/']) == 7
-        % Verify the figures exist, gather their names, and CD to the folder
-        if ~isempty(['Sleep Summary Figs/' guiParams.scoringID '/'])
-            curDir = cd;
-            cd (['Sleep Summary Figs/' guiParams.scoringID '/']);
-            figDirectory = dir('*.fig');
-            figFiles = char({figDirectory.name}');
-            % Re-open each summary figure.
-            for f = 1:size(figFiles, 1)
-                figF = figFiles(f, :);
-                openfig(figF, 'visible');
-            end
-        end
-    end
-end
+% if guiParams.saveFigsToggle == true
+%     % Find the figures' location
+%     if exist(['Sleep Summary Figs/' guiParams.scoringID '/']) == 7
+%         % Verify the figures exist, gather their names, and CD to the folder
+%         if ~isempty(['Sleep Summary Figs/' guiParams.scoringID '/'])
+             curDir = cd;
+%             cd (['Sleep Summary Figs/' guiParams.scoringID '/']);
+%             figDirectory = dir('*.fig');
+%             figFiles = char({figDirectory.name}');
+%             % Re-open each summary figure.
+%             for f = 1:size(figFiles, 1)
+%                 figF = figFiles(f, :);
+%                 openfig(figF, 'visible');
+%             end
+%         end
+%     end
+% end
 
 % Change back to the original directory.
 cd(curDir);

@@ -44,6 +44,33 @@ for bins = 1:length(SleepScoringData.SleepParameters.thetaBandPower)
     end
 end
 
+% Create logical for the spindle power
+for bins = 1:length(SleepScoringData.SleepParameters.spindlePower)
+    if max(SleepScoringData.SleepParameters.spindlePower{bins}) >= guiParams.neurCrit
+        spindleElectrodeLogical(bins, 1) = 1;
+    else
+        spindleElectrodeLogical(bins, 1) = 0;
+    end
+end
+
+% Create logical for the gamma band power
+for bins = 1:length(SleepScoringData.SleepParameters.gammaBandPower)
+    if max(SleepScoringData.SleepParameters.gammaBandPower{bins}) >= guiParams.neurCrit
+        gammaElectrodeLogical(bins, 1) = 1;
+    else
+        gammaElectrodeLogical(bins, 1) = 0;
+    end
+end
+
+% Create logical for the ripple power
+for bins = 1:length(SleepScoringData.SleepParameters.ripplePower)
+    if max(SleepScoringData.SleepParameters.ripplePower{bins}) >= guiParams.neurCrit
+        rippleElectrodeLogical(bins, 1) = 1;
+    else
+        rippleElectrodeLogical(bins, 1) = 0;
+    end
+end
+
 % cell function the logicals together and link binary events.
 electrodeLogical1 = arrayfun(@(deltaElectrodeLogical, thetaElectrodeLogical) any(deltaElectrodeLogical + thetaElectrodeLogical), deltaElectrodeLogical, thetaElectrodeLogical);
 [electrodeLogical] = GT_LinkBinaryEvents(gt(electrodeLogical1, 0), [3, 0]);
@@ -61,6 +88,17 @@ for bins = 1:length(SleepScoringData.SleepParameters.ballVelocity)
 end
 
 GT_AnalysisInfo.(guiParams.scoringID).Logicals.ballLogical{iteration, 1} = ballLogical;
+
+%% BLOCK PURPOSE: Create logical for EMG atonia
+for bins = 1:length(SleepScoringData.SleepParameters.EMG)
+    if sum(SleepScoringData.SleepParameters.EMG{bins}) <= guiParams.ballCrit 
+        EMGLogical(bins, 1) = 1;
+    else
+        EMGLogical(bins, 1) = 0;
+    end
+end
+
+GT_AnalysisInfo.(guiParams.scoringID).Logicals.EMGLogical{iteration, 1} = EMGLogical;
 
 %% BLOCK PURPOSE: Create logical for the heart rate
 for bins = 1:length(SleepScoringData.SleepParameters.HeartRate) 
