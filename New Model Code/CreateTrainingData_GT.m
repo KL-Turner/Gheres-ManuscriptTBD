@@ -8,11 +8,13 @@ for a = 1:size(scoringDataFileIDs,1)
     disp(['Gathering EMG data for probability distribution: (' num2str(a) '/' num2str(size(scoringDataFileIDs,1)) ')']); disp(' ')
     scoringDataFileID = scoringDataFileIDs(a,:);
     load(scoringDataFileID,'Ephys')
-    emgHold = cat(2,emgHold,Ephys.downSampleEMG);
+    EMG_Signal=Ephys.downSampleEMG;
+    EMG_Signal(EMG_Signal<0)=0; % Negative EMG values are artifact of filtering, set to 0 for plotting purposes
+    emgHold = cat(2,emgHold,log(EMG_Signal)); % use natural log transform to visualize dynamic range of EMG signal
 end
 % plot histogram of EMG data to assist in identification of bimodal distribution values
 figure
-histogram(emgHold,100,'Normalization','probability')
+histogram(emgHold,500,'Normalization','probability')% visualize log transformed data as a histogram using 500 bins
 xlabel('EMG Power')
 ylabel('Probability')
 % go through each file and create a list of manual scores
