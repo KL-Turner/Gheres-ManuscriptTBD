@@ -14,7 +14,7 @@ timeVec = (1:length(ballVelocity))/samplingRate;
 % ball velocity - apply any extra processing or filters
 ballVelocity = ballVelocity(1:trialDuration*samplingRate); 
 % EMG - apply any extra processing or filters
-EMG = EMG(1:trialDuration*samplingRate); 
+EMG = log(EMG(1:trialDuration*samplingRate)); 
 % change in total hemoglobin
 procHbT = filtfilt(B,A,dHbT(1:trialDuration*samplingRate));
 % hippocampal LFP
