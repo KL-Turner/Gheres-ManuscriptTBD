@@ -35,7 +35,7 @@ else
 end
 saveFigs = 'y';
 %% supplemental figure panels
-% FigTemp_GheresTBD(rootFolder,saveFigs,AnalysisResults)
+FigTemp_GheresTBD(rootFolder,saveFigs,AnalysisResults)
 [AnalysisResults] = FigS1_GheresTBD(rootFolder,saveFigs,AnalysisResults);
 [AnalysisResults] = FigS2_GheresTBD(rootFolder,saveFigs,AnalysisResults);
 [AnalysisResults] = FigS3_GheresTBD(rootFolder,saveFigs,AnalysisResults);
