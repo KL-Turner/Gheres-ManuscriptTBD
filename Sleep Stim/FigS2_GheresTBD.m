@@ -1,10 +1,10 @@
-function [AnalysisResults] = Fig3_GheresTBD(rootFolder,saveFigs,AnalysisResults)
+function [AnalysisResults] = FigS2_GheresTBD(rootFolder,saveFigs,AnalysisResults)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
 % The Pennsylvania State University, Dept. of Biomedical Engineering
 % https://github.com/KL-Turner
 %
-% Purpose: Generate figure panel S2 for Turner_Kederasetti_Gheres_Proctor_Costanzo_Drew_Manuscript2020
+% Purpose: Generate temporary supplemental figure panel for Gheres (TBD)
 %________________________________________________________________________________________________________________________
 
 %% set-up and process data
@@ -19,21 +19,21 @@ for a = 1:length(IOSanimalIDs)
         dataType = dataTypes{1,b};
         for d = 1:length(solenoidNames)
             solenoidName = solenoidNames{1,d};
-            if isfield(AnalysisResults.(animalID).EvokedAvgs.REM.(dataType).(solenoidName),'count') == true
-                data.(dataType).(solenoidName).count(:,a) = AnalysisResults.(animalID).EvokedAvgs.REM.(dataType).(solenoidName).count;
-                data.(dataType).(solenoidName).HbT(:,a) = AnalysisResults.(animalID).EvokedAvgs.REM.(dataType).(solenoidName).CBV_HbT.HbT;
-                data.(dataType).(solenoidName).CBV(:,a) = AnalysisResults.(animalID).EvokedAvgs.REM.(dataType).(solenoidName).CBV.CBV;
-                data.(dataType).(solenoidName).cortMUA(:,a) = AnalysisResults.(animalID).EvokedAvgs.REM.(dataType).(solenoidName).MUA.corticalData;
-                data.(dataType).(solenoidName).hipMUA(:,a) = AnalysisResults.(animalID).EvokedAvgs.REM.(dataType).(solenoidName).MUA.hippocampalData;
-                data.(dataType).(solenoidName).cortGam(:,a) = AnalysisResults.(animalID).EvokedAvgs.REM.(dataType).(solenoidName).Gam.corticalData;
-                data.(dataType).(solenoidName).hipGam(:,a) = AnalysisResults.(animalID).EvokedAvgs.REM.(dataType).(solenoidName).Gam.hippocampalData;
-                data.(dataType).(solenoidName).timeVector(:,a) = AnalysisResults.(animalID).EvokedAvgs.REM.(dataType).(solenoidName).timeVector;
-                data.(dataType).(solenoidName).cortS(:,:,a) = AnalysisResults.(animalID).EvokedAvgs.REM.(dataType).(solenoidName).LFP.corticalS;
-                data.(dataType).(solenoidName).cortS_Gam(:,:,a) = AnalysisResults.(animalID).EvokedAvgs.REM.(dataType).(solenoidName).LFP.corticalS(49:end,20:23);
-                data.(dataType).(solenoidName).hipS(:,:,a) = AnalysisResults.(animalID).EvokedAvgs.REM.(dataType).(solenoidName).LFP.hippocampalS;
-                data.(dataType).(solenoidName).hipS_Gam(:,:,a) = AnalysisResults.(animalID).EvokedAvgs.REM.(dataType).(solenoidName).LFP.hippocampalS(49:end,20:23);
-                data.(dataType).(solenoidName).T(:,a) = AnalysisResults.(animalID).EvokedAvgs.REM.(dataType).(solenoidName).LFP.T;
-                data.(dataType).(solenoidName).F(:,a) = AnalysisResults.(animalID).EvokedAvgs.REM.(dataType).(solenoidName).LFP.F;
+            if isfield(AnalysisResults.(animalID).EvokedAvgs.NREM.(dataType).(solenoidName),'count') == true
+                data.(dataType).(solenoidName).count(:,a) = AnalysisResults.(animalID).EvokedAvgs.NREM.(dataType).(solenoidName).count;
+                data.(dataType).(solenoidName).HbT(:,a) = AnalysisResults.(animalID).EvokedAvgs.NREM.(dataType).(solenoidName).CBV_HbT.HbT;
+                data.(dataType).(solenoidName).CBV(:,a) = AnalysisResults.(animalID).EvokedAvgs.NREM.(dataType).(solenoidName).CBV.CBV;
+                data.(dataType).(solenoidName).cortMUA(:,a) = AnalysisResults.(animalID).EvokedAvgs.NREM.(dataType).(solenoidName).MUA.corticalData;
+                data.(dataType).(solenoidName).hipMUA(:,a) = AnalysisResults.(animalID).EvokedAvgs.NREM.(dataType).(solenoidName).MUA.hippocampalData;
+                data.(dataType).(solenoidName).cortGam(:,a) = AnalysisResults.(animalID).EvokedAvgs.NREM.(dataType).(solenoidName).Gam.corticalData;
+                data.(dataType).(solenoidName).hipGam(:,a) = AnalysisResults.(animalID).EvokedAvgs.NREM.(dataType).(solenoidName).Gam.hippocampalData;
+                data.(dataType).(solenoidName).timeVector(:,a) = AnalysisResults.(animalID).EvokedAvgs.NREM.(dataType).(solenoidName).timeVector;
+                data.(dataType).(solenoidName).cortS(:,:,a) = AnalysisResults.(animalID).EvokedAvgs.NREM.(dataType).(solenoidName).LFP.corticalS;
+                data.(dataType).(solenoidName).cortS_Gam(:,:,a) = AnalysisResults.(animalID).EvokedAvgs.NREM.(dataType).(solenoidName).LFP.corticalS(49:end,20:23);
+                data.(dataType).(solenoidName).hipS(:,:,a) = AnalysisResults.(animalID).EvokedAvgs.NREM.(dataType).(solenoidName).LFP.hippocampalS;
+                data.(dataType).(solenoidName).hipS_Gam(:,:,a) = AnalysisResults.(animalID).EvokedAvgs.NREM.(dataType).(solenoidName).LFP.hippocampalS(49:end,20:23);
+                data.(dataType).(solenoidName).T(:,a) = AnalysisResults.(animalID).EvokedAvgs.NREM.(dataType).(solenoidName).LFP.T;
+                data.(dataType).(solenoidName).F(:,a) = AnalysisResults.(animalID).EvokedAvgs.NREM.(dataType).(solenoidName).LFP.F;
             end
         end
     end
@@ -84,33 +84,63 @@ data.Auditory.F = cat(2,data.adjLH.AudSol.F,data.adjRH.AudSol.F);
 % take the averages of each field through the proper dimension
 for f = 1:length(compDataTypes)
     compDataType = compDataTypes{1,f};
-    data.(compDataType).mean_Count = mean(data.(compDataType).count,2);
-    data.(compDataType).std_Count = std(data.(compDataType).count,0,2);
-    data.(compDataType).mean_HbT = mean(data.(compDataType).HbT,2);
-    data.(compDataType).std_HbT = std(data.(compDataType).HbT,0,2);
-    data.(compDataType).mean_CBV = mean(data.(compDataType).CBV,2);
-    data.(compDataType).std_CBV = std(data.(compDataType).CBV,0,2);
-    data.(compDataType).mean_CortMUA = mean(data.(compDataType).cortMUA,2);
-    data.(compDataType).std_CortMUA = std(data.(compDataType).cortMUA,0,2);
-    data.(compDataType).mean_HipMUA = mean(data.(compDataType).hipMUA,2);
-    data.(compDataType).std_HipMUA = std(data.(compDataType).hipMUA,0,2);
-    data.(compDataType).mean_CortGam = mean(data.(compDataType).cortGam,2);
-    data.(compDataType).std_CortGam = std(data.(compDataType).cortGam,0,2);
-    data.(compDataType).mean_HipGam = mean(data.(compDataType).hipGam,2);
-    data.(compDataType).std_HipGam = std(data.(compDataType).hipGam,0,2);
-    data.(compDataType).mean_timeVector = mean(data.(compDataType).timeVector,2);
-    data.(compDataType).mean_CortS = mean(data.(compDataType).cortS,3).*100;
-    data.(compDataType).mean_CortS_Gam = mean(mean(mean(data.(compDataType).cortS_Gam.*100,2),1),3);
-    data.(compDataType).std_CortS_Gam = std(mean(mean(data.(compDataType).cortS_Gam.*100,2),1),0,3);
-    data.(compDataType).mean_HipS = mean(data.(compDataType).hipS,3).*100;
-    data.(compDataType).mean_HipS_Gam = mean(mean(mean(data.(compDataType).hipS_Gam.*100,2),1),3);
-    data.(compDataType).std_HipS_Gam = std(mean(mean(data.(compDataType).hipS_Gam.*100,2),1),0,3);
-    data.(compDataType).mean_T = mean(data.(compDataType).T,2);
-    data.(compDataType).mean_F = mean(data.(compDataType).F,2);
+    hh = 1;
+    jj = 1;
+    data.(compDataType).nMice = length(data.(compDataType).count)/2;
+    data.(compDataType).nHem= sum(data.(compDataType).count ~= 0);
+    % check cortical data for missing points
+    for gg = 1:length(data.(compDataType).count)
+        if data.(compDataType).count(1,gg) ~= 0
+            procData.(compDataType).count(1,hh) = data.(compDataType).count(1,gg);
+            procData.(compDataType).HbT(:,hh) = data.(compDataType).HbT(:,gg);
+            procData.(compDataType).CBV(:,hh) = data.(compDataType).CBV(:,gg);
+            procData.(compDataType).cortMUA(:,hh) = data.(compDataType).cortMUA(:,gg);
+            procData.(compDataType).cortGam(:,hh) = data.(compDataType).cortGam(:,gg);
+            procData.(compDataType).timeVector(:,hh) = data.(compDataType).timeVector(:,gg);
+            procData.(compDataType).cortS(:,:,hh) = data.(compDataType).cortS(:,:,gg);
+            procData.(compDataType).cortS_Gam(:,:,hh) = data.(compDataType).cortS_Gam(:,:,gg);
+            procData.(compDataType).T(:,hh) = data.(compDataType).T(:,gg);
+            procData.(compDataType).F(:,hh) = data.(compDataType).F(:,gg);
+            hh = hh + 1;
+        end
+    end
+    % check hippocampal data for missing points
+    for ii = 1:size(data.(compDataType).hipMUA,2)
+        if sum(data.(compDataType).hipMUA(:,ii)) ~= 0
+            procData.(compDataType).hipMUA(:,jj) = data.(compDataType).hipMUA(:,ii);
+            procData.(compDataType).hipGam(:,jj) = data.(compDataType).hipGam(:,ii);
+            procData.(compDataType).hipS(:,:,jj) = data.(compDataType).hipS(:,:,ii);
+            procData.(compDataType).hipS_Gam(:,:,jj) = data.(compDataType).hipS_Gam(:,:,ii);
+            jj = jj + 1;
+        end
+    end
+    data.(compDataType).mean_Count = mean(procData.(compDataType).count,2);
+    data.(compDataType).std_Count = std(procData.(compDataType).count,0,2);
+    data.(compDataType).mean_HbT = mean(procData.(compDataType).HbT,2);
+    data.(compDataType).std_HbT = std(procData.(compDataType).HbT,0,2);
+    data.(compDataType).mean_CBV = mean(procData.(compDataType).CBV,2);
+    data.(compDataType).std_CBV = std(procData.(compDataType).CBV,0,2);
+    data.(compDataType).mean_CortMUA = mean(procData.(compDataType).cortMUA,2);
+    data.(compDataType).std_CortMUA = std(procData.(compDataType).cortMUA,0,2);
+    data.(compDataType).mean_HipMUA = mean(procData.(compDataType).hipMUA,2);
+    data.(compDataType).std_HipMUA = std(procData.(compDataType).hipMUA,0,2);
+    data.(compDataType).mean_CortGam = mean(procData.(compDataType).cortGam,2);
+    data.(compDataType).std_CortGam = std(procData.(compDataType).cortGam,0,2);
+    data.(compDataType).mean_HipGam = mean(procData.(compDataType).hipGam,2);
+    data.(compDataType).std_HipGam = std(procData.(compDataType).hipGam,0,2);
+    data.(compDataType).mean_timeVector = mean(procData.(compDataType).timeVector,2);
+    data.(compDataType).mean_CortS = mean(procData.(compDataType).cortS,3).*100;
+    data.(compDataType).mean_CortS_Gam = mean(mean(mean(procData.(compDataType).cortS_Gam.*100,2),1),3);
+    data.(compDataType).std_CortS_Gam = std(mean(mean(procData.(compDataType).cortS_Gam.*100,2),1),0,3);
+    data.(compDataType).mean_HipS = mean(procData.(compDataType).hipS,3).*100;
+    data.(compDataType).mean_HipS_Gam = mean(mean(mean(procData.(compDataType).hipS_Gam.*100,2),1),3);
+    data.(compDataType).std_HipS_Gam = std(mean(mean(procData.(compDataType).hipS_Gam.*100,2),1),0,3);
+    data.(compDataType).mean_T = mean(procData.(compDataType).T,2);
+    data.(compDataType).mean_F = mean(procData.(compDataType).F,2);
 end
 %% Fig. S2
 summaryFigure = figure('Name','FigS2 (a-r)'); %#ok<*NASGU>
-sgtitle('Figure Panel S2 (a-r) Turner Manuscript 2020')
+sgtitle('NREM Stimulation')
 %% [S2a] Cortical MUA Contra Stim
 ax1 = subplot(6,3,1);
 plot(data.Contra.mean_timeVector,data.Contra.mean_CortMUA,'color',colors_Manuscript2020('rich black'),'LineWidth',1);
@@ -359,9 +389,16 @@ set(ax6,'position',ax6Pos);
 set(ax10,'position',ax10Pos);
 set(ax11,'position',ax11Pos);
 set(ax12,'position',ax12Pos);
+% for main fig
+AnalysisResults.NREM.T = data.Contra.mean_T;
+AnalysisResults.NREM.F = data.Contra.mean_F;
+AnalysisResults.NREM.cortLFP = data.Contra.mean_CortS;
+AnalysisResults.NREM.timeVector = data.Contra.mean_timeVector;
+AnalysisResults.NREM.meanHbT = data.Contra.mean_HbT;
+AnalysisResults.NREM.stdHbT = data.Contra.std_HbT;
 %% save figure(s)
 if strcmp(saveFigs,'y') == true
-    dirpath = [rootFolder '\Summary Figures and Structures\MATLAB Analysis Figures\'];
+    dirpath = [rootFolder '\Gheres Summary Figures and Structures\MATLAB Analysis Figures\'];
     if ~exist(dirpath,'dir')
         mkdir(dirpath);
     end
@@ -380,42 +417,49 @@ if strcmp(saveFigs,'y') == true
     disp('[S2] Text values for gamma/HbT/reflectance changes')
     disp('======================================================================================================================')
     disp('----------------------------------------------------------------------------------------------------------------------')
+    % n and stim count
+    disp(['NREM Contra stim n: ' num2str(round(data.Contra.nMice,0)) ' mice ' num2str(round(data.Contra.nHem,0)) ' hem']); disp(' ')
+    disp(['NREM Contra stim # of puffs: ' num2str(round(data.Contra.mean_Count,1)) ' +/- ' num2str(round(data.Contra.std_Count,1))]); disp(' ')
+    disp(['NREM Ipsil stim n: ' num2str(round(data.Ipsi.nMice,0)) ' mice ' num2str(round(data.Ipsi.nHem,0)) ' hem']); disp(' ')
+    disp(['NREM Ipsil stim # of puffs: ' num2str(round(data.Ipsi.mean_Count,1)) ' +/- ' num2str(round(data.Ipsi.std_Count,1))]); disp(' ')
+    disp(['NREM Audit stim n: ' num2str(round(data.Auditory.nMice,0)) ' mice ' num2str(round(data.Auditory.nHem,0)) ' hem']); disp(' ')
+    disp(['NREM Audit stim # of puffs: ' num2str(round(data.Auditory.mean_Count,1)) ' +/- ' num2str(round(data.Auditory.std_Count,1))]); disp(' ')
     % cortical MUA/LFP
     [~,index] = max(data.Contra.mean_CortMUA);
-    disp(['Contra stim Cort gamma MUA P/P (%): ' num2str(round(data.Contra.mean_CortMUA(index),1)) ' +/- ' num2str(round(data.Contra.std_CortMUA(index),1))]); disp(' ')
+    disp(['NREM Contra stim Cort gamma MUA P/P (%): ' num2str(round(data.Contra.mean_CortMUA(index),1)) ' +/- ' num2str(round(data.Contra.std_CortMUA(index),1))]); disp(' ')
     [~,index] = max(data.Ipsi.mean_CortMUA);
-    disp(['Ipsil stim Cort gamma MUA P/P (%): ' num2str(round(data.Ipsi.mean_CortMUA(index),1)) ' +/- ' num2str(round(data.Ipsi.std_CortMUA(index),1))]); disp(' ')
+    disp(['NREM Ipsil stim Cort gamma MUA P/P (%): ' num2str(round(data.Ipsi.mean_CortMUA(index),1)) ' +/- ' num2str(round(data.Ipsi.std_CortMUA(index),1))]); disp(' ')
     [~,index] = max(data.Auditory.mean_CortMUA);
-    disp(['Audit stim Cort gamma MUA P/P (%): ' num2str(round(data.Auditory.mean_CortMUA(index),1)) ' +/- ' num2str(round(data.Auditory.std_CortMUA(index),1))]); disp(' ')
+    disp(['NREM Audit stim Cort gamma MUA P/P (%): ' num2str(round(data.Auditory.mean_CortMUA(index),1)) ' +/- ' num2str(round(data.Auditory.std_CortMUA(index),1))]); disp(' ')
     % cortical LFP
-    disp(['Contra stim Cort gamma LFP P/P (%): ' num2str(round(data.Contra.mean_CortS_Gam,1)) ' +/- ' num2str(round(data.Contra.std_CortS_Gam,1))]); disp(' ')
-    disp(['Ipsil stim Cort gamma LFP P/P (%): ' num2str(round(data.Ipsi.mean_CortS_Gam,1)) ' +/- ' num2str(round(data.Ipsi.std_CortS_Gam,1))]); disp(' ')
-    disp(['Audit stim Cort gamma LFP P/P (%): ' num2str(round(data.Auditory.mean_CortS_Gam,1)) ' +/- ' num2str(round(data.Auditory.std_CortS_Gam,1))]); disp(' ')
+    disp(['NREM Contra stim Cort gamma LFP P/P (%): ' num2str(round(data.Contra.mean_CortS_Gam,1)) ' +/- ' num2str(round(data.Contra.std_CortS_Gam,1))]); disp(' ')
+    disp(['NREM Ipsil stim Cort gamma LFP P/P (%): ' num2str(round(data.Ipsi.mean_CortS_Gam,1)) ' +/- ' num2str(round(data.Ipsi.std_CortS_Gam,1))]); disp(' ')
+    disp(['NREM Audit stim Cort gamma LFP P/P (%): ' num2str(round(data.Auditory.mean_CortS_Gam,1)) ' +/- ' num2str(round(data.Auditory.std_CortS_Gam,1))]); disp(' ')
     % hippocampal MUA
     [~,index] = max(data.Contra.mean_HipMUA);
-    disp(['Contra stim Hip gamma MUA P/P (%): ' num2str(round(data.Contra.mean_HipMUA(index),1)) ' +/- ' num2str(round(data.Contra.std_HipMUA(index),1))]); disp(' ')
+    disp(['NREM Contra stim Hip gamma MUA P/P (%): ' num2str(round(data.Contra.mean_HipMUA(index),1)) ' +/- ' num2str(round(data.Contra.std_HipMUA(index),1))]); disp(' ')
     [~,index] = max(data.Ipsi.mean_HipMUA);
-    disp(['Ipsil stim Hip gamma MUA P/P (%): ' num2str(round(data.Ipsi.mean_HipMUA(index),1)) ' +/- ' num2str(round(data.Ipsi.std_HipMUA(index),1))]); disp(' ')
+    disp(['NREM Ipsil stim Hip gamma MUA P/P (%): ' num2str(round(data.Ipsi.mean_HipMUA(index),1)) ' +/- ' num2str(round(data.Ipsi.std_HipMUA(index),1))]); disp(' ')
     [~,index] = max(data.Auditory.mean_HipMUA);
-    disp(['Audit stim Hip gamma MUA P/P (%): ' num2str(round(data.Auditory.mean_HipMUA(index),1)) ' +/- ' num2str(round(data.Auditory.std_HipMUA(index),1))]); disp(' ')
-    % hipocampal LFP
-    disp(['Contra stim Hip gamma LFP P/P (%): ' num2str(round(data.Contra.mean_HipS_Gam,1)) ' +/- ' num2str(round(data.Contra.std_HipS_Gam,1))]); disp(' ')
-    disp(['Ipsil stim Hip gamma LFP P/P (%): ' num2str(round(data.Ipsi.mean_HipS_Gam,1)) ' +/- ' num2str(round(data.Ipsi.std_HipS_Gam,1))]); disp(' ')
-    disp(['Auditory stim Hip gamma LFP P/P (%): ' num2str(round(data.Auditory.mean_HipS_Gam,1)) ' +/- ' num2str(round(data.Auditory.std_HipS_Gam,1))]); disp(' ')
+    disp(['NREM Audit stim Hip gamma MUA P/P (%): ' num2str(round(data.Auditory.mean_HipMUA(index),1)) ' +/- ' num2str(round(data.Auditory.std_HipMUA(index),1))]); disp(' ')
+    % hippocampal LFP
+    disp(['NREM Contra stim Hip gamma LFP P/P (%): ' num2str(round(data.Contra.mean_HipS_Gam,1)) ' +/- ' num2str(round(data.Contra.std_HipS_Gam,1))]); disp(' ')
+    disp(['NREM Ipsil stim Hip gamma LFP P/P (%): ' num2str(round(data.Ipsi.mean_HipS_Gam,1)) ' +/- ' num2str(round(data.Ipsi.std_HipS_Gam,1))]); disp(' ')
+    disp(['NREM Auditory stim Hip gamma LFP P/P (%): ' num2str(round(data.Auditory.mean_HipS_Gam,1)) ' +/- ' num2str(round(data.Auditory.std_HipS_Gam,1))]); disp(' ')
     % HbT
     [~,index] = max(data.Contra.mean_HbT);
-    disp(['Contra stim [HbT] (uM): ' num2str(round(data.Contra.mean_HbT(index),1)) ' +/- ' num2str(round(data.Contra.std_HbT(index),1))]); disp(' ')
+    disp(['NREM Contra stim [HbT] (uM): ' num2str(round(data.Contra.mean_HbT(index),1)) ' +/- ' num2str(round(data.Contra.std_HbT(index),1))]); disp(' ')
     [~,index] = max(data.Ipsi.mean_HbT);
-    disp(['Ipsil stim [HbT] (uM): ' num2str(round(data.Ipsi.mean_HbT(index),1)) ' +/- ' num2str(round(data.Ipsi.std_HbT(index),1))]); disp(' ')
+    disp(['NREM Ipsil stim [HbT] (uM): ' num2str(round(data.Ipsi.mean_HbT(index),1)) ' +/- ' num2str(round(data.Ipsi.std_HbT(index),1))]); disp(' ')
     [~,index] = max(data.Auditory.mean_HbT);
-    disp(['Audit stim [HbT] (uM): ' num2str(round(data.Auditory.mean_HbT(index),1)) ' +/- ' num2str(round(data.Auditory.std_HbT(index),1))]); disp(' ')
+    disp(['NREM Audit stim [HbT] (uM): ' num2str(round(data.Auditory.mean_HbT(index),1)) ' +/- ' num2str(round(data.Auditory.std_HbT(index),1))]); disp(' ')
     % R/R
     [~,index] = min(data.Contra.mean_CBV);
-    disp(['Contra stim refl R/R (%): ' num2str(round(data.Contra.mean_CBV(index),1)) ' +/- ' num2str(round(data.Contra.std_CBV(index),1))]); disp(' ')
+    disp(['NREM Contra stim refl R/R (%): ' num2str(round(data.Contra.mean_CBV(index),1)) ' +/- ' num2str(round(data.Contra.std_CBV(index),1))]); disp(' ')
     [~,index] = min(data.Ipsi.mean_CBV);
-    disp(['Ipsil stim refl R/R (%): ' num2str(round(data.Ipsi.mean_CBV(index),1)) ' +/- ' num2str(round(data.Ipsi.std_CBV(index),1))]); disp(' ')
+    disp(['NREM Ipsil stim refl R/R (%): ' num2str(round(data.Ipsi.mean_CBV(index),1)) ' +/- ' num2str(round(data.Ipsi.std_CBV(index),1))]); disp(' ')
     [~,index] = min(data.Auditory.mean_CBV);
-    disp(['Audit stim refl R/R (%): ' num2str(round(data.Auditory.mean_CBV(index),1)) ' +/- ' num2str(round(data.Auditory.std_CBV(index),1))]); disp(' ')
+    disp(['NREM Audit stim refl R/R (%): ' num2str(round(data.Auditory.mean_CBV(index),1)) ' +/- ' num2str(round(data.Auditory.std_CBV(index),1))]); disp(' ')
     disp('----------------------------------------------------------------------------------------------------------------------')
     diary off
 end

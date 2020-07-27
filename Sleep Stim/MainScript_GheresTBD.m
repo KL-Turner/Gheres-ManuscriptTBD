@@ -4,7 +4,7 @@ function [] = MainScript_GheresTBD()
 % The Pennsylvania State University, Dept. of Biomedical Engineering
 % https://github.com/KL-Turner
 %________________________________________________________________________________________________________________________
-% Purpose: Generates KLT's main and supplemental figs for the 2020 sleep paper.
+% Purpose: Generates KLT's main and supplemental figs for the Gheres (TBD) paper.
 %
 % Scripts used to pre-process the original data are located in the folder "Pre-processing-scripts".
 % Functions that are used in both the analysis and pre-processing are located in the analysis folder.
@@ -35,11 +35,11 @@ else
 end
 saveFigs = 'y';
 %% supplemental figure panels
-Fig1_GheresTBD(rootFolder,saveFigs,AnalysisResults);
-Fig2_GheresTBD(rootFolder,saveFigs,AnalysisResults);
-Fig3_GheresTBD(rootFolder,saveFigs,AnalysisResults);
-Fig4_GheresTBD(rootFolder,saveFigs,AnalysisResults);
-Fig5_GheresTBD(rootFolder,saveFigs,AnalysisResults);
+% FigTemp_GheresTBD(rootFolder,saveFigs,AnalysisResults)
+[AnalysisResults] = FigS1_GheresTBD(rootFolder,saveFigs,AnalysisResults);
+[AnalysisResults] = FigS2_GheresTBD(rootFolder,saveFigs,AnalysisResults);
+[AnalysisResults] = FigS3_GheresTBD(rootFolder,saveFigs,AnalysisResults);
+Fig1_GheresTBD(rootFolder,saveFigs,AnalysisResults)
 %% fin.
 disp('MainScript Analysis - Complete'); disp(' ')
 % sendmail('kevinlturnerjr@gmail.com','Manuscript2020 Analysis Complete');
@@ -55,7 +55,7 @@ else
     AnalysisResults = [];
 end
 %% Block [1] Analyze the stimulus-evoked and whisking-evoked neural/hemodynamic responses (IOS)
-runFromStart = 'y';
+runFromStart = 'n';
 for pp = 1:length(IOS_animalIDs)
     if isfield(AnalysisResults,(IOS_animalIDs{1,pp})) == false || isfield(AnalysisResults.(IOS_animalIDs{1,pp}),'EvokedAvgs') == false || strcmp(runFromStart,'y') == true
         [AnalysisResults] = AnalyzeEvokedResponses_GheresTBD(IOS_animalIDs{1,pp},rootFolder,AnalysisResults);

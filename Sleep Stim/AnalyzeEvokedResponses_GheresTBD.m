@@ -45,6 +45,17 @@ trialDuration_sec = EventData.CBV_HbT.adjLH.stim.trialDuration_sec;
 timeVector = (0:(EventData.CBV_HbT.adjLH.stim.epoch.duration*samplingRate))/samplingRate - EventData.CBV_HbT.adjLH.stim.epoch.offset;
 offset = EventData.CBV_HbT.adjLH.stim.epoch.offset;
 T2 = -2:(1/specSamplingRate):10;
+% criteria for the FilterEvents data struct
+whiskCriteriaA.Fieldname = {'duration','duration','puffDistance'};
+whiskCriteriaA.Comparison = {'gt','lt','gt'};
+whiskCriteriaA.Value = {0.5,2,5};
+whiskCriteriaB.Fieldname = {'duration','duration','puffDistance'};
+whiskCriteriaB.Comparison = {'gt','lt','gt'};
+whiskCriteriaB.Value = {2,5,5};
+whiskCriteriaC.Fieldname = {'duration','puffDistance'};
+whiskCriteriaC.Comparison = {'gt','gt'};
+whiskCriteriaC.Value = {5,5};
+whiskCriteriaNames = {'ShortWhisks','IntermediateWhisks','LongWhisks'};
 % Criteria for the FilterEvents data struct
 stimCriteriaA.Value = {'LPadSol'};
 stimCriteriaA.Fieldname = {'solenoidName'};
@@ -59,7 +70,143 @@ stimCriteriaNames = {'stimCriteriaA','stimCriteriaB','stimCriteriaC'};
 for aa = 1:length(dataTypes)
     dataType = dataTypes{1,aa};
     neuralDataType = ['cortical_' dataType(4:end)];
-    % filter the EventData.mat structure for stimulus events that meet the desired criteria
+    %%
+    for bb = 1:length(whiskCriteriaNames)
+        whiskCriteriaName = whiskCriteriaNames{1,bb};
+        if strcmp(whiskCriteriaName,'ShortWhisks') == true
+            WhiskCriteria = whiskCriteriaA;
+        elseif strcmp(whiskCriteriaName,'IntermediateWhisks') == true
+            WhiskCriteria = whiskCriteriaB;
+        elseif strcmp(whiskCriteriaName,'LongWhisks') == true
+            WhiskCriteria = whiskCriteriaC;
+        end
+        [whiskLogical] = FilterEvents_IOS_Manuscript2020(EventData.CBV_HbT.(dataType).whisk,WhiskCriteria);
+        combWhiskLogical = logical(whiskLogical);
+        [allWhiskHbTData] = EventData.CBV_HbT.(dataType).whisk.data(combWhiskLogical,:);
+        [allWhiskCBVData] = EventData.CBV.(dataType).whisk.NormData(combWhiskLogical,:);
+        [allWhiskEMGData] = EventData.EMG.emg.whisk.data(combWhiskLogical,:);
+        [allWhiskCorticalMUAData] = EventData.(neuralDataType).muaPower.whisk.NormData(combWhiskLogical,:);
+        [allWhiskHippocampalMUAData] = EventData.hippocampus.muaPower.whisk.NormData(combWhiskLogical,:);
+        [allWhiskCorticalGamData] = EventData.(neuralDataType).gammaBandPower.whisk.NormData(combWhiskLogical,:);
+        [allWhiskHippocampalGamData] = EventData.hippocampus.gammaBandPower.whisk.NormData(combWhiskLogical,:);
+        [allWhiskFileIDs] = EventData.CBV_HbT.(dataType).whisk.fileIDs(combWhiskLogical,:);
+        [allWhiskEventTimes] = EventData.CBV_HbT.(dataType).whisk.eventTime(combWhiskLogical,:);
+        allWhiskDurations = EventData.CBV_HbT.(dataType).whisk.duration(combWhiskLogical,:);
+        % decimate the file list to only include those files that occur within the desired number of target minutes
+        [finalWhiskHbTData,finalWhiskFileIDs,~,finalWhiskFileEventTimes] = RemoveInvalidData_IOS_Manuscript2020(allWhiskHbTData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
+        [finalWhiskCBVData,~,~,~] = RemoveInvalidData_IOS_Manuscript2020(allWhiskCBVData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
+        [finalWhiskEMGData,~,~,~] = RemoveInvalidData_IOS_Manuscript2020(allWhiskEMGData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
+        [finalWhiskCorticalMUAData,~,~,~] = RemoveInvalidData_IOS_Manuscript2020(allWhiskCorticalMUAData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
+        [finalWhiskHippocampalMUAData,~,~,~] = RemoveInvalidData_IOS_Manuscript2020(allWhiskHippocampalMUAData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
+        [finalWhiskCorticalGamData,~,~,~] = RemoveInvalidData_IOS_Manuscript2020(allWhiskCorticalGamData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
+        [finalWhiskHippocampalGamData,~,~,~] = RemoveInvalidData_IOS_Manuscript2020(allWhiskHippocampalGamData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
+        % lowpass filter each whisking event and mean-subtract by the first 2 seconds
+        clear procWhiskHbTData procWhiskCBVData procWhiskEMGData procWhiskCorticalMUAData procWhiskHippocampalMUAData procWhiskCorticalGamData procWhiskHippocampalGamData finalWhiskStartTimes finalWhiskEndTimes finalWhiskFiles
+        dd = 1;
+        for cc = 1:size(finalWhiskHbTData,1)
+            whiskStartTime = round(finalWhiskFileEventTimes(cc,1),1) - 2;
+            whiskEndTime = whiskStartTime + 12;
+            finalWhiskFileID = finalWhiskFileIDs{cc,1};
+            if whiskStartTime >= 0.5 && whiskEndTime <= (trialDuration_sec - 0.5)
+                whiskHbTarray = finalWhiskHbTData(cc,:);
+                whiskCBVarray = finalWhiskCBVData(cc,:);
+                whiskEMGarray = finalWhiskEMGData(cc,:);
+                fileID = finalWhiskFileIDs(cc,1);
+                strDay = ConvertDate_IOS_Manuscript2020(fileID{1,1}(1:6));
+                whiskCorticalMUAarray = finalWhiskCorticalMUAData(cc,:);
+                whiskHippocampalMUAarray = finalWhiskHippocampalMUAData(cc,:);
+                whiskCorticalGamArray = finalWhiskCorticalGamData(cc,:);
+                whiskHippocampalGamArray = finalWhiskHippocampalGamData(cc,:);
+                filtWhiskHbTarray = sgolayfilt(whiskHbTarray,3,17);
+                filtWhiskCBVarray = sgolayfilt(whiskCBVarray,3,17);
+                filtWhiskCorticalMUAarray = sgolayfilt(whiskCorticalMUAarray,3,17);
+                filtWhiskHippocampalMUAarray = sgolayfilt(whiskHippocampalMUAarray,3,17);
+                filtWhiskCorticalGamArray = sgolayfilt(whiskCorticalGamArray,3,17);
+                filtWhiskHippocampalGamArray = sgolayfilt(whiskHippocampalGamArray,3,17);
+                procWhiskHbTData(dd,:) = filtWhiskHbTarray - mean(filtWhiskHbTarray(1:(offset*samplingRate))); %#ok<*AGROW>
+                procWhiskCBVData(dd,:) = filtWhiskCBVarray - mean(filtWhiskCBVarray(1:(offset*samplingRate)));
+                procWhiskEMGData(dd,:) = whiskEMGarray - RestingBaselines.manualSelection.EMG.emg.(strDay);
+                procWhiskCorticalMUAData(dd,:) = filtWhiskCorticalMUAarray - mean(filtWhiskCorticalMUAarray(1:(offset*samplingRate)));
+                procWhiskHippocampalMUAData(dd,:) = filtWhiskHippocampalMUAarray - mean(filtWhiskHippocampalMUAarray(1:(offset*samplingRate)));
+                procWhiskCorticalGamData(dd,:) = filtWhiskCorticalGamArray - mean(filtWhiskCorticalGamArray(1:(offset*samplingRate)));
+                procWhiskHippocampalGamData(dd,:) = filtWhiskHippocampalGamArray - mean(filtWhiskHippocampalGamArray(1:(offset*samplingRate)));
+                finalWhiskStartTimes(dd,1) = whiskStartTime;
+                finalWhiskEndTimes(dd,1) = whiskEndTime;
+                finalWhiskFiles{dd,1} = finalWhiskFileID;
+                dd = dd + 1;
+            end
+        end
+        meanWhiskHbTData = mean(procWhiskHbTData,1);
+        stdWhiskHbTData = std(procWhiskHbTData,0,1);
+        meanWhiskCBVData = mean(procWhiskCBVData,1)*100;
+        stdWhiskCBVData = std(procWhiskCBVData,0,1)*100;
+        meanWhiskEMGData = mean(procWhiskEMGData,1);
+        stdWhiskEMGData = std(procWhiskEMGData,0,1);
+        meanWhiskCorticalMUAData = mean(procWhiskCorticalMUAData,1)*100;
+        stdWhiskCorticalMUAData = std(procWhiskCorticalMUAData,0,1)*100;
+        meanWhiskHippocampalMUAData = mean(procWhiskHippocampalMUAData,1)*100;
+        stdWhiskHippocampalMUAData = std(procWhiskHippocampalMUAData,0,1)*100;
+        meanWhiskCorticalGamData = mean(procWhiskCorticalGamData,1)*100;
+        stdWhiskCorticalGamData = std(procWhiskCorticalGamData,0,1)*100;
+        meanWhiskHippocampalGamData = mean(procWhiskHippocampalGamData,1)*100;
+        stdWhiskHippocampalGamData = std(procWhiskHippocampalGamData,0,1)*100;
+        % extract LFP from spectrograms associated with the whisking indecies
+        whiskCorticalZhold = [];
+        whiskHippocampalZhold = [];
+        for ee = 1:length(finalWhiskFiles)
+            % load normalized one-second bin data from each file
+            whiskFileID = finalWhiskFiles{ee,1};
+            whiskSpecDataFileID = [animalID '_' whiskFileID '_SpecDataB.mat'];
+            whiskSpecField = neuralDataType;
+            for ff = 1:length(AllSpecData.(whiskSpecField).fileIDs)
+                if strcmp(AllSpecData.(whiskSpecField).fileIDs{ff,1},whiskSpecDataFileID) == true
+                    whiskCorticalS_Data = AllSpecData.(whiskSpecField).normS{ff,1};
+                    whiskHippocampalS_Data = AllSpecData.hippocampus.normS{ff,1};
+                    F = AllSpecData.(whiskSpecField).F{ff,1};
+                    T = round(AllSpecData.(whiskSpecField).T{ff,1},1);
+                end
+            end
+            whiskStartTimeIndex = find(T == round(finalWhiskStartTimes(ee,1),1));
+            whiskStartTimeIndex = whiskStartTimeIndex(1);
+            whiskDurationIndex = find(T == round(finalWhiskEndTimes(ee,1),1));
+            whiskDurationIndex = whiskDurationIndex(end);
+            whiskCorticalS_Vals = whiskCorticalS_Data(:,whiskStartTimeIndex:whiskDurationIndex);
+            whiskHippocampalS_Vals = whiskHippocampalS_Data(:,whiskStartTimeIndex:whiskDurationIndex);
+            % mean subtract each row with detrend
+            transpWhiskCorticalS_Vals = whiskCorticalS_Vals';   % Transpose since detrend goes down columns
+            transpWhiskHippocampalS_Vals = whiskHippocampalS_Vals';
+            dTWhiskCorticalS_Vals = transpWhiskCorticalS_Vals;
+            dTWhiskCorticalS_Vals = dTWhiskCorticalS_Vals(1:12*specSamplingRate + 1,:);
+            dTWhiskHippocampalS_Vals = transpWhiskHippocampalS_Vals;
+            dTWhiskHippocampalS_Vals = dTWhiskHippocampalS_Vals(1:12*specSamplingRate + 1,:);
+            whiskCorticalZhold = cat(3,whiskCorticalZhold,dTWhiskCorticalS_Vals');   % transpose back to original orientation
+            whiskHippocampalZhold = cat(3,whiskHippocampalZhold,dTWhiskHippocampalS_Vals');
+        end
+        % figure time/frequency axis and average each S data matrix through time
+        meanWhiskCorticalS = mean(whiskCorticalZhold,3);
+        meanWhiskHippocampalS = mean(whiskHippocampalZhold,3);
+        % save results
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).CBV_HbT.HbT = meanWhiskHbTData;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).CBV_HbT.HbTStD = stdWhiskHbTData;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).CBV.CBV = meanWhiskCBVData;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).CBV.CBVStD = stdWhiskCBVData;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).EMG.EMG = meanWhiskEMGData;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).EMG.EMGStD = stdWhiskEMGData;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).MUA.corticalData = meanWhiskCorticalMUAData;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).MUA.corticalStD = stdWhiskCorticalMUAData;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).MUA.hippocampalData = meanWhiskHippocampalMUAData;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).MUA.hippocampalStD = stdWhiskHippocampalMUAData;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).Gam.corticalData = meanWhiskCorticalGamData;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).Gam.corticalStD = stdWhiskCorticalGamData;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).Gam.hippocampalData = meanWhiskHippocampalGamData;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).Gam.hippocampalStD = stdWhiskHippocampalGamData;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).timeVector = timeVector;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).LFP.corticalS = meanWhiskCorticalS;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).LFP.hippocampalS = meanWhiskHippocampalS;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).LFP.T = T2;
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).LFP.F = F;
+    end 
+    %% filter the EventData.mat structure for stimulus events that meet the desired criteria
     for bb = 1:length(stimCriteriaNames)
         stimCriteriaName = stimCriteriaNames{1,bb};
         if strcmp(stimCriteriaName,'stimCriteriaA') == true
@@ -82,7 +229,7 @@ for aa = 1:length(dataTypes)
         [allStimFileIDs] = EventData.CBV_HbT.(dataType).stim.fileIDs(allStimFilter,:);
         [allStimEventTimes] = EventData.CBV_HbT.(dataType).stim.eventTime(allStimFilter,:);
         allStimDurations = zeros(length(allStimEventTimes),1);
-        FilterCategories = {'Awake','NREM','REM','NREMawake','REMawake'};
+        FilterCategories = {'Awake','NREM','REM'};
         for cc = 1:length(FilterCategories)
             filterCategory = FilterCategories{1,cc};
             if strcmp(filterCategory,'Awake') == true
@@ -95,25 +242,17 @@ for aa = 1:length(dataTypes)
                 [finalStimHipGamData,~,~,~] = RemoveInvalidData_GheresTBD(allStimHipGamData,allStimFileIDs,allStimDurations,allStimEventTimes,ManualDecisions);
             else
                 if strcmp(filterCategory,'NREM') == true
-                    scoreA = 'NREM Sleep';
-                    scoreB = 'NREM Sleep';
+                    score = 'NREM Sleep';
                 elseif strcmp(filterCategory,'REM') == true
-                    scoreA = 'REM Sleep';
-                    scoreB = 'REM Sleep';
-                elseif strcmp(filterCategory,'NREMawake') == true
-                    scoreA = 'NREM Sleep';
-                    scoreB = 'Not Sleep';
-                elseif strcmp(filterCategory,'REMawake') == true
-                    scoreA = 'REM Sleep';
-                    scoreB = 'Not Sleep';
+                    score = 'REM Sleep';
                 end
                 % decimate the file list to only include those files that occur within the desired number of target minutes
-                [finalStimHbTData,finalStimFileIDs,~,finalStimFileEventTimes] = KeepSleepData_GheresTBD(allStimHbTData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,scoreA,scoreB);
-                [finalStimCBVData,~,~,~] = KeepSleepData_GheresTBD(allStimCBVData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,scoreA,scoreB);
-                [finalStimCortMUAData,~,~,~] = KeepSleepData_GheresTBD(allStimCortMUAData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,scoreA,scoreB);
-                [finalStimHipMUAData,~,~,~] = KeepSleepData_GheresTBD(allStimHipMUAData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,scoreA,scoreB);
-                [finalStimCortGamData,~,~,~] = KeepSleepData_GheresTBD(allStimCortGamData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,scoreA,scoreB);
-                [finalStimHipGamData,~,~,~] = KeepSleepData_GheresTBD(allStimHipGamData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,scoreA,scoreB);
+                [finalStimHbTData,finalStimFileIDs,~,finalStimFileEventTimes] = KeepSleepData_GheresTBD(allStimHbTData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
+                [finalStimCBVData,~,~,~] = KeepSleepData_GheresTBD(allStimCBVData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
+                [finalStimCortMUAData,~,~,~] = KeepSleepData_GheresTBD(allStimCortMUAData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
+                [finalStimHipMUAData,~,~,~] = KeepSleepData_GheresTBD(allStimHipMUAData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
+                [finalStimCortGamData,~,~,~] = KeepSleepData_GheresTBD(allStimCortGamData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
+                [finalStimHipGamData,~,~,~] = KeepSleepData_GheresTBD(allStimHipGamData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
             end
             % lowpass filter each whisking event and mean-subtract by the first 2 seconds
             clear procStimHbTData procStimCBVData procStimCortMUAData procStimHipMUAData procStimCortGamData procStimHipGamData finalStimStartTimes finalStimEndTimes finalStimFiles

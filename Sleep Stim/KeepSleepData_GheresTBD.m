@@ -1,4 +1,4 @@
-function [decData,decFileIDs,decDurations,decEventTimes] = KeepSleepData_GheresTBD(data,fileIDs,durations,eventTimes,ScoringResults,scoreA,scoreB)
+function [decData,decFileIDs,decDurations,decEventTimes] = KeepSleepData_GheresTBD(data,fileIDs,durations,eventTimes,ScoringResults,score)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
 % The Pennsylvania State University, Dept. of Biomedical Engineering
@@ -26,10 +26,9 @@ for a = 1:size(data,1)
         end
     end
     sleepBinNumber = ceil(startTime/5);
-    eventStateA = scoringLabels(sleepBinNumber);
-    eventStateB = scoringLabels(sleepBinNumber + 1);
+    eventState = scoringLabels(sleepBinNumber);
     % check that the event falls within appropriate bounds
-    if strcmp(eventStateA,scoreA) == true && strcmp(eventStateB,scoreB) == true
+    if strcmp(eventState,score) == true
         if startTime >= offset && endTime <= (trialDuration_sec - offset)
             if iscell(data) == true
                 decData{x,1} = data{a,1}; %#ok<*AGROW>
