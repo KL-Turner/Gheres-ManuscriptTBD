@@ -1,22 +1,14 @@
-function cancel = GT_multiWaitbar(label, varargin)
+function [cancel] = multiWaitbar_GheresTBD(label,varargin)
 %________________________________________________________________________________________________________________________
-% Edited by Kevin L. Turner
+% Utilized in analysis by Kevin L. Turner
 % The Pennsylvania State University, Dept. of Biomedical Engineering
 % https://github.com/KL-Turner
+%
+% Removed the estimated time remaining feature, as it was very inaccurate.
+%
+%   Last Edited: March 23rd, 2019
 %________________________________________________________________________________________________________________________
 %
-%   **This function is only lightly edited to fix a few timing issues. Full credit goes to the author, Ben Tordoff.
-%
-%   Purpose: Create a loading bar to display analysis progress.
-%________________________________________________________________________________________________________________________
-%
-%   Inputs: See detailed descriptions below.
-%
-%   Outputs: -
-%
-%   Last Revised: March 8th, 2019
-%________________________________________________________________________________________________________________________
-
 %multiWaitbar: add, remove or update an entry on the multi waitbar
 %
 %   multiWaitbar(LABEL,VALUE) adds a waitbar for the specified label, or
@@ -341,8 +333,9 @@ f = figure( ...
     'NumberTitle', 'off' );
 % Resize and centre on the first screen
 screenSize = get(0,'ScreenSize');
-figSz = [400 400];
+figSz = [600 100];
 figPos = ceil((screenSize(1,3:4)-figSz)/2);
+figPos(2) = ceil(screenSize(4)*.85);
 fobj = handle( f );
 fobj.Position = [figPos, figSz];
 setappdata( fobj, 'ProgressEntries', [] );
@@ -390,9 +383,15 @@ if ischar(baseColor)
         case 'M'
             baseColor = [0.6 0 0.6];
         case 'Y'
-            baseColor = [0.9 0.8 0.2];
+            baseColor = [0.720000 0.530000 0.040000];
         case 'W'
             baseColor = [0.9 0.9 0.9];
+        case 'O'
+            baseColor = [0.910000 0.410000 0.170000];
+        case 'P'
+            baseColor = [0.470000 0.320000 0.660000];
+        case 'A'
+            baseColor = [0.940000 0.870000 0.800000];
         otherwise
             error( badColorErrorID, badColorErrorMsg );
     end
@@ -617,7 +616,7 @@ if ~updated && (decval == lastdecval)
 end
 
 % Now work out the remaining time
-minTime = 0.5; % secs
+minTime = 0; % secs
 if val <= 0
     % Zero value, so clear the eta
     entry.Created = tic();
