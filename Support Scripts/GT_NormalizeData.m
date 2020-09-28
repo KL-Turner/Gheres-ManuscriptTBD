@@ -56,11 +56,11 @@ SleepScoringData.Spectrograms.FiveSec.F5 = F5;
 
 %% Z-Score normalize data to awake resting baselines
 SleepScoringData.normCBV = (SleepScoringData.CBV - cbvBaseline.Avg) ./ cbvBaseline.Avg;
-SleepScoringData.normDeltaBandPower = (SleepScoringData.deltaBandPower - deltaBaseline.Avg) ./ deltaBaseline.stanDev;
-SleepScoringData.normThetaBandPower = (SleepScoringData.thetaBandPower - thetaBaseline.Avg) ./ thetaBaseline.stanDev;
-SleepScoringData.normSpindlePower = (SleepScoringData.spindlePower - spindleBaseline.Avg) ./ spindleBaseline.stanDev;
-SleepScoringData.normGammaBandPower = (SleepScoringData.gammaBandPower - gammaBaseline.Avg) ./ gammaBaseline.stanDev;
-SleepScoringData.normRipplePower=(SleepScoringData.ripplePower-rippleBaseline.Avg)./rippleBaseline.stanDev;
+SleepScoringData.normDeltaBandPower = (SleepScoringData.deltaBandPower - deltaBaseline.Avg) ./ deltaBaseline.Avg;
+SleepScoringData.normThetaBandPower = (SleepScoringData.thetaBandPower - thetaBaseline.Avg) ./ thetaBaseline.Avg;
+SleepScoringData.normSpindlePower = (SleepScoringData.spindlePower - spindleBaseline.Avg) ./ spindleBaseline.Avg;
+SleepScoringData.normGammaBandPower = (SleepScoringData.gammaBandPower - gammaBaseline.Avg) ./ gammaBaseline.Avg;
+SleepScoringData.normRipplePower=(SleepScoringData.ripplePower-rippleBaseline.Avg)./rippleBaseline.Avg;
 
 save(sleepScoringDataFile, 'SleepScoringData');
 

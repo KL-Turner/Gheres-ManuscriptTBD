@@ -69,7 +69,17 @@ for FN = 1:length(FName)
         otherwise
             error(' ')
     end
+    if isequal(length(FiltArray),length(IndFilt))
     FiltArray = and(FiltArray,IndFilt);
+    else
+        if length(FiltArray)>length(IndFilt)
+            FiltArray=FiltArray(1:length(IndFilt));
+            FiltArray = and(FiltArray,IndFilt);
+        else
+            IndFilt=indFilt(1:length(FiltArray));
+            FiltArray = and(FiltArray,IndFilt);
+        end
+    end
 end
 
 end
