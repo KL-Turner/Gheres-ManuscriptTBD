@@ -35,11 +35,12 @@ else
 end
 saveFigs = 'y';
 %% supplemental figure panels
-FigTemp_GheresTBD(rootFolder,saveFigs,AnalysisResults)
-[AnalysisResults] = FigS1_GheresTBD(rootFolder,saveFigs,AnalysisResults);
-[AnalysisResults] = FigS2_GheresTBD(rootFolder,saveFigs,AnalysisResults);
-[AnalysisResults] = FigS3_GheresTBD(rootFolder,saveFigs,AnalysisResults);
-Fig1_GheresTBD(rootFolder,saveFigs,AnalysisResults)
+% FigTemp_GheresTBD(rootFolder,saveFigs,AnalysisResults)
+FigTemp2_GheresTBD(rootFolder,saveFigs,AnalysisResults)
+% [AnalysisResults] = FigS1_GheresTBD(rootFolder,saveFigs,AnalysisResults);
+% [AnalysisResults] = FigS2_GheresTBD(rootFolder,saveFigs,AnalysisResults);
+% [AnalysisResults] = FigS3_GheresTBD(rootFolder,saveFigs,AnalysisResults);
+% Fig1_GheresTBD(rootFolder,saveFigs,AnalysisResults)
 %% fin.
 disp('MainScript Analysis - Complete'); disp(' ')
 % sendmail('kevinlturnerjr@gmail.com','Manuscript2020 Analysis Complete');
@@ -61,6 +62,14 @@ for pp = 1:length(IOS_animalIDs)
         [AnalysisResults] = AnalyzeEvokedResponses_GheresTBD(IOS_animalIDs{1,pp},rootFolder,AnalysisResults);
     end
     multiWaitbar_GheresTBD('Analyzing evoked responses','Value',pp/length(IOS_animalIDs));
+end
+%% Block [9] Analyze the spectral coherence between bilateral hemodynamic [HbT] and neural signals (IOS)
+runFromStart = 'n';
+for jj = 1:length(IOS_animalIDs)
+    if isfield(AnalysisResults,(IOS_animalIDs{1,jj})) == false || isfield(AnalysisResults.(IOS_animalIDs{1,jj}),'Coherence') == false || strcmp(runFromStart,'y') == true
+        [AnalysisResults] = AnalyzeCoherence_GT(IOS_animalIDs{1,jj},rootFolder,AnalysisResults);
+    end
+    multiWaitbar_Manuscript2020('Analyzing coherence','Value',jj/length(IOS_animalIDs));
 end
 %% fin.
 disp('Loading analysis results and generating figures...'); disp(' ')
