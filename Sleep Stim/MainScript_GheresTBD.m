@@ -23,7 +23,7 @@ end
 % add root folder to Matlab's working directory.
 addpath(genpath(rootFolder))
 %% run the data analysis. The progress bars will show the analysis progress.
-rerunAnalysis = 'n';
+rerunAnalysis = 'y';
 if exist('AnalysisResults_Gheres.mat') ~= 2 || strcmp(rerunAnalysis,'y') == true
     multiWaitbar_GheresTBD('Analyzing evoked responses',0,'Color','G'); pause(0.25);
     % run analysis and output a structure containing all the analyzed data.
@@ -50,8 +50,8 @@ function [AnalysisResults] = AnalyzeData_Manuscript2020(rootFolder)
 % IOS animal IDs
 IOS_animalIDs = {'T99','T101','T102','T103','T105','T108','T109','T110','T111','T119','T120','T121','T122','T123'};
 % Two photon animal IDs
-if exist('AnalysisResults_Gheres.mat') == 2
-    load('AnalysisResults_Gheres.mat')
+if exist('AnalysisResults.mat') == 2
+    load('AnalysisResults.mat')
 else
     AnalysisResults = [];
 end
