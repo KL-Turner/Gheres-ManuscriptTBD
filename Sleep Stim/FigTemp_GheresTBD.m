@@ -92,18 +92,18 @@ summaryFigure = figure('Name','Fig'); %#ok<*NASGU>
 % sgtitle('EMG vs. Whisking behaviors')
 %% [] ShortWhisks whisks cortical MUA
 ax1 = subplot(2,3,1);
-plot(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanCortMUA,'-','color',colors_Manuscript2020('rich black'),'LineWidth',1);
+plot(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanCortMUA,'-','color',colors_GT('rich black'),'LineWidth',1);
 hold on
-plot(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanCortMUA + data.ShortWhisks.stdCortMUA,'-','color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanCortMUA - data.ShortWhisks.stdCortMUA,'-','color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanCortMUA + data.ShortWhisks.stdCortMUA,'-','color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanCortMUA - data.ShortWhisks.stdCortMUA,'-','color',colors_GT('battleship grey'),'LineWidth',0.5)
 xline(0,'color','k','LineWidth',2);
 ylabel('\DeltaP/P (%)')
 ylim([-15,30])
 yyaxis right
-semilogy(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanEMG,'-','color',colors_Manuscript2020('deep carrot orange'),'LineWidth',1);
+semilogy(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanEMG,'-','color',colors_GT('deep carrot orange'),'LineWidth',1);
 hold on
-semilogy(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanEMG + data.IntermediateWhisks.stdEMG,'-','color',colors_Manuscript2020('carrot orange'),'LineWidth',0.5)
-semilogy(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanEMG - data.IntermediateWhisks.stdEMG,'-','color',colors_Manuscript2020('carrot orange'),'LineWidth',0.5)
+semilogy(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanEMG + data.IntermediateWhisks.stdEMG,'-','color',colors_GT('carrot orange'),'LineWidth',0.5)
+semilogy(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanEMG - data.IntermediateWhisks.stdEMG,'-','color',colors_GT('carrot orange'),'LineWidth',0.5)
 ylabel('EMG power (a.u.)','rotation',-90,'VerticalAlignment','bottom')
 title('Brief whisk cortical MUA/EMG')
 xlabel('Peri-whisk time (s)')
@@ -111,23 +111,23 @@ axis square
 xlim([-2,10])
 ylim([0,1.5])
 set(gca,'box','off')
-ax1.YAxis(1).Color = colors_Manuscript2020('rich black');
-ax1.YAxis(2).Color = colors_Manuscript2020('deep carrot orange');
+ax1.YAxis(1).Color = colors_GT('rich black');
+ax1.YAxis(2).Color = colors_GT('deep carrot orange');
 ax1.TickLength = [0.03,0.03];
 %% [] IntermediateWhisks whisks cortical MUA
 ax2 = subplot(2,3,2);
-plot(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanCortMUA,'-','color',colors_Manuscript2020('rich black'),'LineWidth',1);
+plot(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanCortMUA,'-','color',colors_GT('rich black'),'LineWidth',1);
 hold on
-plot(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanCortMUA + data.IntermediateWhisks.stdCortMUA,'-','color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanCortMUA - data.IntermediateWhisks.stdCortMUA,'-','color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanCortMUA + data.IntermediateWhisks.stdCortMUA,'-','color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanCortMUA - data.IntermediateWhisks.stdCortMUA,'-','color',colors_GT('battleship grey'),'LineWidth',0.5)
 xline(0,'color','k','LineWidth',2);
 ylabel('\DeltaP/P (%)')
 ylim([-15,30])
 yyaxis right
-semilogy(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanEMG,'-','color',colors_Manuscript2020('deep carrot orange'),'LineWidth',1);
+semilogy(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanEMG,'-','color',colors_GT('deep carrot orange'),'LineWidth',1);
 hold on
-semilogy(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanEMG + data.IntermediateWhisks.stdEMG,'-','color',colors_Manuscript2020('carrot orange'),'LineWidth',0.5)
-semilogy(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanEMG - data.IntermediateWhisks.stdEMG,'-','color',colors_Manuscript2020('carrot orange'),'LineWidth',0.5)
+semilogy(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanEMG + data.IntermediateWhisks.stdEMG,'-','color',colors_GT('carrot orange'),'LineWidth',0.5)
+semilogy(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanEMG - data.IntermediateWhisks.stdEMG,'-','color',colors_GT('carrot orange'),'LineWidth',0.5)
 ylabel('EMG power (a.u.)','rotation',-90,'VerticalAlignment','bottom')
 title('Moderate whisk cortical MUA/EMG')
 xlabel('Peri-whisk time (s)')
@@ -135,23 +135,23 @@ axis square
 xlim([-2,10])
 ylim([0,1.5])
 set(gca,'box','off')
-ax2.YAxis(1).Color = colors_Manuscript2020('rich black');
-ax2.YAxis(2).Color = colors_Manuscript2020('deep carrot orange');
+ax2.YAxis(1).Color = colors_GT('rich black');
+ax2.YAxis(2).Color = colors_GT('deep carrot orange');
 ax2.TickLength = [0.03,0.03];
 %% [] LongWhisks whisks cortical MUA
 ax3 = subplot(2,3,3);
-plot(data.LongWhisks.meanTimeVector,data.LongWhisks.meanCortMUA,'-','color',colors_Manuscript2020('rich black'),'LineWidth',1);
+plot(data.LongWhisks.meanTimeVector,data.LongWhisks.meanCortMUA,'-','color',colors_GT('rich black'),'LineWidth',1);
 hold on
-plot(data.LongWhisks.meanTimeVector,data.LongWhisks.meanCortMUA + data.LongWhisks.stdCortMUA,'-','color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.LongWhisks.meanTimeVector,data.LongWhisks.meanCortMUA - data.LongWhisks.stdCortMUA,'-','color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.LongWhisks.meanTimeVector,data.LongWhisks.meanCortMUA + data.LongWhisks.stdCortMUA,'-','color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.LongWhisks.meanTimeVector,data.LongWhisks.meanCortMUA - data.LongWhisks.stdCortMUA,'-','color',colors_GT('battleship grey'),'LineWidth',0.5)
 xline(0,'color','k','LineWidth',2);
 ylabel('\DeltaP/P (%)')
 ylim([-15,30])
 yyaxis right
-semilogy(data.LongWhisks.meanTimeVector,data.LongWhisks.meanEMG,'-','color',colors_Manuscript2020('deep carrot orange'),'LineWidth',1);
+semilogy(data.LongWhisks.meanTimeVector,data.LongWhisks.meanEMG,'-','color',colors_GT('deep carrot orange'),'LineWidth',1);
 hold on
-semilogy(data.LongWhisks.meanTimeVector,data.LongWhisks.meanEMG + data.LongWhisks.stdEMG,'-','color',colors_Manuscript2020('carrot orange'),'LineWidth',0.5)
-semilogy(data.LongWhisks.meanTimeVector,data.LongWhisks.meanEMG - data.LongWhisks.stdEMG,'-','color',colors_Manuscript2020('carrot orange'),'LineWidth',0.5)
+semilogy(data.LongWhisks.meanTimeVector,data.LongWhisks.meanEMG + data.LongWhisks.stdEMG,'-','color',colors_GT('carrot orange'),'LineWidth',0.5)
+semilogy(data.LongWhisks.meanTimeVector,data.LongWhisks.meanEMG - data.LongWhisks.stdEMG,'-','color',colors_GT('carrot orange'),'LineWidth',0.5)
 ylabel('EMG power (a.u.)','rotation',-90,'VerticalAlignment','bottom')
 title('Extended whisk cortical MUA/EMG')
 xlabel('Peri-whisk time (s)')
@@ -159,23 +159,23 @@ axis square
 xlim([-2,10])
 ylim([0,1.5])
 set(gca,'box','off')
-ax3.YAxis(1).Color = colors_Manuscript2020('rich black');
-ax3.YAxis(2).Color = colors_Manuscript2020('deep carrot orange');
+ax3.YAxis(1).Color = colors_GT('rich black');
+ax3.YAxis(2).Color = colors_GT('deep carrot orange');
 ax3.TickLength = [0.03,0.03];
 %% [] Short whisks HbT
 ax4 = subplot(2,3,4);
-plot(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanHbT,'-','color',colors_Manuscript2020('rich black'),'LineWidth',1);
+plot(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanHbT,'-','color',colors_GT('rich black'),'LineWidth',1);
 hold on
-plot(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanHbT + data.ShortWhisks.stdHbT,'-','color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanHbT - data.ShortWhisks.stdHbT,'-','color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanHbT + data.ShortWhisks.stdHbT,'-','color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanHbT - data.ShortWhisks.stdHbT,'-','color',colors_GT('battleship grey'),'LineWidth',0.5)
 xline(0,'color','k','LineWidth',2);
 ylabel('\Delta[HbT] (\muM)')
 ylim([-5,20])
 yyaxis right
-semilogy(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanEMG,'-','color',colors_Manuscript2020('deep carrot orange'),'LineWidth',1);
+semilogy(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanEMG,'-','color',colors_GT('deep carrot orange'),'LineWidth',1);
 hold on
-semilogy(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanEMG + data.ShortWhisks.stdEMG,'-','color',colors_Manuscript2020('carrot orange'),'LineWidth',0.5)
-semilogy(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanEMG - data.ShortWhisks.stdEMG,'-','color',colors_Manuscript2020('carrot orange'),'LineWidth',0.5)
+semilogy(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanEMG + data.ShortWhisks.stdEMG,'-','color',colors_GT('carrot orange'),'LineWidth',0.5)
+semilogy(data.ShortWhisks.meanTimeVector,data.ShortWhisks.meanEMG - data.ShortWhisks.stdEMG,'-','color',colors_GT('carrot orange'),'LineWidth',0.5)
 ylabel('EMG power (a.u.)','rotation',-90,'VerticalAlignment','bottom')
 title('Brief whisk \Delta[HbT]/EMG')
 xlabel('Peri-whisk time (s)')
@@ -183,23 +183,23 @@ axis square
 xlim([-2,10])
 ylim([0,1.5])
 set(gca,'box','off')
-ax4.YAxis(1).Color = colors_Manuscript2020('rich black');
-ax4.YAxis(2).Color = colors_Manuscript2020('deep carrot orange');
+ax4.YAxis(1).Color = colors_GT('rich black');
+ax4.YAxis(2).Color = colors_GT('deep carrot orange');
 ax4.TickLength = [0.03,0.03];
 %% [] Intermediate whisks HbT
 ax5 = subplot(2,3,5);
-plot(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanHbT,'-','color',colors_Manuscript2020('rich black'),'LineWidth',1);
+plot(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanHbT,'-','color',colors_GT('rich black'),'LineWidth',1);
 hold on
-plot(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanHbT + data.IntermediateWhisks.stdHbT,'-','color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanHbT - data.IntermediateWhisks.stdHbT,'-','color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanHbT + data.IntermediateWhisks.stdHbT,'-','color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanHbT - data.IntermediateWhisks.stdHbT,'-','color',colors_GT('battleship grey'),'LineWidth',0.5)
 xline(0,'color','k','LineWidth',2);
 ylabel('\Delta[HbT] (\muM)')
 ylim([-5,20])
 yyaxis right
-semilogy(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanEMG,'-','color',colors_Manuscript2020('deep carrot orange'),'LineWidth',1);
+semilogy(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanEMG,'-','color',colors_GT('deep carrot orange'),'LineWidth',1);
 hold on
-semilogy(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanEMG + data.IntermediateWhisks.stdEMG,'-','color',colors_Manuscript2020('carrot orange'),'LineWidth',0.5)
-semilogy(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanEMG - data.IntermediateWhisks.stdEMG,'-','color',colors_Manuscript2020('carrot orange'),'LineWidth',0.5)
+semilogy(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanEMG + data.IntermediateWhisks.stdEMG,'-','color',colors_GT('carrot orange'),'LineWidth',0.5)
+semilogy(data.IntermediateWhisks.meanTimeVector,data.IntermediateWhisks.meanEMG - data.IntermediateWhisks.stdEMG,'-','color',colors_GT('carrot orange'),'LineWidth',0.5)
 ylabel('EMG power (a.u.)','rotation',-90,'VerticalAlignment','bottom')
 title('Moderate whisk \Delta[HbT]/EMG')
 xlabel('Peri-whisk time (s)')
@@ -207,23 +207,23 @@ axis square
 xlim([-2,10])
 ylim([0,1.5])
 set(gca,'box','off')
-ax5.YAxis(1).Color = colors_Manuscript2020('rich black');
-ax5.YAxis(2).Color = colors_Manuscript2020('deep carrot orange');
+ax5.YAxis(1).Color = colors_GT('rich black');
+ax5.YAxis(2).Color = colors_GT('deep carrot orange');
 ax5.TickLength = [0.03,0.03];
 %% [] Long whisks HbT
 ax6 = subplot(2,3,6);
-plot(data.LongWhisks.meanTimeVector,data.LongWhisks.meanHbT,'-','color',colors_Manuscript2020('rich black'),'LineWidth',1);
+plot(data.LongWhisks.meanTimeVector,data.LongWhisks.meanHbT,'-','color',colors_GT('rich black'),'LineWidth',1);
 hold on
-plot(data.LongWhisks.meanTimeVector,data.LongWhisks.meanHbT + data.LongWhisks.stdHbT,'-','color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.LongWhisks.meanTimeVector,data.LongWhisks.meanHbT - data.LongWhisks.stdHbT,'-','color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.LongWhisks.meanTimeVector,data.LongWhisks.meanHbT + data.LongWhisks.stdHbT,'-','color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.LongWhisks.meanTimeVector,data.LongWhisks.meanHbT - data.LongWhisks.stdHbT,'-','color',colors_GT('battleship grey'),'LineWidth',0.5)
 xline(0,'color','k','LineWidth',2);
 ylabel('\Delta[HbT] (\muM)')
 ylim([-5,20])
 yyaxis right
-semilogy(data.LongWhisks.meanTimeVector,data.LongWhisks.meanEMG,'-','color',colors_Manuscript2020('deep carrot orange'),'LineWidth',1);
+semilogy(data.LongWhisks.meanTimeVector,data.LongWhisks.meanEMG,'-','color',colors_GT('deep carrot orange'),'LineWidth',1);
 hold on
-semilogy(data.LongWhisks.meanTimeVector,data.LongWhisks.meanEMG + data.LongWhisks.stdEMG,'-','color',colors_Manuscript2020('carrot orange'),'LineWidth',0.5)
-semilogy(data.LongWhisks.meanTimeVector,data.LongWhisks.meanEMG - data.LongWhisks.stdEMG,'-','color',colors_Manuscript2020('carrot orange'),'LineWidth',0.5)
+semilogy(data.LongWhisks.meanTimeVector,data.LongWhisks.meanEMG + data.LongWhisks.stdEMG,'-','color',colors_GT('carrot orange'),'LineWidth',0.5)
+semilogy(data.LongWhisks.meanTimeVector,data.LongWhisks.meanEMG - data.LongWhisks.stdEMG,'-','color',colors_GT('carrot orange'),'LineWidth',0.5)
 ylabel('EMG power (a.u.)','rotation',-90,'VerticalAlignment','bottom')
 title('Extended whisk \Delta[HbT]/EMG')
 xlabel('Peri-whisk time (s)')
@@ -231,8 +231,8 @@ axis square
 xlim([-2,10])
 ylim([0,1.5])
 set(gca,'box','off')
-ax6.YAxis(1).Color = colors_Manuscript2020('rich black');
-ax6.YAxis(2).Color = colors_Manuscript2020('deep carrot orange');
+ax6.YAxis(1).Color = colors_GT('rich black');
+ax6.YAxis(2).Color = colors_GT('deep carrot orange');
 ax6.TickLength = [0.03,0.03];
 %% axes positions
 % %% save figure(s)

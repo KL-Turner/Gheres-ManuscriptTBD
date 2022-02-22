@@ -143,10 +143,10 @@ summaryFigure = figure('Name','FigS3 (a-r)'); %#ok<*NASGU>
 sgtitle('REM Stimulation')
 %% [S3a] Cortical MUA Contra Stim
 ax1 = subplot(6,3,1);
-plot(data.Contra.mean_timeVector,data.Contra.mean_CortMUA,'color',colors_Manuscript2020('rich black'),'LineWidth',1);
+plot(data.Contra.mean_timeVector,data.Contra.mean_CortMUA,'color',colors_GT('rich black'),'LineWidth',1);
 hold on
-plot(data.Contra.mean_timeVector,data.Contra.mean_CortMUA + data.Contra.std_CortMUA,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.Contra.mean_timeVector,data.Contra.mean_CortMUA - data.Contra.std_CortMUA,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.Contra.mean_timeVector,data.Contra.mean_CortMUA + data.Contra.std_CortMUA,'color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.Contra.mean_timeVector,data.Contra.mean_CortMUA - data.Contra.std_CortMUA,'color',colors_GT('battleship grey'),'LineWidth',0.5)
 title('[S3a] Contra stim cortical MUA')
 ylabel('\DeltaP/P (%)')
 xlabel('Peri-stimulus time (s)')
@@ -155,10 +155,10 @@ set(gca,'box','off')
 ax1.TickLength = [0.03,0.03];
 %% [S3b] Cortical MUA Ispi Stim
 ax2 = subplot(6,3,2);
-plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_CortMUA,'color',colors_Manuscript2020('rich black'),'LineWidth',1)
+plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_CortMUA,'color',colors_GT('rich black'),'LineWidth',1)
 hold on
-plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_CortMUA + data.Ipsi.std_CortMUA,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_CortMUA - data.Ipsi.std_CortMUA,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_CortMUA + data.Ipsi.std_CortMUA,'color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_CortMUA - data.Ipsi.std_CortMUA,'color',colors_GT('battleship grey'),'LineWidth',0.5)
 title('[S3b] Ipsi stim cortical MUA')
 ylabel('\DeltaP/P (%)')
 xlabel('Peri-stimulus time (s)')
@@ -167,10 +167,10 @@ set(gca,'box','off')
 ax2.TickLength = [0.03,0.03];
 %% [S3c] Cortical MUA Auditory Stim
 ax3 = subplot(6,3,3);
-plot(data.Auditory.mean_timeVector,data.Auditory.mean_CortMUA,'color',colors_Manuscript2020('rich black'),'LineWidth',1)
+plot(data.Auditory.mean_timeVector,data.Auditory.mean_CortMUA,'color',colors_GT('rich black'),'LineWidth',1)
 hold on
-plot(data.Auditory.mean_timeVector,data.Auditory.mean_CortMUA + data.Auditory.std_CortMUA,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.Auditory.mean_timeVector,data.Auditory.mean_CortMUA - data.Auditory.std_CortMUA,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.Auditory.mean_timeVector,data.Auditory.mean_CortMUA + data.Auditory.std_CortMUA,'color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.Auditory.mean_timeVector,data.Auditory.mean_CortMUA - data.Auditory.std_CortMUA,'color',colors_GT('battleship grey'),'LineWidth',0.5)
 title('[S3c] Aud stim cortical MUA')
 ylabel('\DeltaP/P (%)')
 xlabel('Peri-stimulus time (s)')
@@ -218,10 +218,10 @@ set(gca,'box','off')
 ax6.TickLength = [0.03,0.03];
 %% [S3g] Hippocampal MUA Contra Stim
 ax7 = subplot(6,3,7);
-plot(data.Contra.mean_timeVector,data.Contra.mean_HipMUA,'color',colors_Manuscript2020('rich black'),'LineWidth',1)
+plot(data.Contra.mean_timeVector,data.Contra.mean_HipMUA,'color',colors_GT('rich black'),'LineWidth',1)
 hold on
-plot(data.Contra.mean_timeVector,data.Contra.mean_HipMUA + data.Contra.std_HipMUA,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.Contra.mean_timeVector,data.Contra.mean_HipMUA - data.Contra.std_HipMUA,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.Contra.mean_timeVector,data.Contra.mean_HipMUA + data.Contra.std_HipMUA,'color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.Contra.mean_timeVector,data.Contra.mean_HipMUA - data.Contra.std_HipMUA,'color',colors_GT('battleship grey'),'LineWidth',0.5)
 title('[S3g] Contra stim hippocampal MUA')
 ylabel('\DeltaP/P (%)')
 xlabel('Peri-stimulus time (s)')
@@ -230,10 +230,10 @@ set(gca,'box','off')
 ax7.TickLength = [0.03,0.03];
 %% [S3h] Hippocampal MUA Ispi Stim
 ax8 = subplot(6,3,8);
-plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_HipMUA,'color',colors_Manuscript2020('rich black'),'LineWidth',1)
+plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_HipMUA,'color',colors_GT('rich black'),'LineWidth',1)
 hold on
-plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_HipMUA + data.Ipsi.std_HipMUA,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_HipMUA - data.Ipsi.std_HipMUA,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_HipMUA + data.Ipsi.std_HipMUA,'color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_HipMUA - data.Ipsi.std_HipMUA,'color',colors_GT('battleship grey'),'LineWidth',0.5)
 title('[S3h] Ipsi stim hippocampal MUA')
 ylabel('\DeltaP/P (%)')
 xlabel('Peri-stimulus time (s)')
@@ -242,10 +242,10 @@ set(gca,'box','off')
 ax8.TickLength = [0.03,0.03];
 %% [S3i] Hippocampal MUA Auditory Stim
 ax9 = subplot(6,3,9);
-plot(data.Auditory.mean_timeVector,data.Auditory.mean_HipMUA,'color',colors_Manuscript2020('rich black'),'LineWidth',1)
+plot(data.Auditory.mean_timeVector,data.Auditory.mean_HipMUA,'color',colors_GT('rich black'),'LineWidth',1)
 hold on
-plot(data.Auditory.mean_timeVector,data.Auditory.mean_HipMUA + data.Auditory.std_HipMUA,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.Auditory.mean_timeVector,data.Auditory.mean_HipMUA - data.Auditory.std_HipMUA,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.Auditory.mean_timeVector,data.Auditory.mean_HipMUA + data.Auditory.std_HipMUA,'color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.Auditory.mean_timeVector,data.Auditory.mean_HipMUA - data.Auditory.std_HipMUA,'color',colors_GT('battleship grey'),'LineWidth',0.5)
 title('[S3i] Aud stim hippocampal MUA')
 ylabel('\DeltaP/P (%)')
 xlabel('Peri-stimulus time (s)')
@@ -293,10 +293,10 @@ set(gca,'box','off')
 ax12.TickLength = [0.03,0.03];
 %% [S3m] CBV HbT Contra Stim
 ax13 = subplot(6,3,13);
-plot(data.Contra.mean_timeVector,data.Contra.mean_HbT,'color',colors_Manuscript2020('rich black'),'LineWidth',1)
+plot(data.Contra.mean_timeVector,data.Contra.mean_HbT,'color',colors_GT('rich black'),'LineWidth',1)
 hold on
-plot(data.Contra.mean_timeVector,data.Contra.mean_HbT + data.Contra.std_HbT,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.Contra.mean_timeVector,data.Contra.mean_HbT - data.Contra.std_HbT,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.Contra.mean_timeVector,data.Contra.mean_HbT + data.Contra.std_HbT,'color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.Contra.mean_timeVector,data.Contra.mean_HbT - data.Contra.std_HbT,'color',colors_GT('battleship grey'),'LineWidth',0.5)
 title('[S3m] Contra stim \Delta[HbT] (\muM)')
 ylabel('\Delta[HbT] (\muM)')
 xlabel('Peri-stimulus time (s)')
@@ -305,10 +305,10 @@ set(gca,'box','off')
 ax13.TickLength = [0.03,0.03];
 %% [S3n] CBV HbT Ispi Stim
 ax14 = subplot(6,3,14);
-plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_HbT,'color',colors_Manuscript2020('rich black'),'LineWidth',1)
+plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_HbT,'color',colors_GT('rich black'),'LineWidth',1)
 hold on
-plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_HbT + data.Ipsi.std_HbT,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_HbT - data.Ipsi.std_HbT,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_HbT + data.Ipsi.std_HbT,'color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_HbT - data.Ipsi.std_HbT,'color',colors_GT('battleship grey'),'LineWidth',0.5)
 title('[S3n] Ipsi stim \Delta[HbT] (\muM)')
 ylabel('\Delta[HbT] (\muM)')
 xlabel('Peri-stimulus time (s)')
@@ -317,10 +317,10 @@ set(gca,'box','off')
 ax14.TickLength = [0.03,0.03];
 %% [S3o] CBV HbT Auditory Stim
 ax15 = subplot(6,3,15);
-plot(data.Auditory.mean_timeVector,data.Auditory.mean_HbT,'color',colors_Manuscript2020('rich black'),'LineWidth',1)
+plot(data.Auditory.mean_timeVector,data.Auditory.mean_HbT,'color',colors_GT('rich black'),'LineWidth',1)
 hold on
-plot(data.Auditory.mean_timeVector,data.Auditory.mean_HbT + data.Auditory.std_HbT,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.Auditory.mean_timeVector,data.Auditory.mean_HbT - data.Auditory.std_HbT,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.Auditory.mean_timeVector,data.Auditory.mean_HbT + data.Auditory.std_HbT,'color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.Auditory.mean_timeVector,data.Auditory.mean_HbT - data.Auditory.std_HbT,'color',colors_GT('battleship grey'),'LineWidth',0.5)
 title('[S3o] Aud stim \Delta[HbT] (\muM)')
 ylabel('\Delta[HbT] (\muM)')
 xlabel('Peri-stimulus time (s)')
@@ -329,10 +329,10 @@ set(gca,'box','off')
 ax15.TickLength = [0.03,0.03];
 %% [S3p] CBV Refl Contra Stim
 ax16 = subplot(6,3,16);
-plot(data.Contra.mean_timeVector,data.Contra.mean_CBV,'color',colors_Manuscript2020('rich black'),'LineWidth',1)
+plot(data.Contra.mean_timeVector,data.Contra.mean_CBV,'color',colors_GT('rich black'),'LineWidth',1)
 hold on
-plot(data.Contra.mean_timeVector,data.Contra.mean_CBV + data.Contra.std_CBV,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.Contra.mean_timeVector,data.Contra.mean_CBV - data.Contra.std_CBV,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.Contra.mean_timeVector,data.Contra.mean_CBV + data.Contra.std_CBV,'color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.Contra.mean_timeVector,data.Contra.mean_CBV - data.Contra.std_CBV,'color',colors_GT('battleship grey'),'LineWidth',0.5)
 title('[S3p] Contra stim reflectance')
 ylabel('\DeltaR/R (%)')
 xlabel('Peri-stimulus time (s)')
@@ -341,10 +341,10 @@ set(gca,'box','off')
 ax16.TickLength = [0.03,0.03];
 %% [S3q] CBV Refl Ispi Stim
 ax17 = subplot(6,3,17);
-plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_CBV,'color',colors_Manuscript2020('rich black'),'LineWidth',1)
+plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_CBV,'color',colors_GT('rich black'),'LineWidth',1)
 hold on
-plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_CBV + data.Ipsi.std_CBV,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_CBV - data.Ipsi.std_CBV,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_CBV + data.Ipsi.std_CBV,'color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.Ipsi.mean_timeVector,data.Ipsi.mean_CBV - data.Ipsi.std_CBV,'color',colors_GT('battleship grey'),'LineWidth',0.5)
 title('[S3q] Ipsi stim reflectance')
 ylabel('\DeltaR/R (%)')
 xlabel('Peri-stimulus time (s)')
@@ -353,10 +353,10 @@ set(gca,'box','off')
 ax17.TickLength = [0.03,0.03];
 %% [S3r] CBV Refl Auditory Stim
 ax18 = subplot(6,3,18);
-plot(data.Auditory.mean_timeVector,data.Auditory.mean_CBV,'color',colors_Manuscript2020('rich black'),'LineWidth',1)
+plot(data.Auditory.mean_timeVector,data.Auditory.mean_CBV,'color',colors_GT('rich black'),'LineWidth',1)
 hold on
-plot(data.Auditory.mean_timeVector,data.Auditory.mean_CBV + data.Auditory.std_CBV,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
-plot(data.Auditory.mean_timeVector,data.Auditory.mean_CBV - data.Auditory.std_CBV,'color',colors_Manuscript2020('battleship grey'),'LineWidth',0.5)
+plot(data.Auditory.mean_timeVector,data.Auditory.mean_CBV + data.Auditory.std_CBV,'color',colors_GT('battleship grey'),'LineWidth',0.5)
+plot(data.Auditory.mean_timeVector,data.Auditory.mean_CBV - data.Auditory.std_CBV,'color',colors_GT('battleship grey'),'LineWidth',0.5)
 title('[S3r] Aud stim reflectance')
 ylabel('\DeltaR/R (%)')
 xlabel('Peri-stimulus time (s)')

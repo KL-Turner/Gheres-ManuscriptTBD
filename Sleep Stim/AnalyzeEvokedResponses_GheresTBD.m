@@ -80,7 +80,7 @@ for aa = 1:length(dataTypes)
         elseif strcmp(whiskCriteriaName,'LongWhisks') == true
             WhiskCriteria = whiskCriteriaC;
         end
-        [whiskLogical] = FilterEvents_IOS_Manuscript2020(EventData.CBV_HbT.(dataType).whisk,WhiskCriteria);
+        [whiskLogical] = FilterEvents_GheresTBD(EventData.CBV_HbT.(dataType).whisk,WhiskCriteria);
         combWhiskLogical = logical(whiskLogical);
         [allWhiskHbTData] = EventData.CBV_HbT.(dataType).whisk.data(combWhiskLogical,:);
         [allWhiskCBVData] = EventData.CBV.(dataType).whisk.NormData(combWhiskLogical,:);
@@ -93,13 +93,13 @@ for aa = 1:length(dataTypes)
         [allWhiskEventTimes] = EventData.CBV_HbT.(dataType).whisk.eventTime(combWhiskLogical,:);
         allWhiskDurations = EventData.CBV_HbT.(dataType).whisk.duration(combWhiskLogical,:);
         % decimate the file list to only include those files that occur within the desired number of target minutes
-        [finalWhiskHbTData,finalWhiskFileIDs,~,finalWhiskFileEventTimes] = RemoveInvalidData_IOS_Manuscript2020(allWhiskHbTData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
-        [finalWhiskCBVData,~,~,~] = RemoveInvalidData_IOS_Manuscript2020(allWhiskCBVData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
-        [finalWhiskEMGData,~,~,~] = RemoveInvalidData_IOS_Manuscript2020(allWhiskEMGData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
-        [finalWhiskCorticalMUAData,~,~,~] = RemoveInvalidData_IOS_Manuscript2020(allWhiskCorticalMUAData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
-        [finalWhiskHippocampalMUAData,~,~,~] = RemoveInvalidData_IOS_Manuscript2020(allWhiskHippocampalMUAData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
-        [finalWhiskCorticalGamData,~,~,~] = RemoveInvalidData_IOS_Manuscript2020(allWhiskCorticalGamData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
-        [finalWhiskHippocampalGamData,~,~,~] = RemoveInvalidData_IOS_Manuscript2020(allWhiskHippocampalGamData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
+        [finalWhiskHbTData,finalWhiskFileIDs,~,finalWhiskFileEventTimes] = RemoveInvalidData_GheresTBD(allWhiskHbTData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
+        [finalWhiskCBVData,~,~,~] = RemoveInvalidData_GheresTBD(allWhiskCBVData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
+        [finalWhiskEMGData,~,~,~] = RemoveInvalidData_GheresTBD(allWhiskEMGData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
+        [finalWhiskCorticalMUAData,~,~,~] = RemoveInvalidData_GheresTBD(allWhiskCorticalMUAData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
+        [finalWhiskHippocampalMUAData,~,~,~] = RemoveInvalidData_GheresTBD(allWhiskHippocampalMUAData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
+        [finalWhiskCorticalGamData,~,~,~] = RemoveInvalidData_GheresTBD(allWhiskCorticalGamData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
+        [finalWhiskHippocampalGamData,~,~,~] = RemoveInvalidData_GheresTBD(allWhiskHippocampalGamData,allWhiskFileIDs,allWhiskDurations,allWhiskEventTimes,ManualDecisions);
         % lowpass filter each whisking event and mean-subtract by the first 2 seconds
         clear procWhiskHbTData procWhiskCBVData procWhiskEMGData procWhiskCorticalMUAData procWhiskHippocampalMUAData procWhiskCorticalGamData procWhiskHippocampalGamData finalWhiskStartTimes finalWhiskEndTimes finalWhiskFiles
         dd = 1;
@@ -112,7 +112,7 @@ for aa = 1:length(dataTypes)
                 whiskCBVarray = finalWhiskCBVData(cc,:);
                 whiskEMGarray = finalWhiskEMGData(cc,:);
                 fileID = finalWhiskFileIDs(cc,1);
-                strDay = ConvertDate_IOS_Manuscript2020(fileID{1,1}(1:6));
+                strDay = ConvertDate_GheresTBD(fileID{1,1}(1:6));
                 whiskCorticalMUAarray = finalWhiskCorticalMUAData(cc,:);
                 whiskHippocampalMUAarray = finalWhiskHippocampalMUAData(cc,:);
                 whiskCorticalGamArray = finalWhiskCorticalGamData(cc,:);
