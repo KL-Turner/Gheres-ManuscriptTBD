@@ -186,6 +186,7 @@ for aa = 1:length(dataTypes)
         meanWhiskCorticalS = mean(whiskCorticalZhold,3);
         meanWhiskHippocampalS = mean(whiskHippocampalZhold,3);
         % save results
+        AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).count = size(procWhiskHbTData,1);
         AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).CBV_HbT.HbT = meanWhiskHbTData;
         AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).CBV_HbT.HbTStD = stdWhiskHbTData;
         AnalysisResults.(animalID).EvokedAvgs.Whisk.(dataType).(whiskCriteriaName).CBV.CBV = meanWhiskCBVData;
@@ -336,7 +337,7 @@ for aa = 1:length(dataTypes)
                 meanStimCortS = mean(stimCortZhold,3);
                 meanStimHipS = mean(stimHipZhold,3);
                 % save results
-                AnalysisResults.(animalID).EvokedAvgs.(filterCategory).(dataType).(solenoid).count = size(procStimHipMUAData,1);
+                AnalysisResults.(animalID).EvokedAvgs.(filterCategory).(dataType).(solenoid).count = size(procStimHbTData,1);
                 AnalysisResults.(animalID).EvokedAvgs.(filterCategory).(dataType).(solenoid).CBV_HbT.HbT = meanStimHbTData;
                 AnalysisResults.(animalID).EvokedAvgs.(filterCategory).(dataType).(solenoid).CBV_HbT.HbTStD = stdStimHbTData;
                 AnalysisResults.(animalID).EvokedAvgs.(filterCategory).(dataType).(solenoid).CBV.CBV = meanStimCBVData;

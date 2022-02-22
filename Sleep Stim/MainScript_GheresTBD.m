@@ -33,14 +33,12 @@ else
     disp('Loading analysis results and generating figures...'); disp(' ')
     load('AnalysisResults_Gheres.mat')
 end
-saveFigs = 'y';
 %% supplemental figure panels
-[AnalysisResults] = FigS1_GheresTBD(rootFolder,saveFigs,AnalysisResults);
-[AnalysisResults] = FigS2_GheresTBD(rootFolder,saveFigs,AnalysisResults);
-[AnalysisResults] = FigS3_GheresTBD(rootFolder,saveFigs,AnalysisResults);
-Fig1_GheresTBD(rootFolder,saveFigs,AnalysisResults)
-%% fin.
-disp('MainScript Analysis - Complete'); disp(' ')
+[AnalysisResults] = FigS1_GheresTBD(rootFolder,'y',AnalysisResults);
+[AnalysisResults] = FigS2_GheresTBD(rootFolder,'y',AnalysisResults);
+[AnalysisResults] = FigS3_GheresTBD(rootFolder,'y',AnalysisResults);
+Fig1_GheresTBD(rootFolder,'y',AnalysisResults)
+
 end
 
 function [AnalysisResults] = AnalyzeData_Manuscript2020(rootFolder)
