@@ -388,6 +388,7 @@ set(ax10,'position',ax10Pos);
 set(ax11,'position',ax11Pos);
 set(ax12,'position',ax12Pos);
 % for main fig
+AnalysisResults.Awake.count = round(data.Contra.mean_Count);
 AnalysisResults.Awake.T = data.Contra.mean_T;
 AnalysisResults.Awake.F = data.Contra.mean_F;
 AnalysisResults.Awake.cortLFP = data.Contra.mean_CortS;

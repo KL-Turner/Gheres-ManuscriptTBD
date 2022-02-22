@@ -390,6 +390,7 @@ set(ax10,'position',ax10Pos);
 set(ax11,'position',ax11Pos);
 set(ax12,'position',ax12Pos);
 % for main fig
+AnalysisResults.REM.count = round(data.Contra.mean_Count);
 AnalysisResults.REM.T = data.Contra.mean_T;
 AnalysisResults.REM.F = data.Contra.mean_F;
 AnalysisResults.REM.cortLFP = data.Contra.mean_CortS;

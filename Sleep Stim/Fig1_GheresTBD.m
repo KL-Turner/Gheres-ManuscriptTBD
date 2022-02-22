@@ -129,6 +129,10 @@ ax5Pos(3:4) = ax6Pos(3:4);
 set(ax1,'position',ax1Pos);
 set(ax3,'position',ax3Pos);
 set(ax5,'position',ax5Pos);
+%% counts
+disp(['Awake stim count: ' num2str(AnalysisResults.Awake.count)]); disp(' ')
+disp(['NREM stim count: ' num2str(AnalysisResults.NREM.count)]); disp(' ')
+disp(['REM stim count: ' num2str(AnalysisResults.REM.count)]); disp(' ')
 %% save figure(s)
 if strcmp(saveFigs,'y') == true
     dirpath = [rootFolder '\Gheres Summary Figures and Structures\MATLAB Analysis Figures\'];

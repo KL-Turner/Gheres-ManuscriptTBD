@@ -43,8 +43,8 @@ end
 
 function [AnalysisResults] = AnalyzeData_Manuscript2020(rootFolder)
 animalIDs = {'T99','T101','T102','T103','T105','T108','T109','T110','T111','T119','T120','T121','T122','T123'};
-if exist('AnalysisResults.mat') == 2 %#ok<EXIST>
-    load('AnalysisResults.mat')
+if exist('AnalysisResults_Gheres.mat') == 2 %#ok<EXIST>
+    load('AnalysisResults_Gheres.mat')
 else
     AnalysisResults = [];
 end
