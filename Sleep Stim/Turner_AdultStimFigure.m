@@ -1,4 +1,4 @@
-function [AnalysisResults] = Fig1_GheresTBD(rootFolder,saveFigs,AnalysisResults)
+function [] = Turner_AdultStimFigure(rootFolder,saveFigs,AnalysisResults)
 %________________________________________________________________________________________________________________________
 % Written by Kevin L. Turner
 % The Pennsylvania State University, Dept. of Biomedical Engineering
@@ -12,7 +12,7 @@ animalIDs = {'T99','T101','T102','T103','T105','T108','T109','T110','T111','T119
 solenoidNames = {'LPadSol','RPadSol','AudSol'};
 compDataTypes = {'Ipsi','Contra','Auditory'};
 dataTypes = {'adjLH','adjRH'};
-arousalStates = {'Awake','NREM'};
+arousalStates = {'Awake','NREM','Together'};
 % cd through each animal's directory and extract the appropriate analysis results
 for aa = 1:length(animalIDs)
     animalID = animalIDs{1,aa};
@@ -76,7 +76,7 @@ for aa = 1:length(animalIDs)
     animalID = animalIDs{1,aa};
     for bb = 1:length(transitions)
         transition = transitions{1,bb};
-        data.(transition).HbT(aa,:) = AnalysisResults.(animalID).Transitions.(transition).HbT - mean(AnalysisResults.(animalID).Transitions.(transition).HbT);
+        data.(transition).HbT(aa,:) = AnalysisResults.(animalID).Transitions.(transition).HbT;
     end
 end
 % take average for each behavioral transition
@@ -85,7 +85,18 @@ for cc = 1:length(transitions)
     data.(transition).meanHbT = mean(data.(transition).HbT,1);
     data.(transition).stdHbT = std(data.(transition).HbT,0,1);
 end
-T1 = -30 + (1/30):(1/30):30;
+T1 = -26.5 + (1/30):(1/30):33.5;
+%% probability of peri-stimulus arousal state
+data.awakeProbability = []; data.awakeNumerics = []; data.asleepProbability = []; data.asleepNumerics = [];
+for aa  = 1:length(animalIDs)
+    animalID = animalIDs{1,aa};
+    data.awakeProbability = cat(1,data.awakeProbability,AnalysisResults.(animalID).Probability.awakeProbability);
+    data.asleepProbability = cat(1,data.asleepProbability,AnalysisResults.(animalID).Probability.asleepProbability);
+end
+data.meanAwakeProb = mean(data.awakeProbability,1);
+data.stdAwakeProb = std(data.awakeProbability,0,1);
+data.meanAsleepProb = mean(data.asleepProbability,1);
+data.stdAsleepProb = std(data.asleepProbability,0,1);
 %% Fig. 1
 summaryFigure = figure('Name','Gheres et al TBD');
 %% [1d] Comb states CBV HbT Contra Stim
@@ -97,20 +108,37 @@ plot(data.Awake.Contra.meanTimeVector,data.Awake.Contra.meanHbT - data.Awake.Con
 p2 = plot(data.NREM.Contra.meanTimeVector,data.NREM.Contra.meanHbT,'color',colors('sapphire'),'LineWidth',2);
 plot(data.NREM.Contra.meanTimeVector,data.NREM.Contra.meanHbT + data.NREM.Contra.stdHbT,'color',colors('sapphire'),'LineWidth',0.5)
 plot(data.NREM.Contra.meanTimeVector,data.NREM.Contra.meanHbT - data.NREM.Contra.stdHbT,'color',colors('sapphire'),'LineWidth',0.5)
-p3 = plot(T1,data.NREMtoAWAKE.meanHbT,'-','color',colors_eLife2020('royal purple'),'LineWidth',2);
+p3 = plot(T1,data.NREMtoAWAKE.meanHbT,'-','color',colors('royal purple'),'LineWidth',2);
 hold on
-plot(T1,data.NREMtoAWAKE.meanHbT + data.NREMtoAWAKE.stdHbT,'-','color',colors_eLife2020('royal purple'),'LineWidth',0.5)
-plot(T1,data.NREMtoAWAKE.meanHbT - data.NREMtoAWAKE.stdHbT,'-','color',colors_eLife2020('royal purple'),'LineWidth',0.5)
+plot(T1,data.NREMtoAWAKE.meanHbT + data.NREMtoAWAKE.stdHbT,'-','color',colors('royal purple'),'LineWidth',0.5)
+plot(T1,data.NREMtoAWAKE.meanHbT - data.NREMtoAWAKE.stdHbT,'-','color',colors('royal purple'),'LineWidth',0.5)
+p4 = plot(data.Together.Contra.meanTimeVector,data.Together.Contra.meanHbT,'color',colors('black'),'LineWidth',2);
+plot(data.Together.Contra.meanTimeVector,data.Together.Contra.meanHbT + data.Together.Contra.stdHbT,'color',colors('black'),'LineWidth',0.5)
+plot(data.Together.Contra.meanTimeVector,data.Together.Contra.meanHbT - data.Together.Contra.stdHbT,'color',colors('black'),'LineWidth',0.5)
 ylabel('\Delta[HbT] (\muM)')
-xlabel('Peri-stimulus time (s)')
-% xlim([-2,10])
-legend([p1,p2,p3],'Awake','NREM','NREM to Awake Transition')
+xlabel('Time (sec)')
+xlim([-5,15])
+legend([p1,p2,p3,p4],'Awake','NREM','NREM to Awake Transition','Unsorted Stimulus')
 axis square
 set(gca,'box','off')
 ax1.TickLength = [0.03,0.03];
 %% Probability of arousal during a stimulation
-subplot(1,2,2)
-
+ax2 = subplot(1,2,2);
+p1 = plot([-10,-5,0,5,10],data.meanAwakeProb,'color',colors('black'),'LineWidth',2);
+hold on
+% plot([-10,-5,0,5,10],data.meanAwakeProb + data.stdAwakeProb,'color',colors('black'),'LineWidth',0.5);
+% plot([-10,-5,0,5,10],data.meanAwakeProb - data.stdAwakeProb,'color',colors('black'),'LineWidth',0.5);
+p2 = plot([-10,-5,0,5,10],data.meanAsleepProb,'color',colors('candy apple red'),'LineWidth',2);
+% plot([-10,-5,0,5,10],data.meanAsleepProb + data.stdAsleepProb,'color',colors('candy apple red'),'LineWidth',0.5);
+% plot([-10,-5,0,5,10],data.meanAsleepProb - data.stdAsleepProb,'color',colors('candy apple red'),'LineWidth',0.5);
+ylabel('Probability of Arousal State')
+xlabel('Time (sec)')
+legend([p1,p2],'Awake','Asleep')
+ylim([0,1])
+axis square
+set(gca,'box','off')
+xticks([-10,-5,0,5,10])
+ax2.TickLength = [0.03,0.03];
 %% save figure(s)
 if strcmp(saveFigs,'y') == true
     dirpath = [rootFolder '\Gheres Summary Figures and Structures\MATLAB Analysis Figures\'];

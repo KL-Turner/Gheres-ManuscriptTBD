@@ -25,7 +25,7 @@ for a = 1:size(data,1)
             scoringLabels = ScoringResults.labels{b,1};
         end
     end
-    sleepBinNumber = ceil(startTime/5);
+    sleepBinNumber = ceil(startTime/5) - 1;
     eventState = scoringLabels(sleepBinNumber);
     % check that the event falls within appropriate bounds
     if strcmp(eventState,score) == true

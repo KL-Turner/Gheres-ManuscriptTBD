@@ -26,25 +26,23 @@ addpath(genpath(rootFolder))
 rerunAnalysis = 'y';
 if exist('AnalysisResults_Gheres.mat') ~= 2 || strcmp(rerunAnalysis,'y') == true %#ok<EXIST>
     multiWaitbar_GheresTBD('Analyzing evoked responses',0,'Color','G'); pause(0.25);
+    multiWaitbar_GheresTBD('Analyzing behavioral transitions',0,'Color','G'); pause(0.25);
+    multiWaitbar_GheresTBD('Analyzing peri-stimulus arousal probability',0,'Color','G'); pause(0.25);
     % run analysis and output a structure containing all the analyzed data.
     [AnalysisResults] = AnalyzeData_Manuscript2020(rootFolder);
     multiWaitbar_GheresTBD('CloseAll');
 else
     disp('Loading analysis results and generating figures...'); disp(' ')
-    load('AnalysisResults_Gheres.mat')
+    load('AnalysisResults.mat')
 end
-%% supplemental figure panels
-[AnalysisResults] = FigS1_GheresTBD(rootFolder,'y',AnalysisResults);
-[AnalysisResults] = FigS2_GheresTBD(rootFolder,'y',AnalysisResults);
-[AnalysisResults] = FigS3_GheresTBD(rootFolder,'y',AnalysisResults);
-Fig1_GheresTBD(rootFolder,'y',AnalysisResults)
-
+%% figure
+Turner_AdultStimFigure(rootFolder,'y',AnalysisResults)
 end
 
 function [AnalysisResults] = AnalyzeData_Manuscript2020(rootFolder)
 animalIDs = {'T99','T101','T102','T103','T105','T108','T109','T110','T111','T119','T120','T121','T122','T123'};
-if exist('AnalysisResults_Gheres.mat') == 2 %#ok<EXIST>
-    load('AnalysisResults_Gheres.mat')
+if exist('AnalysisResults.mat') == 2 %#ok<EXIST>
+    load('AnalysisResults.mat')
 else
     AnalysisResults = [];
 end
@@ -52,9 +50,24 @@ end
 runFromStart = 'n';
 for pp = 1:length(animalIDs)
     if isfield(AnalysisResults,(animalIDs{1,pp})) == false || isfield(AnalysisResults.(animalIDs{1,pp}),'EvokedAvgs') == false || strcmp(runFromStart,'y') == true
-        [AnalysisResults] = AnalyzeEvokedResponses_GheresTBD(animalIDs{1,pp},rootFolder,AnalysisResults);
+        [AnalysisResults] = AnalyzeEvokedResponses2_GheresTBD(animalIDs{1,pp},rootFolder,AnalysisResults);
     end
     multiWaitbar_GheresTBD('Analyzing evoked responses','Value',pp/length(animalIDs));
 end
-
+%% Block [2] Analyze the transitions between different arousal-states (IOS)
+runFromStart = 'n';
+for dd = 1:length(animalIDs)
+    if isfield(AnalysisResults,(animalIDs{1,dd})) == false || isfield(AnalysisResults.(animalIDs{1,dd}),'Transitions') == false || strcmp(runFromStart,'y') == true
+        [AnalysisResults] = AnalyzeTransitionalAverages_GheresTBD(animalIDs{1,dd},rootFolder,AnalysisResults);
+    end
+    multiWaitbar_eLife2020('Analyzing behavioral transitions','Value',dd/length(animalIDs));
+end
+%% Block [3] Analyze the peri-stimulus arousal state (IOS)
+runFromStart = 'n';
+for dd = 1:length(animalIDs)
+    if isfield(AnalysisResults,(animalIDs{1,dd})) == false || isfield(AnalysisResults.(animalIDs{1,dd}),'Probability') == false || strcmp(runFromStart,'y') == true
+        [AnalysisResults] = AnalyzeStimulusArousalProbability_GheresTBD(animalIDs{1,dd},rootFolder,AnalysisResults);
+    end
+    multiWaitbar_eLife2020('Analyzing peri-stimulus arousal probability','Value',dd/length(animalIDs));
+end
 end

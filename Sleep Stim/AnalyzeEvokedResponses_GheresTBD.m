@@ -230,7 +230,7 @@ for aa = 1:length(dataTypes)
         [allStimFileIDs] = EventData.CBV_HbT.(dataType).stim.fileIDs(allStimFilter,:);
         [allStimEventTimes] = EventData.CBV_HbT.(dataType).stim.eventTime(allStimFilter,:);
         allStimDurations = zeros(length(allStimEventTimes),1);
-        FilterCategories = {'Awake','NREM','REM'};
+        FilterCategories = {'Awake','NREM','REM','AwakeNREM'};
         for cc = 1:length(FilterCategories)
             filterCategory = FilterCategories{1,cc};
             if strcmp(filterCategory,'Awake') == true
@@ -241,12 +241,8 @@ for aa = 1:length(dataTypes)
                 [finalStimHipMUAData,~,~,~] = RemoveInvalidData_GheresTBD(allStimHipMUAData,allStimFileIDs,allStimDurations,allStimEventTimes,ManualDecisions);
                 [finalStimCortGamData,~,~,~] = RemoveInvalidData_GheresTBD(allStimCortGamData,allStimFileIDs,allStimDurations,allStimEventTimes,ManualDecisions);
                 [finalStimHipGamData,~,~,~] = RemoveInvalidData_GheresTBD(allStimHipGamData,allStimFileIDs,allStimDurations,allStimEventTimes,ManualDecisions);
-            else
-                if strcmp(filterCategory,'NREM') == true
-                    score = 'NREM Sleep';
-                elseif strcmp(filterCategory,'REM') == true
-                    score = 'REM Sleep';
-                end
+            elseif strcmp(filterCategory,'NREM') == true
+                score = 'NREM Sleep';
                 % decimate the file list to only include those files that occur within the desired number of target minutes
                 [finalStimHbTData,finalStimFileIDs,~,finalStimFileEventTimes] = KeepSleepData_GheresTBD(allStimHbTData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
                 [finalStimCBVData,~,~,~] = KeepSleepData_GheresTBD(allStimCBVData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
@@ -254,6 +250,19 @@ for aa = 1:length(dataTypes)
                 [finalStimHipMUAData,~,~,~] = KeepSleepData_GheresTBD(allStimHipMUAData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
                 [finalStimCortGamData,~,~,~] = KeepSleepData_GheresTBD(allStimCortGamData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
                 [finalStimHipGamData,~,~,~] = KeepSleepData_GheresTBD(allStimHipGamData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
+            elseif strcmp(filterCategory,'REM') == true
+                score = 'REM Sleep';
+                % decimate the file list to only include those files that occur within the desired number of target minutes
+                [finalStimHbTData,finalStimFileIDs,~,finalStimFileEventTimes] = KeepSleepData_GheresTBD(allStimHbTData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
+                [finalStimCBVData,~,~,~] = KeepSleepData_GheresTBD(allStimCBVData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
+                [finalStimCortMUAData,~,~,~] = KeepSleepData_GheresTBD(allStimCortMUAData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
+                [finalStimHipMUAData,~,~,~] = KeepSleepData_GheresTBD(allStimHipMUAData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
+                [finalStimCortGamData,~,~,~] = KeepSleepData_GheresTBD(allStimCortGamData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
+                [finalStimHipGamData,~,~,~] = KeepSleepData_GheresTBD(allStimHipGamData,allStimFileIDs,allStimDurations,allStimEventTimes,ScoringResults,score);
+            elseif strcmp(filterCategory,'AwakeNREM') == true
+                
+
+
             end
             % lowpass filter each whisking event and mean-subtract by the first 2 seconds
             clear procStimHbTData procStimCBVData procStimCortMUAData procStimHipMUAData procStimCortGamData procStimHipGamData finalStimStartTimes finalStimEndTimes finalStimFiles
@@ -362,5 +371,5 @@ for aa = 1:length(dataTypes)
     end
 end
 cd(rootFolder)
-save('AnalysisResults_Gheres.mat','AnalysisResults')
+save('AnalysisResults.mat','AnalysisResults')
 end
