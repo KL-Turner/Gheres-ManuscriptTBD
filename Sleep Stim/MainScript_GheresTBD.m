@@ -24,7 +24,7 @@ end
 addpath(genpath(rootFolder))
 %% run the data analysis. The progress bars will show the analysis progress.
 rerunAnalysis = 'y';
-if exist('AnalysisResults_Gheres.mat') ~= 2 || strcmp(rerunAnalysis,'y') == true %#ok<EXIST>
+if exist('AnalysisResults.mat') ~= 2 || strcmp(rerunAnalysis,'y') == true %#ok<EXIST>
     multiWaitbar_GheresTBD('Analyzing evoked responses',0,'Color','G'); pause(0.25);
     multiWaitbar_GheresTBD('Analyzing behavioral transitions',0,'Color','G'); pause(0.25);
     multiWaitbar_GheresTBD('Analyzing peri-stimulus arousal probability',0,'Color','G'); pause(0.25);
@@ -60,7 +60,7 @@ for dd = 1:length(animalIDs)
     if isfield(AnalysisResults,(animalIDs{1,dd})) == false || isfield(AnalysisResults.(animalIDs{1,dd}),'Transitions') == false || strcmp(runFromStart,'y') == true
         [AnalysisResults] = AnalyzeTransitionalAverages_GheresTBD(animalIDs{1,dd},rootFolder,AnalysisResults);
     end
-    multiWaitbar_eLife2020('Analyzing behavioral transitions','Value',dd/length(animalIDs));
+    multiWaitbar_GheresTBD('Analyzing behavioral transitions','Value',dd/length(animalIDs));
 end
 %% Block [3] Analyze the peri-stimulus arousal state (IOS)
 runFromStart = 'n';
@@ -68,6 +68,6 @@ for dd = 1:length(animalIDs)
     if isfield(AnalysisResults,(animalIDs{1,dd})) == false || isfield(AnalysisResults.(animalIDs{1,dd}),'Probability') == false || strcmp(runFromStart,'y') == true
         [AnalysisResults] = AnalyzeStimulusArousalProbability_GheresTBD(animalIDs{1,dd},rootFolder,AnalysisResults);
     end
-    multiWaitbar_eLife2020('Analyzing peri-stimulus arousal probability','Value',dd/length(animalIDs));
+    multiWaitbar_GheresTBD('Analyzing peri-stimulus arousal probability','Value',dd/length(animalIDs));
 end
 end
